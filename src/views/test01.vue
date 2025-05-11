@@ -143,12 +143,6 @@
   background-color: #f8f9fa;
   color: #333;
   line-height: 1.6;
-
-  /* 아래 세 줄을 추가/수정하세요 */
-  width: 100%;
-  max-width: 1200px;   /* 페이지 중앙 영역의 최대 너비 (원하는 값으로 조정) */
-  margin: 0 auto;      /* 좌우 여백 자동, 중앙 정렬 */
-  padding: 0 20px;     /* 뷰포트가 작아졌을 때 양옆 여백 (선택) */
 }
 
 /* 상단 메뉴바 스타일 */
