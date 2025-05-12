@@ -1,132 +1,241 @@
 <template>
-  <div class="trip-website">
-    <!-- 상단 메뉴바 -->
-    <nav class="menu-bar">
-      <div class="site-title">
-        <h1>Trip</h1>
+  <div class="travel-container">
+    <!-- 헤더 -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">T</span>ravel
       </div>
       <div class="menu-items">
-        <a href="#" class="menu-link">Travel Info</a>
-        <a href="#" class="menu-link">AI Recommendation</a>
-        <a href="#" class="menu-link">Travel Plan</a>
-        <a href="#" class="menu-link">Community</a>
+        <a href="#" class="menu-link active">Home</a>
+        <a href="#" class="menu-link">Our Tours</a>
+        <a href="#" class="menu-link">Reviews</a>
+        <a href="#" class="menu-link contact-btn">Contact Us</a>
       </div>
-      <div class="login-section">
-        <a href="#" class="login-button">
-          <div class="profile-icon"></div>
-        </a>
-      </div>
-    </nav>
+    </header>
 
-    <!-- 메인 배너 영역 -->
-    <div class="main-banner">
-      <div class="banner-content">
-        <h2 class="banner-title">AI Companion Travel</h2>
-        <button class="start-button">Get Started</button>
-      </div>
-    </div>
+    <!-- 히어로 섹션 -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <p class="hero-subtitle">The vacation you deserve is closer than you think 🤔</p>
+        <h1 class="hero-title">
+          Life is short <br> 
+          and the world 🌎<br>
+          is Wide! 🌴
+        </h1>
 
-    <!-- 여행지 추천 섹션 -->
-    <section class="recommendation-section">
-      <h3 class="section-title">Recommended Destinations</h3>
+        <!-- 검색 바 -->
+        <div class="search-bar">
+          <div class="search-item">
+            <div class="search-label">
+              <span class="icon">📍</span>
+              Location
+            </div>
+            <div class="search-value">Manali, India</div>
+          </div>
+          <div class="search-divider"></div>
+          <div class="search-item">
+            <div class="search-label">
+              <span class="icon">📅</span>
+              Date
+            </div>
+            <div class="search-value">26 Oct 2022</div>
+          </div>
+          <div class="search-divider"></div>
+          <div class="search-item">
+            <div class="search-label">
+              <span class="icon">🔄</span>
+              Return
+            </div>
+            <div class="search-value">12 Nov 2022</div>
+          </div>
+          <button class="search-button">
+            <span class="search-icon">🔍</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-images">
+        <div class="main-image">
+          <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Traveler in nature">
+        </div>
+        <div class="secondary-image">
+          <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="Scenic view">
+        </div>
+        <div class="travel-icon tent">🏕️</div>
+        <div class="travel-icon hotel">🏨</div>
+        <div class="travel-icon location">📍</div>
+        <div class="travel-icon helicopter">🚁</div>
+        <div class="dotted-line"></div>
+      </div>
+    </section>
+
+    <!-- 서비스 섹션 -->
+    <section class="services-section">
+      <div class="section-heading">
+        <h2 class="section-title">WHAT WE SERVE</h2>
+        <div class="service-intro">
+          <h3>Top Values <br>For You 🔥</h3>
+          <p class="intro-text">Try a variety of benefits when using our services.</p>
+        </div>
+      </div>
       
-      <!-- 지그재그 이미지 갤러리 -->
-      <div class="irregular-grid">
-        <!-- 스위스 알프스 마을 -->
-        <div class="grid-item grid-item-large">
-          <div class="image-container">
-            <img src="https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg" alt="Swiss Alps Village with Snow Mountains" class="gallery-image">
-            <div class="image-overlay">
-              <div class="image-caption">
-                <h4>Swiss Alps</h4>
-                <p>Picturesque village nestled in the majestic mountains</p>
-              </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">🌎</div>
+          <h4>Lot Of Choices</h4>
+          <p>Total 460+ destinations that we work with.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">🧳</div>
+          <h4>Best Tour Guide</h4>
+          <p>Our tour guides with 15+ years of experience.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">🎫</div>
+          <h4>Easy Booking</h4>
+          <p>With an easy and fast ticket purchase process.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 목적지 섹션 -->
+    <section class="destinations-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">TOP DESTINATION</h2>
+          <h3 class="destination-title">Discover Top Destination ✈️</h3>
+        </div>
+        <div class="navigation-arrows">
+          <button class="arrow-btn prev">◀</button>
+          <button class="arrow-btn next">▶</button>
+        </div>
+      </div>
+      
+      <div class="destination-cards">
+        <div class="destination-card">
+          <div class="destination-image">
+            <img src="https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg" alt="Kullu Manali">
+          </div>
+          <div class="destination-info">
+            <h4>Kullu Manali, Himachal Pradesh</h4>
+            <div class="destination-meta">
+              <span class="price">₹ 20,000</span>
+              <span class="duration">10 Days Trip</span>
             </div>
           </div>
         </div>
-
-        <!-- 호수에서 보트 타는 사람들 -->
-        <div class="grid-item grid-item-medium">
-          <div class="image-container">
-            <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="People Boating in a Park Lake" class="gallery-image">
-            <div class="image-overlay">
-              <div class="image-caption">
-                <h4>Summer Retreat</h4>
-                <p>Peaceful afternoon at the park lake</p>
-              </div>
+        
+        <div class="destination-card">
+          <div class="destination-image">
+            <img src="https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg" alt="Rann Utsav">
+          </div>
+          <div class="destination-info">
+            <h4>Rann Utsav (Kutch), Gujarat</h4>
+            <div class="destination-meta">
+              <span class="price">₹ 20,000</span>
+              <span class="duration">10 Days Trip</span>
             </div>
           </div>
         </div>
-
-        <!-- 연안 열차와 바다 -->
-        <div class="grid-item grid-item-medium">
-          <div class="image-container">
-            <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="Green Train Heading to the Sea" class="gallery-image">
-            <div class="image-overlay">
-              <div class="image-caption">
-                <h4>Coastal Journey</h4>
-                <p>Scenic railway along the breathtaking coastline</p>
-              </div>
+        
+        <div class="destination-card">
+          <div class="destination-image">
+            <img src="https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg" alt="Hawa Mahal">
+          </div>
+          <div class="destination-info">
+            <h4>Hawa Mahal (Jaipur), Rajasthan</h4>
+            <div class="destination-meta">
+              <span class="price">₹ 20,000</span>
+              <span class="duration">10 Days Trip</span>
             </div>
           </div>
         </div>
-
-        <!-- 연안 열차와 바다 (다른 각도) -->
-        <div class="grid-item grid-item-small">
-          <div class="image-container">
-            <img src="https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg" alt="Coastal Train Between Houses" class="gallery-image">
-            <div class="image-overlay">
-              <div class="image-caption">
-                <h4>Hidden Passage</h4>
-                <p>Train tracks winding between seaside homes</p>
-              </div>
-            </div>
+        
+        <div class="destination-card">
+          <div class="destination-image">
+            <img src="https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg" alt="Kullu Manali">
           </div>
-        </div>
-
-        <!-- 벚꽃길과 버스 -->
-        <div class="grid-item grid-item-large">
-          <div class="image-container">
-            <img src="https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg" alt="Cherry Blossom Tunnel with Blue Bus" class="gallery-image">
-            <div class="image-overlay">
-              <div class="image-caption">
-                <h4>Spring Blossoms</h4>
-                <p>Cherry blossom avenue with passing blue bus</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 서울 한강 풍경 -->
-        <div class="grid-item grid-item-wide">
-          <div class="image-container">
-            <img src="https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg" alt="Han River and Seoul Cityscape" class="gallery-image">
-            <div class="image-overlay">
-              <div class="image-caption">
-                <h4>Seoul Sunset</h4>
-                <p>Evening by the Han River with Seoul's iconic skyline</p>
-              </div>
+          <div class="destination-info">
+            <h4>Kullu Manali, Himachal Pradesh</h4>
+            <div class="destination-meta">
+              <span class="price">₹ 20,000</span>
+              <span class="duration">10 Days Trip</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <footer class="site-footer">
-      <p>© 2025 Trip | Your AI-Powered Travel Companion</p>
-      <div class="footer-links">
-        <a href="#">About</a>
-        <a href="#">Contact</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
+    <!-- 항공사 로고 섹션 -->
+    <section class="airlines-section">
+      <div class="airline-logo">
+        <span>JET AIRWAYS ✈️</span>
       </div>
-    </footer>
+      <div class="airline-logo">
+        <span>AirAsia</span>
+      </div>
+      <div class="airline-logo">
+        <span>✈️ SpiceJet</span>
+      </div>
+      <div class="airline-logo">
+        <span>IndiGo ✈️</span>
+      </div>
+      <div class="airline-logo">
+        <span>✈️ GoAir</span>
+      </div>
+    </section>
+
+    <!-- 휴가 계획 섹션 -->
+    <section class="vacation-planning">
+      <div class="planning-images">
+        <div class="main-planning-image">
+          <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Traveler in nature">
+        </div>
+        <div class="secondary-planning-image">
+          <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="Scenic view">
+        </div>
+      </div>
+      
+      <div class="planning-content">
+        <h2 class="planning-subtitle">TRAVEL POINT</h2>
+        <h3 class="planning-title">We Helping You Find Your Dream Vacation 😊</h3>
+        <p class="planning-text">
+          Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type...
+        </p>
+        
+        <div class="stats-container">
+          <div class="stat-item">
+            <h3 class="stat-value">100+</h3>
+            <p class="stat-label">Holiday Package</p>
+          </div>
+          <div class="stat-item">
+            <h3 class="stat-value">230</h3>
+            <p class="stat-label">Luxury Hotel</p>
+          </div>
+          <div class="stat-item">
+            <h3 class="stat-value">12</h3>
+            <p class="stat-label">Elite Airline</p>
+          </div>
+          <div class="stat-item">
+            <h3 class="stat-value">114M+</h3>
+            <p class="stat-label">Satisfied Traveler</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 리뷰 섹션 -->
+    <section class="reviews-section">
+      <h2 class="reviews-subtitle">HAPPY TRAVELLERS</h2>
+      <h3 class="reviews-title">What Our Travellers Say 😊</h3>
+    </section>
   </div>
 </template>
 
 <script setup>
-// 이미지 파일은 public 폴더에 저장하거나 assets 폴더를 사용할 수 있습니다
-// 실제 배포 시에는 이미지 경로를 적절히 조정해야 합니다
+// 함수 및 데이터는 여기에 추가할 수 있습니다
 </script>
 
 <style scoped>
@@ -135,40 +244,38 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
-/* 전체 페이지 스타일 */
-.trip-website {
-  font-family: 'Caveat', 'Brush Script MT', cursive;
-  background-color: #f8f9fa;
-  color: #333;
-  line-height: 1.6;
-
-  /* 아래 세 줄을 추가/수정하세요 */
-  width: 100%;
-  max-width: 1200px;   /* 페이지 중앙 영역의 최대 너비 (원하는 값으로 조정) */
-  margin: 0 auto;      /* 좌우 여백 자동, 중앙 정렬 */
-  padding: 0 20px;     /* 뷰포트가 작아졌을 때 양옆 여백 (선택) */
+/* 전체 컨테이너 */
+.travel-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(120deg, #f0f4ff 0%, #fff9f9 100%);
+  overflow: hidden;
 }
 
-/* 상단 메뉴바 스타일 */
-.menu-bar {
+/* 헤더 스타일 */
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 5%;
-  background-color: #fff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  margin-bottom: 3rem;
 }
 
-.site-title h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #3a86ff;
-  margin: 0;
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.logo-icon {
+  color: #ff8c00;
+  background-color: #ffefd5;
+  padding: 2px 8px;
+  border-radius: 50%;
+  margin-right: 2px;
 }
 
 .menu-items {
@@ -178,298 +285,525 @@
 
 .menu-link {
   text-decoration: none;
-  color: #555;
-  font-size: 1.4rem;
+  color: #666;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
+
+.menu-link.active {
+  color: #ff8c00;
+  font-weight: 600;
+}
+
+.contact-btn {
+  border: 1px solid #ddd;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  transition: all 0.3s ease;
 }
 
-.menu-link:hover {
-  background-color: #f0f7ff;
-  color: #3a86ff;
-}
-
-.login-section {
+/* 히어로 섹션 */
+.hero-section {
   display: flex;
-  align-items: center;
-}
-
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #f0f0f0;
-  border: 2px solid #ddd;
-  background-image: url('path/to/profile-icon.png');
-  background-size: cover;
-  background-position: center;
-}
-
-/* 메인 배너 영역 스타일 */
-.main-banner {
-  height: 400px;
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('path/to/banner-image.jpg');
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 3rem;
-}
-
-.banner-content {
-  text-align: center;
-  color: white;
-  max-width: 800px;
-  padding: 2rem;
+  justify-content: space-between;
+  margin-bottom: 5rem;
   position: relative;
 }
 
-.banner-title {
-  font-size: 3.5rem;
+.hero-content {
+  flex: 1;
+  padding-right: 2rem;
+}
+
+.hero-subtitle {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.2;
   margin-bottom: 2rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  color: #333;
 }
 
-.start-button {
-  position: absolute;
-  right: 2rem;
-  background-color: #3a86ff;
-  color: white;
+/* 검색 바 */
+.search-bar {
+  display: flex;
+  background-color: white;
+  border-radius: 50px;
+  padding: 0.8rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+}
+
+.search-item {
+  padding: 0 1rem;
+}
+
+.search-label {
+  font-size: 0.8rem;
+  color: #999;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.search-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.search-divider {
+  width: 1px;
+  background-color: #eee;
+}
+
+.search-button {
+  width: 50px;
+  height: 50px;
+  background-color: #ff8c00;
   border: none;
-  padding: 0.8rem 2rem;
-  font-size: 1.5rem;
-  border-radius: 30px;
+  border-radius: 50%;
+  color: white;
+  font-size: 1.2rem;
   cursor: pointer;
-  font-family: 'Caveat', cursive;
-  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.start-button:hover {
-  background-color: #2a75ff;
+/* 히어로 이미지 */
+.hero-images {
+  flex: 1;
+  position: relative;
+  height: 400px;
 }
 
-/* 여행지 추천 섹션 스타일 */
-.recommendation-section {
-  padding: 2rem 5%;
+.main-image {
+  position: absolute;
+  width: 300px;
+  height: 350px;
+  border-radius: 50% 40% 30% 20%;
+  overflow: hidden;
+  top: 0;
+  right: 50px;
+}
+
+.secondary-image {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 40% 50% 20% 30%;
+  overflow: hidden;
+  bottom: 0;
+  right: 0;
+}
+
+.main-image img, .secondary-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.travel-icon {
+  position: absolute;
+  font-size: 1.5rem;
+  background-color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tent {
+  top: 20px;
+  right: 400px;
+}
+
+.hotel {
+  top: 60px;
+  right: 10px;
+}
+
+.location {
+  bottom: 180px;
+  right: 340px;
+}
+
+.helicopter {
+  top: 150px;
+  right: 230px;
+}
+
+.dotted-line {
+  position: absolute;
+  border: 2px dashed #ccc;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  top: 50px;
+  right: 100px;
+  border-left: none;
+  border-bottom: none;
+}
+
+/* 서비스 섹션 */
+.services-section {
+  margin-bottom: 5rem;
+}
+
+.section-heading {
+  display: flex;
   margin-bottom: 3rem;
 }
 
 .section-title {
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-  color: #333;
-  text-align: left;
-}
-
-/* 불규칙한 그리드 레이아웃 */
-.irregular-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-auto-rows: minmax(180px, auto);
-  gap: 20px;
-  margin-bottom: 3rem;
-}
-
-.grid-item {
-  overflow: hidden;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-}
-
-.grid-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-}
-
-/* 스위스 알프스 마을 큰 이미지 */
-.irregular-grid .grid-item:nth-child(1) {
-  grid-column: 1 / span 7;
-  grid-row: 1 / span 3;
-}
-
-/* 호수에서 보트 타는 사람들 */
-.irregular-grid .grid-item:nth-child(2) {
-  grid-column: 8 / span 5;
-  grid-row: 1 / span 2;
-}
-
-/* 연안 열차와 바다 */
-.irregular-grid .grid-item:nth-child(3) {
-  grid-column: 1 / span 4;
-  grid-row: 4 / span 2;
-}
-
-/* 연안 열차와 바다 (다른 각도) */
-.irregular-grid .grid-item:nth-child(4) {
-  grid-column: 5 / span 4;
-  grid-row: 4 / span 2;
-}
-
-/* 벚꽃길과 버스 */
-.irregular-grid .grid-item:nth-child(5) {
-  grid-column: 9 / span 4;
-  grid-row: 3 / span 3;
-}
-
-/* 서울 한강 풍경 */
-.irregular-grid .grid-item:nth-child(6) {
-  grid-column: 1 / span 12;
-  grid-row: 6 / span 2;
-}
-
-.image-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.gallery-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.5s ease;
-}
-
-.grid-item:hover .gallery-image {
-  transform: scale(1.05);
-}
-
-.image-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-  padding: 2rem 1.5rem 1.5rem;
-  color: white;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.grid-item:hover .image-overlay {
-  opacity: 1;
-}
-
-.image-caption h4 {
-  font-size: 2rem;
+  font-size: 0.9rem;
+  color: #ff8c00;
+  font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
-.image-caption p {
-  font-size: 1.3rem;
-  font-weight: 300;
+.service-intro {
+  flex: 1;
 }
 
-/* 푸터 스타일 */
-.site-footer {
-  background-color: #f0f7ff;
-  padding: 2rem 5%;
-  text-align: center;
+.service-intro h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.intro-text {
+  color: #666;
+  max-width: 300px;
+}
+
+.services-grid {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+}
+
+.service-card {
+  background-color: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  flex: 1;
+}
+
+.service-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.service-card h4 {
   font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.service-card p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* 목적지 섹션 */
+.destinations-section {
+  margin-bottom: 5rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+}
+
+.destination-title {
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.navigation-arrows {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.arrow-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: all 0.3s;
+}
+
+.arrow-btn:hover {
+  background-color: #ff8c00;
+  color: white;
+  border-color: #ff8c00;
+}
+
+.destination-cards {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding: 0.5rem;
+  scrollbar-width: none; /* Firefox */
+}
+
+.destination-cards::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.destination-card {
+  min-width: 250px;
+  background-color: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.destination-image {
+  height: 180px;
+  overflow: hidden;
+}
+
+.destination-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.destination-card:hover .destination-image img {
+  transform: scale(1.05);
+}
+
+.destination-info {
+  padding: 1rem;
+}
+
+.destination-info h4 {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.destination-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.price {
+  color: #ff8c00;
+  font-weight: 600;
+}
+
+.duration {
   color: #666;
 }
 
-.footer-links {
-  margin-top: 1rem;
+/* 항공사 로고 섹션 */
+.airlines-section {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 0;
+  margin-bottom: 5rem;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.airline-logo {
+  color: #999;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* 휴가 계획 섹션 */
+.vacation-planning {
+  display: flex;
+  gap: 4rem;
+  margin-bottom: 5rem;
+}
+
+.planning-images {
+  flex: 1;
+  position: relative;
+  height: 400px;
+}
+
+.main-planning-image {
+  position: absolute;
+  width: 300px;
+  height: 350px;
+  border-radius: 40% 50% 20% 30%;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+}
+
+.secondary-planning-image {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50% 40% 30% 20%;
+  overflow: hidden;
+  bottom: 0;
+  left: 150px;
+}
+
+.planning-content {
+  flex: 1;
+}
+
+.planning-subtitle {
+  font-size: 0.9rem;
+  color: #ff8c00;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.planning-title {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.planning-text {
+  color: #666;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
 }
 
-.footer-links a {
-  text-decoration: none;
-  color: #3a86ff;
-  transition: color 0.3s ease;
+.stat-item {
+  text-align: left;
 }
 
-.footer-links a:hover {
-  color: #2a75ff;
-  text-decoration: underline;
+.stat-value {
+  font-size: 1.8rem;
+  color: #ff8c00;
+  margin-bottom: 0.3rem;
 }
 
-/* 반응형 스타일 */
-@media (max-width: 1200px) {
-  .irregular-grid {
-    grid-template-columns: repeat(8, 1fr);
+.stat-label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* 리뷰 섹션 */
+.reviews-section {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.reviews-subtitle {
+  font-size: 0.9rem;
+  color: #ff8c00;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.reviews-title {
+  font-size: 1.8rem;
+  color: #333;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .hero-section, 
+  .vacation-planning {
+    flex-direction: column;
   }
   
-  .irregular-grid .grid-item:nth-child(1) {
-    grid-column: 1 / span 5;
+  .services-grid {
+    flex-wrap: wrap;
   }
   
-  .irregular-grid .grid-item:nth-child(2) {
-    grid-column: 6 / span 3;
+  .service-card {
+    min-width: calc(50% - 1rem);
   }
   
-  .irregular-grid .grid-item:nth-child(3) {
-    grid-column: 1 / span 4;
+  .hero-images,
+  .planning-images {
+    margin-top: 3rem;
   }
   
-  .irregular-grid .grid-item:nth-child(4) {
-    grid-column: 5 / span 4;
+  .main-image,
+  .main-planning-image {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
   }
   
-  .irregular-grid .grid-item:nth-child(5) {
-    grid-column: 1 / span 8;
-    grid-row: 6 / span 2;
+  .secondary-image,
+  .secondary-planning-image {
+    right: auto;
+    left: calc(50% + 100px);
   }
   
-  .irregular-grid .grid-item:nth-child(6) {
-    grid-column: 1 / span 8;
-    grid-row: 8 / span 2;
-  }
-  
-  .banner-title {
-    font-size: 3rem;
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .menu-bar {
+  .header {
     flex-direction: column;
     gap: 1rem;
-    padding: 1rem;
   }
   
   .menu-items {
     width: 100%;
     justify-content: space-between;
-    gap: 0.5rem;
   }
   
-  .menu-link {
-    font-size: 1.2rem;
-    padding: 0.3rem 0.6rem;
+  .section-heading {
+    flex-direction: column;
+    gap: 1rem;
   }
   
-  .irregular-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+  .services-grid {
+    flex-direction: column;
   }
   
-  .irregular-grid .grid-item:nth-child(1),
-  .irregular-grid .grid-item:nth-child(2),
-  .irregular-grid .grid-item:nth-child(3),
-  .irregular-grid .grid-item:nth-child(4),
-  .irregular-grid .grid-item:nth-child(5),
-  .irregular-grid .grid-item:nth-child(6) {
-    grid-column: 1 / span 4;
-    grid-row: auto;
+  .service-card {
+    width: 100%;
   }
   
-  .banner-title {
-    font-size: 2.5rem;
+  .airlines-section {
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
   }
   
-  .start-button {
-    position: static;
-    margin-top: 1rem;
+  .airline-logo {
+    margin: 0 1rem;
+  }
+  
+  .stats-container {
+    grid-template-columns: 1fr;
   }
 }
 </style>
