@@ -1,5 +1,14 @@
 <template>
   <div class="travel-container">
+    <!-- 배경 그라데이션 원형들 -->
+    <div class="gradient-circle circle1"></div>
+    <div class="gradient-circle circle2"></div>
+    <div class="gradient-circle circle3"></div>
+    <div class="gradient-circle circle4"></div>
+    <div class="gradient-circle circle5"></div>
+    <div class="gradient-circle circle6"></div>
+    <div class="gradient-circle circle7"></div>
+    
     <!-- 헤더 -->
     <header class="header">
       <div class="logo">
@@ -56,10 +65,10 @@
 
       <div class="hero-images">
         <div class="main-image">
-          <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Traveler in nature">
+          <img src="https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg" alt="Traveler in nature">
         </div>
         <div class="secondary-image">
-          <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="Scenic view">
+          <img src="https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg" alt="Scenic view">
         </div>
         <div class="travel-icon tent">🏕️</div>
         <div class="travel-icon hotel">🏨</div>
@@ -249,11 +258,87 @@
 
 /* 전체 컨테이너 */
 .travel-container {
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
-  background: linear-gradient(120deg, #f0f4ff 0%, #fff9f9 100%);
+  background-color: #ffffff;
   overflow: hidden;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* 그라데이션 원형(타원형) 스타일 */
+.gradient-circle {
+  position: absolute;
+  border-radius: 65% 35% 60% 40% / 60% 40% 60% 40%;
+  z-index: 0;
+  transform: skew(-5deg, -10deg);
+}
+
+/* 개별 그라데이션 타원형 위치 및 스타일 */
+.circle1 {
+  top: -10%;
+  left: -5%;
+  width: 45vw;
+  height: 35vw;
+  background: radial-gradient(ellipse, rgba(204, 228, 255, 0.9) 0%, rgba(204, 228, 255, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
+  transform: rotate(-15deg);
+}
+
+.circle2 {
+  bottom: -15%;
+  right: -10%;
+  width: 50vw;
+  height: 38vw;
+  background: radial-gradient(ellipse, rgba(255, 219, 240, 0.9) 0%, rgba(255, 219, 240, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
+  transform: rotate(10deg);
+}
+
+.circle3 {
+  top: 20%;
+  right: 10%;
+  width: 35vw;
+  height: 25vw;
+  background: radial-gradient(ellipse, rgba(225, 204, 255, 0.85) 0%, rgba(225, 204, 255, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+  transform: rotate(-8deg);
+}
+
+.circle4 {
+  bottom: 30%;
+  left: 5%;
+  width: 28vw;
+  height: 22vw;
+  background: radial-gradient(ellipse, rgba(204, 240, 255, 0.9) 0%, rgba(204, 240, 255, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
+  transform: rotate(12deg);
+}
+
+/* 추가된 타원형들 */
+.circle5 {
+  top: 45%;
+  left: 30%;
+  width: 40vw;
+  height: 28vw;
+  background: radial-gradient(ellipse, rgba(210, 200, 255, 0.85) 0%, rgba(210, 200, 255, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+  transform: rotate(-5deg);
+}
+
+.circle6 {
+  bottom: 50%;
+  right: 30%;
+  width: 45vw;
+  height: 32vw;
+  background: radial-gradient(ellipse, rgba(195, 195, 245, 0.8) 0%, rgba(195, 195, 245, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+  transform: rotate(15deg);
+}
+
+.circle7 {
+  bottom: 10%;
+  left: 40%;
+  width: 42vw;
+  height: 30vw;
+  background: radial-gradient(ellipse, rgba(180, 210, 240, 0.85) 0%, rgba(180, 210, 240, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+  transform: rotate(-12deg);
 }
 
 /* 헤더 스타일 */
@@ -262,6 +347,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
 }
 
 .logo {
@@ -307,6 +394,11 @@
   justify-content: space-between;
   margin-bottom: 5rem;
   position: relative;
+  z-index: 1;
+  gap: 1rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero-content {
@@ -333,9 +425,12 @@
   display: flex;
   background-color: white;
   border-radius: 50px;
-  padding: 0.8rem;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  padding: 0.6rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
   max-width: 500px;
+  margin-top: 2.5rem;
+  position: relative;
+  z-index: 4;
 }
 
 .search-item {
@@ -384,78 +479,51 @@
 
 .main-image {
   position: absolute;
-  width: 300px;
-  height: 350px;
-  border-radius: 50% 40% 30% 20%;
+  width: 320px;
+  height: 380px;
   overflow: hidden;
-  top: 0;
-  right: 50px;
+  top: -30px;
+  right: 10px;
+  z-index: 2;
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 
 .secondary-image {
   position: absolute;
   width: 200px;
-  height: 200px;
-  border-radius: 40% 50% 20% 30%;
+  height: 240px;
   overflow: hidden;
-  bottom: 0;
-  right: 0;
+  bottom: -30px;
+  right: -60px;
+  z-index: 1;
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 
 .main-image img, .secondary-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  mix-blend-mode: normal;
+  opacity: 1;
 }
 
-.travel-icon {
-  position: absolute;
-  font-size: 1.5rem;
-  background-color: white;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-.tent {
-  top: 20px;
-  right: 400px;
-}
-
-.hotel {
-  top: 60px;
-  right: 10px;
-}
-
-.location {
-  bottom: 180px;
-  right: 340px;
-}
-
-.helicopter {
-  top: 150px;
-  right: 230px;
-}
-
+/* 점선 경로 완전히 제거 */
 .dotted-line {
-  position: absolute;
-  border: 2px dashed #ccc;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  top: 50px;
-  right: 100px;
-  border-left: none;
-  border-bottom: none;
+  display: none;
+}
+
+/* 아이콘도 제거 */
+.travel-icon {
+  display: none;
 }
 
 /* 서비스 섹션 */
 .services-section {
   margin-bottom: 5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .section-heading {
@@ -518,6 +586,8 @@
 /* 목적지 섹션 */
 .destinations-section {
   margin-bottom: 5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .section-header {
@@ -627,6 +697,8 @@
   margin-bottom: 5rem;
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
+  position: relative;
+  z-index: 1;
 }
 
 .airline-logo {
@@ -640,6 +712,8 @@
   display: flex;
   gap: 4rem;
   margin-bottom: 5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .planning-images {
@@ -649,23 +723,37 @@
 }
 
 .main-planning-image {
-  position: absolute;
-  width: 300px;
-  height: 350px;
-  border-radius: 40% 50% 20% 30%;
-  overflow: hidden;
-  top: 0;
-  left: 0;
+  position: relative;    /* 절대 위치가 아니라 문서 흐름 안에서 */
+  width: 100%;           /* 부모 너비에 맞춤 */
+  max-width: 300px;      /* 최대 넓이 지정 (기존 300px) */
+  height: auto;          /* 높이는 auto로 */
+  overflow: visible;  
+  z-index: 2;   /* 숨김 제거 */
+}
+
+/* 2. 이미지 비율 유지하며 축소 */
+.main-planning-image img {
+  display: block;
+  width: 100%;           /* 컨테이너 너비에 맞춤 */
+  height: auto;          /* 비율 유지 */
+  object-fit: contain;   /* 잘리지 않고 전체 보이기 */
 }
 
 .secondary-planning-image {
   position: absolute;
   width: 200px;
   height: 200px;
-  border-radius: 50% 40% 30% 20%;
-  overflow: hidden;
+  bottom: 0;
+  left: 170px;
+  overflow: visible;
+  z-index: 1;
+}
+.secondary-planning-image img {
+  display: block;
+  width: 100%;      
   bottom: 0;
   left: 150px;
+ 
 }
 
 .planning-content {
@@ -716,6 +804,8 @@
 .reviews-section {
   text-align: center;
   margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
 }
 
 .reviews-subtitle {
@@ -732,9 +822,17 @@
 
 /* 반응형 디자인 */
 @media (max-width: 1024px) {
-  .hero-section, 
-  .vacation-planning {
+  .hero-section {
     flex-direction: column;
+    padding: 0 1rem;
+  }
+  
+  .hero-content {
+    margin-bottom: 2rem;
+  }
+  
+  .hero-title {
+    font-size: 2.8rem;
   }
   
   .services-grid {
@@ -745,26 +843,52 @@
     min-width: calc(50% - 1rem);
   }
   
-  .hero-images,
-  .planning-images {
-    margin-top: 3rem;
+  .hero-images {
+    height: 500px;
+    margin-top: 0;
   }
   
-  .main-image,
+  .main-image {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0;
+  }
+  
+  .secondary-image {
+    right: auto;
+    left: calc(50% + 80px);
+    bottom: 50px;
+  }
+
+  .vacation-planning {
+    flex-direction: column;
+  }
+  
+  .planning-images {
+    margin-top: 0;
+    order: 2;
+  }
+  
   .main-planning-image {
     right: auto;
     left: 50%;
     transform: translateX(-50%);
   }
   
-  .secondary-image,
   .secondary-planning-image {
     right: auto;
-    left: calc(50% + 100px);
+    left: calc(50% + 80px);
   }
   
   .stats-container {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* 그라데이션 타원형 크기 조정 */
+  .circle1, .circle2, .circle3, .circle4, .circle5, .circle6, .circle7 {
+    width: 80vw !important;
+    height: 60vw !important;
   }
 }
 
@@ -804,6 +928,20 @@
   
   .stats-container {
     grid-template-columns: 1fr;
+  }
+
+  .main-planning-image, .secondary-planning-image {
+    position: relative;
+    width: 90%;
+    left: 5% !important;
+    transform: none !important;
+    margin-bottom: 1rem;
+  }
+  
+  /* 그라데이션 타원형 크기 조정 */
+  .circle1, .circle2, .circle3, .circle4, .circle5, .circle6, .circle7 {
+    width: 110vw !important;
+    height: 80vw !important;
   }
 }
 </style>
