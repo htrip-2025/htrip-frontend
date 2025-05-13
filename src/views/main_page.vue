@@ -123,6 +123,7 @@
       </div>
       
       <div class="destination-cards">
+        <!-- Original 4 destination cards -->
         <div class="destination-card">
           <div class="destination-image">
             <img src="https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg" alt="Kullu Manali">
@@ -171,6 +172,59 @@
             <div class="destination-meta">
               <span class="price">₹ 20,000</span>
               <span class="duration">10 Days Trip</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Additional 4 destination cards -->
+        <div class="destination-card">
+          <div class="destination-image">
+            <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="Coastal Railway">
+          </div>
+          <div class="destination-info">
+            <h4>Cinque Terre, Italy</h4>
+            <div class="destination-meta">
+              <span class="price">₹ 45,000</span>
+              <span class="duration">7 Days Trip</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="destination-card">
+          <div class="destination-image">
+            <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Lake Boating">
+          </div>
+          <div class="destination-info">
+            <h4>Lake District, England</h4>
+            <div class="destination-meta">
+              <span class="price">₹ 38,000</span>
+              <span class="duration">5 Days Trip</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="destination-card">
+          <div class="destination-image">
+            <img src="https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg" alt="Mountain Trek">
+          </div>
+          <div class="destination-info">
+            <h4>Swiss Alps, Switzerland</h4>
+            <div class="destination-meta">
+              <span class="price">₹ 52,000</span>
+              <span class="duration">8 Days Trip</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="destination-card">
+          <div class="destination-image">
+            <img src="https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg" alt="Beach Resort">
+          </div>
+          <div class="destination-info">
+            <h4>Bali, Indonesia</h4>
+            <div class="destination-meta">
+              <span class="price">₹ 40,000</span>
+              <span class="duration">6 Days Trip</span>
             </div>
           </div>
         </div>
@@ -244,7 +298,55 @@
 </template>
 
 <script setup>
-// 함수 및 데이터는 여기에 추가할 수 있습니다
+// 화살표 버튼 클릭 시 목적지 카드 스크롤 기능
+
+// DOM이 마운트된 후에 화살표 버튼에 이벤트 리스너 추가
+import { onMounted, ref } from 'vue';
+
+// 스크롤 위치 추적을 위한 ref
+const scrollPosition = ref(0);
+const scrollAmount = 800; // 한 번에 스크롤할 픽셀 수
+const destinationCards = ref(null);
+
+onMounted(() => {
+  // 화살표 버튼 요소 가져오기
+  const prevButton = document.querySelector('.arrow-btn.prev');
+  const nextButton = document.querySelector('.arrow-btn.next');
+  destinationCards.value = document.querySelector('.destination-cards');
+  
+  // 이전 버튼 클릭 이벤트
+  prevButton.addEventListener('click', scrollLeft);
+  
+  // 다음 버튼 클릭 이벤트
+  nextButton.addEventListener('click', scrollRight);
+});
+
+// 왼쪽으로 스크롤하는 함수
+const scrollLeft = () => {
+  if (!destinationCards.value) return;
+  
+  // 부드러운 스크롤 애니메이션으로 왼쪽으로 이동
+  scrollPosition.value = Math.max(0, scrollPosition.value - scrollAmount);
+  destinationCards.value.scrollTo({
+    left: scrollPosition.value,
+    behavior: 'smooth'
+  });
+};
+
+// 오른쪽으로 스크롤하는 함수
+const scrollRight = () => {
+  if (!destinationCards.value) return;
+  
+  // 부드러운 스크롤 애니메이션으로 오른쪽으로 이동
+  scrollPosition.value = Math.min(
+    destinationCards.value.scrollWidth - destinationCards.value.clientWidth,
+    scrollPosition.value + scrollAmount
+  );
+  destinationCards.value.scrollTo({
+    left: scrollPosition.value,
+    behavior: 'smooth'
+  });
+};
 </script>
 
 <style scoped>
@@ -487,6 +589,10 @@
   z-index: 2;
   mask-image: none;
   -webkit-mask-image: none;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  background: transparent;
 }
 
 .secondary-image {
@@ -499,6 +605,10 @@
   z-index: 1;
   mask-image: none;
   -webkit-mask-image: none;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  background: transparent;
 }
 
 .main-image img, .secondary-image img {
@@ -507,6 +617,11 @@
   object-fit: cover;
   mix-blend-mode: normal;
   opacity: 1;
+  border-radius: 0;
+  /* 더 강한 원형 그라데이션 효과 적용 */
+  -webkit-mask-image: radial-gradient(ellipse 85% 85% at center, black 50%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.2) 85%, transparent 90%);
+  mask-image: radial-gradient(ellipse 85% 85% at center, black 50%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.2) 85%, transparent 90%);
+  filter: brightness(1.03) contrast(0.93);
 }
 
 /* 점선 경로 완전히 제거 */
@@ -625,6 +740,11 @@
   background-color: #ff8c00;
   color: white;
   border-color: #ff8c00;
+  transform: scale(1.1);
+}
+
+.arrow-btn:active {
+  transform: scale(0.95);
 }
 
 .destination-cards {
@@ -633,6 +753,9 @@
   overflow-x: auto;
   padding: 0.5rem;
   scrollbar-width: none; /* Firefox */
+  scroll-behavior: smooth; /* 부드러운 스크롤 효과 */
+  -webkit-overflow-scrolling: touch; /* iOS에서 부드러운 스크롤 */
+  scroll-snap-type: x mandatory; /* 스크롤 스냅 */
 }
 
 .destination-cards::-webkit-scrollbar {
@@ -645,6 +768,8 @@
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  scroll-snap-align: start; /* 스크롤 스냅 지점 */
+  transition: transform 0.3s ease;
 }
 
 .destination-image {
@@ -728,15 +853,23 @@
   max-width: 300px;      /* 최대 넓이 지정 (기존 300px) */
   height: auto;          /* 높이는 auto로 */
   overflow: visible;  
-  z-index: 2;   /* 숨김 제거 */
+  z-index: 2;            /* 숨김 제거 */
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  border: none;
 }
 
-/* 2. 이미지 비율 유지하며 축소 */
+/* 이미지 비율 유지하며 축소 */
 .main-planning-image img {
   display: block;
   width: 100%;           /* 컨테이너 너비에 맞춤 */
   height: auto;          /* 비율 유지 */
   object-fit: contain;   /* 잘리지 않고 전체 보이기 */
+  border-radius: 0;
+  -webkit-mask-image: radial-gradient(ellipse 90% 90% at center, black 60%, transparent 95%);
+  mask-image: radial-gradient(ellipse 90% 90% at center, black 60%, transparent 95%);
+  filter: brightness(1.02) contrast(0.95);
 }
 
 .secondary-planning-image {
@@ -747,13 +880,21 @@
   left: 170px;
   overflow: visible;
   z-index: 1;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  border: none;
 }
+
 .secondary-planning-image img {
   display: block;
   width: 100%;      
   bottom: 0;
   left: 150px;
- 
+  border-radius: 0;
+  -webkit-mask-image: radial-gradient(ellipse 90% 90% at center, black 60%, transparent 95%);
+  mask-image: radial-gradient(ellipse 90% 90% at center, black 60%, transparent 95%);
+  filter: brightness(1.02) contrast(0.95);
 }
 
 .planning-content {
