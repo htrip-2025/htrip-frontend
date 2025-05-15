@@ -22,104 +22,68 @@
     <a href="#" class="menu-link">커뮤니티</a>
     <a href="#" class="menu-link search-icon">🔍</a>
   </div>
-  <div class="login-section">
-    <a href="#" class="login-button">로그인</a>
-  </div>
+ <div class="login-section">
+  <a href="#" class="login-button">
+    <span class="button-text">로그인</span>
+  </a>
+</div>
 </header>
 
     <!-- 히어로 섹션 -->
     <section class="hero-section">
       <div class="hero-content">
-        <p class="hero-subtitle">The vacation you deserve is closer than you think 🤔</p>
+        <p class="hero-subtitle">The vacation you deserve is closer than you think </p>
         <h1 class="hero-title">
-          Life is short <br> 
-          and the world 🌎<br>
-          is Wide! 🌴
+            <br>
+          Since I was born <br>
+          I traveled to Korea<br>
         </h1>
 
-        <!-- 검색 바 -->
-        <div class="search-bar">
-          <div class="search-item">
-            <div class="search-label">
-              <span class="icon">📍</span>
-              Location
-            </div>
-            <div class="search-value">Manali, India</div>
-          </div>
-          <div class="search-divider"></div>
-          <div class="search-item">
-            <div class="search-label">
-              <span class="icon">📅</span>
-              Date
-            </div>
-            <div class="search-value">26 Oct 2022</div>
-          </div>
-          <div class="search-divider"></div>
-          <div class="search-item">
-            <div class="search-label">
-              <span class="icon">🔄</span>
-              Return
-            </div>
-            <div class="search-value">12 Nov 2022</div>
-          </div>
-          <button class="search-button">
-            <span class="search-icon">🔍</span>
-          </button>
-        </div>
-      </div>
+        <!-- 계획 시작하기 버튼 - 왼쪽 정렬로 변경 -->
+<div class="plan-button-container">
+  <router-link to="/info" class="plan-start-button">
+    <span class="button-icon">✈️</span>
+    <span class="button-text">여행 계획 시작하기</span>
+    <span class="button-arrow">→</span>
+  </router-link>
+</div>
+</div>
 
       <div class="hero-images">
-        <div class="main-image">
-          <img src="https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg" alt="Traveler in nature">
-        </div>
-        <div class="secondary-image">
-          <img src="https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg" alt="Scenic view">
-        </div>
-        <div class="travel-icon tent">🏕️</div>
-        <div class="travel-icon hotel">🏨</div>
-        <div class="travel-icon location">📍</div>
-        <div class="travel-icon helicopter">🚁</div>
-        <div class="dotted-line"></div>
-      </div>
+  <div class="polaroid-container">
+    <div class="polaroid main-image">
+      <img src="https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg" alt="Traveler in nature">
+      <div class="polaroid-bottom"></div>
+    </div>
+    
+    <div class="polaroid secondary-image">
+      <img src="https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg" alt="Scenic view">
+      <div class="polaroid-bottom"></div>
+    </div>
+    
+    <div class="polaroid third-image">
+      <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Another view">
+      <div class="polaroid-bottom"></div>
+    </div>
+    
+    <div class="polaroid fourth-image">
+      <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="More scenery">
+      <div class="polaroid-bottom"></div>
+    </div>
+  </div>
+</div>
     </section>
 
-    <!-- 서비스 섹션 -->
-    <section class="services-section">
-      <div class="section-heading">
-        <h2 class="section-title">WHAT WE SERVE</h2>
-        <div class="service-intro">
-          <h3>Top Values <br>For You 🔥</h3>
-          <p class="intro-text">Try a variety of benefits when using our services.</p>
-        </div>
-      </div>
-      
-      <div class="services-grid">
-        <div class="service-card">
-          <div class="service-icon">🌎</div>
-          <h4>Lot Of Choices</h4>
-          <p>Total 460+ destinations that we work with.</p>
-        </div>
-        
-        <div class="service-card">
-          <div class="service-icon">🧳</div>
-          <h4>Best Tour Guide</h4>
-          <p>Our tour guides with 15+ years of experience.</p>
-        </div>
-        
-        <div class="service-card">
-          <div class="service-icon">🎫</div>
-          <h4>Easy Booking</h4>
-          <p>With an easy and fast ticket purchase process.</p>
-        </div>
-      </div>
-    </section>
+
+
+
 
     <!-- 목적지 섹션 -->
     <section class="destinations-section">
       <div class="section-header">
         <div>
           <h2 class="section-title">TOP DESTINATION</h2>
-          <h3 class="destination-title">Discover Top Destination ✈️</h3>
+          <h3 class="destination-title">Popular travel destinations ✈️</h3>
         </div>
         <div class="navigation-arrows">
           <button class="arrow-btn prev">◀</button>
@@ -366,9 +330,8 @@ const scrollRight = () => {
 /* 전체 컨테이너 */
 .travel-container {
   width: 100%;
-  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 6rem;
   background-color: #ffffff;
   overflow: hidden;
   position: relative;
@@ -389,7 +352,7 @@ const scrollRight = () => {
   left: -5%;
   width: 45vw;
   height: 35vw;
-  background: radial-gradient(ellipse, rgba(204, 228, 255, 0.9) 0%, rgba(204, 228, 255, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(ellipse, rgba(213, 224, 251, 0.9) 0%, rgba(213, 224, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(-15deg);
 }
 
@@ -398,7 +361,7 @@ const scrollRight = () => {
   right: -10%;
   width: 50vw;
   height: 38vw;
-  background: radial-gradient(ellipse, rgba(255, 219, 240, 0.9) 0%, rgba(255, 219, 240, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(ellipse, rgba(213, 237, 251, 0.9) 0%, rgba(213, 237, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(10deg);
 }
 
@@ -407,7 +370,7 @@ const scrollRight = () => {
   right: 10%;
   width: 35vw;
   height: 25vw;
-  background: radial-gradient(ellipse, rgba(225, 204, 255, 0.85) 0%, rgba(225, 204, 255, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(ellipse, rgba(213, 222, 251, 0.85) 0%, rgba(213, 222, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(-8deg);
 }
 
@@ -416,7 +379,7 @@ const scrollRight = () => {
   left: 5%;
   width: 28vw;
   height: 22vw;
-  background: radial-gradient(ellipse, rgba(204, 240, 255, 0.9) 0%, rgba(204, 240, 255, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(ellipse, rgba(213, 232, 251, 0.9) 0%, rgba(213, 232, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(12deg);
 }
 
@@ -426,7 +389,7 @@ const scrollRight = () => {
   left: 30%;
   width: 40vw;
   height: 28vw;
-  background: radial-gradient(ellipse, rgba(210, 200, 255, 0.85) 0%, rgba(210, 200, 255, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(ellipse, rgba(213, 224, 251, 0.85) 0%, rgba(213, 224, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(-5deg);
 }
 
@@ -435,7 +398,7 @@ const scrollRight = () => {
   right: 30%;
   width: 45vw;
   height: 32vw;
-  background: radial-gradient(ellipse, rgba(195, 195, 245, 0.8) 0%, rgba(195, 195, 245, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(ellipse, rgba(213, 237, 251, 0.8) 0%, rgba(213, 237, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(15deg);
 }
 
@@ -444,10 +407,9 @@ const scrollRight = () => {
   left: 40%;
   width: 42vw;
   height: 30vw;
-  background: radial-gradient(ellipse, rgba(180, 210, 240, 0.85) 0%, rgba(180, 210, 240, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(ellipse, rgba(213, 232, 251, 0.85) 0%, rgba(213, 232, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(-12deg);
 }
-
 /* 헤더 스타일 수정 */
 .header {
   display: flex;
@@ -457,7 +419,7 @@ const scrollRight = () => {
   position: relative;
   z-index: 1;
   padding: 1rem 0;
-  border-bottom: 0.8px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 0.8px solid rgba(0, 0, 0, 0.2);
 }
 
 .logo {
@@ -467,7 +429,7 @@ const scrollRight = () => {
 }
 
 .logo-icon {
-  color: #ff8c00;
+  color: #9581e8;
   background-color: #ffefd5;
   padding: 2px 8px;
   border-radius: 50%;
@@ -487,7 +449,8 @@ const scrollRight = () => {
 }
 
 .menu-link:hover, .menu-link.active {
-  color: #ff8c00;
+  color: #9581e8;
+  background: none;
 }
 
 .search-icon {
@@ -499,19 +462,59 @@ const scrollRight = () => {
   align-items: center;
 }
 
+/* 로그인 버튼 스타일 업데이트 */
 .login-button {
-  text-decoration: none;
-  padding: 0.5rem 1.5rem;
-  background-color: #ff8c00;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #9581e8 0%, #a2b3f8 100%); /* 요청한 색상으로 변경 */
   color: white;
-  border-radius: 20px;
-  font-size: 1rem;
-  transition: all 0.3s;
+  padding: 0.6rem 1.5rem; /* 약간 작게 */
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(149, 129, 232, 0.25); /* 그림자 연하게 */
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.login-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #a2b3f8 0%, #9581e8 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 30px;
 }
 
 .login-button:hover {
-  background-color: #e67e00;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(149, 129, 232, 0.35);
+}
+
+.login-button:hover::before {
+  width: 100%;
+}
+
+.login-button:active {
+  transform: translateY(-1px);
+}
+
+/* 미디어 쿼리에 추가 */
+@media (max-width: 768px) {
+  .login-button {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.85rem;
+  }
 }
 
 /* 반응형 디자인 */
@@ -564,183 +567,226 @@ const scrollRight = () => {
   line-height: 1.2;
   margin-bottom: 2rem;
   color: #333;
+
 }
 
-/* 검색 바 */
-.search-bar {
+
+/* 계획 시작하기 버튼 스타일 - 더 작고 연한 색상으로 수정 */
+.plan-button-container {
+  margin-top: 2rem;
   display: flex;
-  background-color: white;
-  border-radius: 50px;
-  padding: 0.6rem;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-  max-width: 500px;
-  margin-top: 2.5rem;
-  position: relative;
-  z-index: 4;
+  justify-content: flex-start; /* 왼쪽 정렬로 변경 */
 }
 
-.search-item {
-  padding: 0 1rem;
-}
-
-.search-label {
-  font-size: 0.8rem;
-  color: #999;
+.plan-start-button {
   display: flex;
   align-items: center;
-  gap: 5px;
-}
-
-.search-value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #333;
-}
-
-.search-divider {
-  width: 1px;
-  background-color: #eee;
-}
-
-.search-button {
-  width: 50px;
-  height: 50px;
-  background-color: #ff8c00;
-  border: none;
-  border-radius: 50%;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #9581e8 0%, #a2b3f8 100%); /* 연한 색상으로 변경 */
   color: white;
-  font-size: 1.2rem;
+  padding: 0.8rem 1.8rem; /* 패딩 줄임 */
+  border-radius: 30px; /* 약간 줄임 */
+  font-size: 1rem; /* 폰트 크기 줄임 */
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(162, 179, 248, 0.25); /* 그림자 연하게 */
+  transition: all 0.3s ease;
+  width: auto; /* 자동 너비로 변경 */
+  max-width: 300px; /* 최대 너비 줄임 */
+  position: relative;
+  overflow: hidden;
+  border: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  z-index: 1;
 }
 
-/* 히어로 이미지 */
+.plan-start-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #a2b3f8 0%, #9581e8 100%); /* 연한 색상으로 변경 */
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 30px;
+}
+
+.plan-start-button:hover {
+  transform: translateY(-3px); /* 호버 효과 줄임 */
+  box-shadow: 0 10px 25px rgba(162, 179, 248, 0.35);
+}
+
+.plan-start-button:hover::before {
+  width: 100%;
+}
+
+.plan-start-button:active {
+  transform: translateY(-1px);
+}
+
+.button-icon {
+  font-size: 1.1rem; /* 아이콘 크기 줄임 */
+  margin-right: 8px;
+}
+
+.button-text {
+  flex: 1;
+  text-align: left; /* 왼쪽 정렬로 변경 */
+}
+
+.button-arrow {
+  font-size: 1.2rem; /* 화살표 크기 줄임 */
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.plan-start-button:hover .button-arrow {
+  transform: translateX(5px);
+}
+
+/* 미디어 쿼리 */
+@media (max-width: 768px) {
+  .plan-start-button {
+    padding: 1rem 1.8rem;
+    font-size: 1.1rem;
+    max-width: 320px;
+  }
+}
+
+/* 히어로 이미지 폴라로이드 스타일 */
 .hero-images {
   flex: 1;
   position: relative;
-  height: 400px;
+  height: 450px;
+  /*background-color: #f5efd0;*/ /* 옅은 베이지색 배경 */
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+  margin-top: 2rem;
 }
 
-.main-image {
+.polaroid-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.polaroid {
   position: absolute;
-  width: 320px;
-  height: 380px;
-  overflow: hidden;
-  top: -30px;
-  right: 10px;
-  z-index: 2;
-  mask-image: none;
-  -webkit-mask-image: none;
-  border-radius: 15px;
-  box-shadow: none;
-  border: none;
-  background: transparent;
+  background-color: white;
+  padding: 10px 10px 30px 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  width: 200px;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+.polaroid img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.polaroid-bottom {
+  width: 100%;
+  height: 30px;
+  background-color: white;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.polaroid:hover {
+  transform: scale(1.05) rotate(0deg) !important;
+  z-index: 10;
+}
+
+/* 각 폴라로이드 위치 및 회전 */
+.main-image {
+  top: 40px;
+  left: 50px;
+  transform: rotate(-5deg);
+  z-index: 4;
 }
 
 .secondary-image {
+  top: 80px;
+  left: 180px;
+  transform: rotate(3deg);
+  z-index: 3;
+}
+
+.third-image {
+  top: 150px;
+  left: 100px;
+  transform: rotate(-8deg);
+  z-index: 2;
+}
+
+.fourth-image {
+  top: 170px;
+  right: 70px;
+  transform: rotate(6deg);
+  z-index: 1;
+}
+
+/* 배경에 커브 선 추가 */
+/* .hero-images::before {
+  content: '';
   position: absolute;
-  width: 200px;
-  height: 240px;
-  overflow: hidden;
-  bottom: -30px;
-  right: -60px;
-  z-index: 1;
-  mask-image: none;
-  -webkit-mask-image: none;
-  border-radius: 15px;
-  box-shadow: none;
-  border: none;
-  background: transparent;
+  top: 30%;
+  left: 5%;
+  width: 90%;
+  height: 50%;
+  border: 2px solid #e6d7a3;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 50% 50% 0 0;
+  z-index: 0;
+} */
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+  .hero-images {
+    height: 500px;
+  }
+  
+  .polaroid {
+    width: 150px;
+  }
+  
+  .polaroid img {
+    height: 130px;
+  }
+  
+  .main-image {
+    top: 50px;
+    left: 30px;
+  }
+  
+  .secondary-image {
+    top: 100px;
+    left: 120px;
+  }
+  
+  .third-image {
+    top: 200px;
+    left: 60px;
+  }
+  
+  .fourth-image {
+    top: 220px;
+    right: 40px;
+  }
 }
 
-.main-image img, .secondary-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  mix-blend-mode: normal;
-  opacity: 1;
-  border-radius: 0;
-  /* 더 강한 원형 그라데이션 효과 적용 */
-  -webkit-mask-image: radial-gradient(ellipse 85% 85% at center, black 50%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.2) 85%, transparent 90%);
-  mask-image: radial-gradient(ellipse 85% 85% at center, black 50%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.2) 85%, transparent 90%);
-  filter: brightness(1.03) contrast(0.93);
-}
-
-/* 점선 경로 완전히 제거 */
-.dotted-line {
-  display: none;
-}
-
-/* 아이콘도 제거 */
-.travel-icon {
-  display: none;
-}
-
-/* 서비스 섹션 */
-.services-section {
-  margin-bottom: 5rem;
-  position: relative;
-  z-index: 1;
-}
-
-.section-heading {
-  display: flex;
-  margin-bottom: 3rem;
-}
-
-.section-title {
-  font-size: 0.9rem;
-  color: #ff8c00;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.service-intro {
-  flex: 1;
-}
-
-.service-intro h3 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.intro-text {
-  color: #666;
-  max-width: 300px;
-}
-
-.services-grid {
-  display: flex;
-  gap: 2rem;
-  justify-content: space-between;
-}
-
-.service-card {
-  background-color: white;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-  flex: 1;
-}
-
-.service-icon {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.service-card h4 {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
-
-.service-card p {
-  color: #666;
-  font-size: 0.9rem;
-}
 
 /* 목적지 섹션 */
 .destinations-section {
@@ -781,9 +827,9 @@ const scrollRight = () => {
 }
 
 .arrow-btn:hover {
-  background-color: #ff8c00;
+  background-color: #9581e8;
   color: white;
-  border-color: #ff8c00;
+  border-color: #9581e8;
   transform: scale(1.1);
 }
 
@@ -849,7 +895,7 @@ const scrollRight = () => {
 }
 
 .price {
-  color: #ff8c00;
+  color: #9581e8;
   font-weight: 600;
 }
 
@@ -947,7 +993,7 @@ const scrollRight = () => {
 
 .planning-subtitle {
   font-size: 0.9rem;
-  color: #ff8c00;
+  color: #9581e8;
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
@@ -976,7 +1022,7 @@ const scrollRight = () => {
 
 .stat-value {
   font-size: 1.8rem;
-  color: #ff8c00;
+  color: #9581e8;
   margin-bottom: 0.3rem;
 }
 
@@ -995,7 +1041,7 @@ const scrollRight = () => {
 
 .reviews-subtitle {
   font-size: 0.9rem;
-  color: #ff8c00;
+  color: #9581e8;
   font-weight: 600;
   margin-bottom: 0.5rem;
 }

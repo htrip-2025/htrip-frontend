@@ -621,9 +621,8 @@ onMounted(() => {
 /* 전체 컨테이너 */
 .travel-container {
   width: 100%;
-  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 6rem;
   background-color: #ffffff;
   overflow: hidden;
   position: relative;

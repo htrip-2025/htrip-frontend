@@ -74,37 +74,9 @@
 </div>
     </section>
 
-    <!-- 서비스 섹션 -->
-    <section class="services-section">
-      <div class="section-heading">
-        <h2 class="section-title">WHAT WE SERVE</h2>
-        <br>
-        <div class="service-intro">
-          <h3>Top Values <br>For You 🔥</h3>
-          <p class="intro-text">Try a variety of benefits when using our services.</p>
-        </div>
-      </div>
-      
-      <div class="services-grid">
-        <div class="service-card">
-          <div class="service-icon">🌎</div>
-          <h4>Lot Of Choices</h4>
-          <p>Total 460+ destinations that we work with.</p>
-        </div>
-        
-        <div class="service-card">
-          <div class="service-icon">🧳</div>
-          <h4>Best Tour Guide</h4>
-          <p>Our tour guides with 15+ years of experience.</p>
-        </div>
-        
-        <div class="service-card">
-          <div class="service-icon">🎫</div>
-          <h4>Easy Booking</h4>
-          <p>With an easy and fast ticket purchase process.</p>
-        </div>
-      </div>
-    </section>
+
+
+
 
     <!-- 목적지 섹션 -->
     <section class="destinations-section">
@@ -358,9 +330,8 @@ const scrollRight = () => {
 /* 전체 컨테이너 */
 .travel-container {
   width: 100%;
-  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 6rem;
   background-color: #ffffff;
   overflow: hidden;
   position: relative;
@@ -448,7 +419,7 @@ const scrollRight = () => {
   position: relative;
   z-index: 1;
   padding: 1rem 0;
-  border-bottom: 0.8px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 0.8px solid rgba(0, 0, 0, 0.2);
 }
 
 .logo {
@@ -479,6 +450,7 @@ const scrollRight = () => {
 
 .menu-link:hover, .menu-link.active {
   color: #9581e8;
+  background: none;
 }
 
 .search-icon {
@@ -765,7 +737,7 @@ const scrollRight = () => {
 }
 
 /* 배경에 커브 선 추가 */
-.hero-images::before {
+/* .hero-images::before {
   content: '';
   position: absolute;
   top: 30%;
@@ -778,7 +750,7 @@ const scrollRight = () => {
   border-bottom: none;
   border-radius: 50% 50% 0 0;
   z-index: 0;
-}
+} */
 
 /* 반응형 조정 */
 @media (max-width: 768px) {
@@ -815,69 +787,6 @@ const scrollRight = () => {
   }
 }
 
-/* 서비스 섹션 */
-.services-section {
-  margin-bottom: 5rem;
-  position: relative;
-  z-index: 1;
-}
-
-.section-heading {
-  display: flex;
-  margin-bottom: 3rem;
-}
-
-.section-title {
-  font-size: 0.9rem;
-  color: #9581e8;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.service-intro {
-  flex: 1;
-}
-
-.service-intro h3 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.intro-text {
-  color: #666;
-  max-width: 300px;
-}
-
-.services-grid {
-  display: flex;
-  gap: 2rem;
-  justify-content: space-between;
-}
-
-.service-card {
-  background-color: white;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-  flex: 1;
-}
-
-.service-icon {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.service-card h4 {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
-
-.service-card p {
-  color: #666;
-  font-size: 0.9rem;
-}
 
 /* 목적지 섹션 */
 .destinations-section {
