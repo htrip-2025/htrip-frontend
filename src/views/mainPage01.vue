@@ -1,5 +1,296 @@
-<template>
-  <div class="travel-container">
+/* 꽃 모양 각각 다르게 스타일링 */
+.flower::before,
+.flower::after,
+.flower span {
+  content: '';
+  position: absolute;
+  background-color: #ffd7e8;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+/* 꽃 모양 1 - 기본 5잎 벚꽃 */
+.flower1::before {
+  width: 100%;
+  height: 100%;
+  background-color: #ffd7e8;
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  box-shadow: 
+    15px -15px 0 -5px #ffd7e8,
+    0px -20px 0 -5px #ffd7e8,
+    -15px -15px 0 -5px #ffd7e8,
+    -20px 0px 0 -5px #ffd7e8,
+    -15px 15px 0 -5px #ffd7e8,
+    0px 20px 0 -5px #ffd7e8,
+    15px 15px 0 -5px #ffd7e8,
+    20px 0px 0 -5px #ffd7e8;
+}
+
+.flower1::after {
+  width: 15px;
+  height: 15px;
+  background-color: #ffeb8b;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 꽃 모양 2 - 작은 벚꽃 */
+.flower2 {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.flower2::before {
+  width: 100%;
+  height: 100%;
+  background-color: #ffe3f1;
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  box-shadow: 
+    12px -12px 0 -4px #ffe3f1,
+    0px -16px 0 -4px #ffe3f1,
+    -12px -12px 0 -4px #ffe3f1,
+    -16px 0px 0 -4px #ffe3f1,
+    -12px 12px 0 -4px #ffe3f1,
+    0px 16px 0 -4px #ffe3f1,
+    12px 12px 0 -4px #ffe3f1,
+    16px 0px 0 -4px #ffe3f1;
+}
+
+.flower2::after {
+  width: 12px;
+  height: 12px;
+  background-color: #ffdb57;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 꽃 모양 3 - 큰 벚꽃 */
+.flower3 {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.flower3::before {
+  width: 100%;
+  height: 100%;
+  background-color: #ffcedf;
+  border-radius: 45%;
+  top: 0;
+  left: 0;
+  box-shadow: 
+    18px -18px 0 -6px #ffcedf,
+    0px -24px 0 -6px #ffcedf,
+    -18px -18px 0 -6px #ffcedf,
+    -24px 0px 0 -6px #ffcedf,
+    -18px 18px 0 -6px #ffcedf,
+    0px 24px 0 -6px #ffcedf,
+    18px 18px 0 -6px #ffcedf,
+    24px 0px 0 -6px #ffcedf;
+}
+
+.flower3::after {
+  width: 18px;
+  height: 18px;
+  background-color: #ffe066;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 꽃 모양 4 - 타원형 꽃잎 벚꽃 */
+.flower4 {
+  position: relative;
+  width: 45px;
+  height: 45px;
+}
+
+.flower4::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  background-color: #ffddeb;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  box-shadow: 
+    0 0 0 0 #ffddeb,
+    0 0 0 0 #ffddeb,
+    0 0 0 0 #ffddeb,
+    0 0 0 0 #ffddeb,
+    0 0 0 0 #ffddeb;
+}
+
+.flower4::before {
+  box-shadow: 
+    0 -15px 0 -3px #ffddeb,
+    14px -5px 0 -3px #ffddeb,
+    9px 12px 0 -3px #ffddeb,
+    -9px 12px 0 -3px #ffddeb,
+    -14px -5px 0 -3px #ffddeb;
+}
+
+.flower4::after {
+  width: 14px;
+  height: 14px;
+  background-color: #fff066;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 꽃 모양 5 - 둥근 꽃잎 벚꽃 */
+.flower5 {
+  position: relative;
+  width: 55px;
+  height: 55px;
+}
+
+.flower5::before {
+  width: 24px;
+  height: 24px;
+  background-color: #ffc1d8;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 
+    0 -20px 0 -2px #ffc1d8,
+    18px -8px 0 -2px #ffc1d8,
+    12px 16px 0 -2px #ffc1d8,
+    -12px 16px 0 -2px #ffc1d8,
+    -18px -8px 0 -2px #ffc1d8;
+}
+
+.flower5::after {
+  width: 16px;
+  height: 16px;
+  background-color: #ffd700;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}/* 벚꽃 전체 모양 스타일 */
+.flower {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  animation-name: flowerFall;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+/* 꽃 위치 및 애니메이션 타이밍 */
+.flower1 {
+  top: -50px;
+  left: 25%;
+  animation-duration: 18s;
+  animation-delay: 1s;
+}
+
+.flower2 {
+  top: -50px;
+  left: 55%;
+  animation-duration: 15s;
+  animation-delay: 4s;
+}
+
+.flower3 {
+  top: -50px;
+  left: 75%;
+  animation-duration: 20s;
+  animation-delay: 0s;
+}
+
+.flower4 {
+  top: -50px;
+  left: 35%;
+  animation-duration: 22s;
+  animation-delay: 6s;
+}
+
+.flower5 {
+  top: -50px;
+  left: 85%;
+  animation-duration: 16s;
+  animation-delay: 8s;
+}
+
+/* 꽃이 떨어지는 애니메이션 */
+@keyframes flowerFall {
+  0% {
+    top: -50px;
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(45deg) translateX(20px);
+  }
+  50% {
+    transform: rotate(90deg) translateX(-10px);
+  }
+  75% {
+    transform: rotate(180deg) translateX(15px);
+  }
+  100% {
+    top: 120%;
+    transform: rotate(360deg) translateX(-5px);
+  }
+}<template>
+  <div class="travel-container" :class="{ 'cherry-blossom-active': isCherryBlossomActive }">
+    <!-- Cherry Blossom Overlay -->
+    <div class="cherry-blossom-overlay">
+      <!-- 개별 꽃잎들 -->
+      <div class="petal petal1"></div>
+      <div class="petal petal2"></div>
+      <div class="petal petal3"></div>
+      <div class="petal petal4"></div>
+      <div class="petal petal5"></div>
+      <div class="petal petal6"></div>
+      <div class="petal petal7"></div>
+      <div class="petal petal8"></div>
+      <div class="petal petal9"></div>
+      <div class="petal petal10"></div>
+      <div class="petal petal11"></div>
+      <div class="petal petal12"></div>
+      <div class="petal petal13"></div>
+      <div class="petal petal14"></div>
+      <div class="petal petal15"></div>
+      <div class="petal petal16"></div>
+      <div class="petal petal17"></div>
+      <div class="petal petal18"></div>
+      <div class="petal petal19"></div>
+      <div class="petal petal20"></div>
+      <div class="petal petal21"></div>
+      <div class="petal petal22"></div>
+      <div class="petal petal23"></div>
+      <div class="petal petal24"></div>
+      <div class="petal petal25"></div>
+      <div class="petal petal26"></div>
+      <div class="petal petal27"></div>
+      <div class="petal petal28"></div>
+      <div class="petal petal29"></div>
+      <div class="petal petal30"></div>
+      
+      <!-- 전체 꽃 모양 -->
+      <div class="flower flower1"></div>
+      <div class="flower flower2"></div>
+      <div class="flower flower3"></div>
+      <div class="flower flower4"></div>
+      <div class="flower flower5"></div>
+    </div>
+    
     <!-- 배경 그라데이션 원형들 -->
     <div class="gradient-circle circle1"></div>
     <div class="gradient-circle circle2"></div>
@@ -10,24 +301,23 @@
     <div class="gradient-circle circle7"></div>
     
     <!-- 헤더 -->
-   <!-- header 부분만 수정 -->
-<header class="header">
-  <div class="logo">
-    <span class="logo-icon">T</span>rip
-  </div>
-  <div class="menu-items">
-    <a href="#" class="menu-link">AI 추천</a>
-    <a href="/info" class="menu-link">여행정보</a>
-    <a href="#" class="menu-link">여행계획</a>
-    <a href="#" class="menu-link">커뮤니티</a>
-    <a href="#" class="menu-link search-icon">🔍</a>
-  </div>
- <div class="login-section">
-  <a href="#" class="login-button">
-    <span class="button-text">로그인</span>
-  </a>
-</div>
-</header>
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">T</span>rip
+      </div>
+      <div class="menu-items">
+        <a href="#" class="menu-link">AI 추천</a>
+        <a href="/info" class="menu-link">여행정보</a>
+        <a href="#" class="menu-link">여행계획</a>
+        <a href="#" class="menu-link">커뮤니티</a>
+        <a href="#" class="menu-link search-icon">🔍</a>
+      </div>
+     <div class="login-section">
+      <a href="#" class="login-button">
+        <span class="button-text">로그인</span>
+      </a>
+    </div>
+    </header>
 
     <!-- 히어로 섹션 -->
     <section class="hero-section">
@@ -40,43 +330,41 @@
         </h1>
 
         <!-- 계획 시작하기 버튼 - 왼쪽 정렬로 변경 -->
-<div class="plan-button-container">
-  <router-link to="/info" class="plan-start-button">
-    <span class="button-icon">✈️</span>
-    <span class="button-text">여행 계획 시작하기</span>
-    <span class="button-arrow">→</span>
-  </router-link>
-</div>
-</div>
+        <div class="plan-button-container">
+          <router-link to="/info" class="plan-start-button">
+            <span class="button-icon">✈️</span>
+            <span class="button-text">여행 계획 시작하기</span>
+            <span class="button-arrow">→</span>
+          </router-link>
+        </div>
+      </div>
 
       <div class="hero-images">
-  <div class="polaroid-container">
-    <div class="polaroid main-image">
-      <img src="https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg" alt="Traveler in nature">
-      <div class="polaroid-bottom"></div>
-    </div>
-    
-    <div class="polaroid secondary-image">
-      <img src="https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg" alt="Scenic view">
-      <div class="polaroid-bottom"></div>
-    </div>
-    
-    <div class="polaroid third-image">
-      <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Another view">
-      <div class="polaroid-bottom"></div>
-    </div>
-    
-    <div class="polaroid fourth-image">
-      <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="More scenery">
-      <div class="polaroid-bottom"></div>
-    </div>
-  </div>
-</div>
+        <div class="polaroid-container">
+          <div class="polaroid main-image" 
+               @mouseover="activateCherryBlossom" 
+               @mouseleave="deactivateCherryBlossom">
+            <img src="https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg" alt="Traveler in nature">
+            <div class="polaroid-bottom"></div>
+          </div>
+          
+          <div class="polaroid secondary-image">
+            <img src="https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg" alt="Scenic view">
+            <div class="polaroid-bottom"></div>
+          </div>
+          
+          <div class="polaroid third-image">
+            <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Another view">
+            <div class="polaroid-bottom"></div>
+          </div>
+          
+          <div class="polaroid fourth-image">
+            <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="More scenery">
+            <div class="polaroid-bottom"></div>
+          </div>
+        </div>
+      </div>
     </section>
-
-
-
-
 
     <!-- 목적지 섹션 -->
     <section class="destinations-section">
@@ -268,9 +556,19 @@
 
 <script setup>
 // 화살표 버튼 클릭 시 목적지 카드 스크롤 기능
-
-// DOM이 마운트된 후에 화살표 버튼에 이벤트 리스너 추가
 import { onMounted, ref } from 'vue';
+
+// 체리 블라썸 효과 활성화 상태 추적
+const isCherryBlossomActive = ref(false);
+
+// 체리 블라썸 효과 활성화 및 비활성화 함수
+const activateCherryBlossom = () => {
+  isCherryBlossomActive.value = true;
+};
+
+const deactivateCherryBlossom = () => {
+  isCherryBlossomActive.value = false;
+};
 
 // 스크롤 위치 추적을 위한 ref
 const scrollPosition = ref(0);
@@ -327,6 +625,134 @@ const scrollRight = () => {
   font-family: 'Poppins', sans-serif;
 }
 
+/* 체리 블라썸 스타일 */
+.cherry-blossom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  overflow: hidden;
+}
+
+.cherry-blossom-active .cherry-blossom-overlay {
+  opacity: 1;
+}
+
+/* 벚꽃 꽃잎 */
+.petal {
+  position: absolute;
+  opacity: 0.8;
+  animation-name: fallAndSway;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+/* 다양한 꽃잎 모양 */
+.petal1, .petal6, .petal11, .petal16, .petal21, .petal26 {
+  background-image: radial-gradient(ellipse at center, #ffb7c5 0%, #ffc7d1 50%, #ffd8df 100%);
+  border-radius: 150% 0 150% 0;
+  transform: rotate(45deg);
+}
+
+.petal2, .petal7, .petal12, .petal17, .petal22, .petal27 {
+  background-image: radial-gradient(ellipse at center, #ffcad8 0%, #ffd6e1 50%, #ffe8ee 100%);
+  border-radius: 100% 0 100% 30%;
+  transform: rotate(30deg);
+}
+
+.petal3, .petal8, .petal13, .petal18, .petal23, .petal28 {
+  background-image: radial-gradient(ellipse at center, #ffa7b8 0%, #ffbdd0 50%, #ffd5df 100%);
+  border-radius: 120% 20% 120% 20%;
+  transform: rotate(60deg);
+}
+
+.petal4, .petal9, .petal14, .petal19, .petal24, .petal29 {
+  background-image: radial-gradient(ellipse at center, #ffc1d5 0%, #ffd3e2 50%, #ffe5ee 100%);
+  border-radius: 130% 10% 130% 40%;
+  transform: rotate(15deg);
+}
+
+.petal5, .petal10, .petal15, .petal20, .petal25, .petal30 {
+  background-image: radial-gradient(ellipse at center, #ff9ebc 0%, #ffb5ca 50%, #ffcbd9 100%);
+  border-radius: 110% 40% 110% 10%;
+  transform: rotate(75deg);
+}
+
+/* 다양한 크기의 꽃잎 */
+.petal1, .petal16, .petal21 { width: 20px; height: 20px; }
+.petal6, .petal11, .petal26 { width: 15px; height: 15px; }
+.petal2, .petal17, .petal27 { width: 25px; height: 25px; }
+.petal7, .petal12, .petal22 { width: 22px; height: 22px; }
+.petal3, .petal18 { width: 35px; height: 35px; } /* 더 큰 꽃잎 */
+.petal8, .petal13, .petal23, .petal28 { width: 30px; height: 30px; } /* 더 큰 꽃잎 */
+.petal4, .petal19, .petal29 { width: 18px; height: 18px; }
+.petal9, .petal14, .petal24 { width: 28px; height: 28px; } /* 더 큰 꽃잎 */
+.petal5, .petal20, .petal30 { width: 40px; height: 40px; } /* 더 큰 꽃잎 */
+.petal10, .petal15, .petal25 { width: 32px; height: 32px; } /* 더 큰 꽃잎 */
+
+/* 꽃잎의 초기 위치 설정 */
+.petal1 { top: -50px; left: 10%; animation-duration: 10s; animation-delay: 0s; }
+.petal2 { top: -50px; left: 20%; animation-duration: 14s; animation-delay: 1s; }
+.petal3 { top: -50px; left: 30%; animation-duration: 12s; animation-delay: 2s; }
+.petal4 { top: -50px; left: 40%; animation-duration: 15s; animation-delay: 0.5s; }
+.petal5 { top: -50px; left: 50%; animation-duration: 13s; animation-delay: 1.5s; }
+.petal6 { top: -50px; left: 60%; animation-duration: 11s; animation-delay: 3s; }
+.petal7 { top: -50px; left: 70%; animation-duration: 16s; animation-delay: 2.5s; }
+.petal8 { top: -50px; left: 80%; animation-duration: 10s; animation-delay: 1.2s; }
+.petal9 { top: -50px; left: 90%; animation-duration: 13s; animation-delay: 0.8s; }
+.petal10 { top: -50px; left: 15%; animation-duration: 12s; animation-delay: 2.2s; }
+.petal11 { top: -50px; left: 35%; animation-duration: 14s; animation-delay: 1.7s; }
+.petal12 { top: -50px; left: 55%; animation-duration: 11s; animation-delay: 0.3s; }
+.petal13 { top: -50px; left: 75%; animation-duration: 15s; animation-delay: 3.5s; }
+.petal14 { top: -50px; left: 25%; animation-duration: 13s; animation-delay: 2.8s; }
+.petal15 { top: -50px; left: 85%; animation-duration: 12s; animation-delay: 1.3s; }
+.petal16 { top: -50px; left: 5%; animation-duration: 11s; animation-delay: 0.2s; }
+.petal17 { top: -50px; left: 45%; animation-duration: 15s; animation-delay: 1.9s; }
+.petal18 { top: -50px; left: 65%; animation-duration: 13s; animation-delay: 3.2s; }
+.petal19 { top: -50px; left: 95%; animation-duration: 12s; animation-delay: 2.1s; }
+.petal20 { top: -50px; left: 38%; animation-duration: 14s; animation-delay: 1.1s; }
+.petal21 { top: -50px; left: 17%; animation-duration: 15s; animation-delay: 0.7s; }
+.petal22 { top: -50px; left: 52%; animation-duration: 12s; animation-delay: 2.6s; }
+.petal23 { top: -50px; left: 82%; animation-duration: 13s; animation-delay: 3.8s; }
+.petal24 { top: -50px; left: 28%; animation-duration: 11s; animation-delay: 1.4s; }
+.petal25 { top: -50px; left: 62%; animation-duration: 14s; animation-delay: 0.6s; }
+.petal26 { top: -50px; left: 73%; animation-duration: 12s; animation-delay: 3.1s; }
+.petal27 { top: -50px; left: 33%; animation-duration: 13s; animation-delay: 2.3s; }
+.petal28 { top: -50px; left: 87%; animation-duration: 15s; animation-delay: 0.9s; }
+.petal29 { top: -50px; left: 42%; animation-duration: 10s; animation-delay: 2.7s; }
+.petal30 { top: -50px; left: 67%; animation-duration: 16s; animation-delay: 1.6s; }
+
+/* 꽃잎이 떨어지고 좌우로 흔들리는 애니메이션 */
+@keyframes fallAndSway {
+  0% {
+    top: -50px;
+    transform-origin: center;
+  }
+  25% {
+    transform-origin: center;
+    transform: translateX(15px) rotate(20deg);
+  }
+  50% {
+    transform-origin: center;
+    transform: translateX(0) rotate(-10deg);
+  }
+  75% {
+    transform-origin: center;
+    transform: translateX(-15px) rotate(15deg);
+  }
+  100% {
+    top: 120%;
+    transform-origin: center;
+    transform: translateX(0) rotate(-5deg);
+  }
+}
+
 /* 전체 컨테이너 */
 .travel-container {
   width: 100%;
@@ -336,6 +762,7 @@ const scrollRight = () => {
   overflow: hidden;
   position: relative;
   min-height: 100vh;
+  transition: background-color 0.5s ease;
 }
 
 /* 그라데이션 원형(타원형) 스타일 */
@@ -344,6 +771,12 @@ const scrollRight = () => {
   border-radius: 65% 35% 60% 40% / 60% 40% 60% 40%;
   z-index: 0;
   transform: skew(-5deg, -10deg);
+  transition: background 0.5s ease, opacity 0.5s ease;
+}
+
+/* Cherry blossom active일 때 그라데이션 원 색상 변경 */
+.cherry-blossom-active .gradient-circle {
+  opacity: 0.9;
 }
 
 /* 개별 그라데이션 타원형 위치 및 스타일 */
@@ -356,6 +789,10 @@ const scrollRight = () => {
   transform: rotate(-15deg);
 }
 
+.cherry-blossom-active .circle1 {
+  background: radial-gradient(ellipse, rgba(245, 198, 239, 0.9) 0%, rgba(245, 198, 239, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
 .circle2 {
   bottom: -15%;
   right: -10%;
@@ -363,6 +800,10 @@ const scrollRight = () => {
   height: 38vw;
   background: radial-gradient(ellipse, rgba(213, 237, 251, 0.9) 0%, rgba(213, 237, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(10deg);
+}
+
+.cherry-blossom-active .circle2 {
+  background: radial-gradient(ellipse, rgba(252, 227, 248, 0.9) 0%, rgba(252, 227, 248, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
 }
 
 .circle3 {
@@ -374,6 +815,10 @@ const scrollRight = () => {
   transform: rotate(-8deg);
 }
 
+.cherry-blossom-active .circle3 {
+  background: radial-gradient(ellipse, rgba(235, 195, 248, 0.85) 0%, rgba(235, 195, 248, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
 .circle4 {
   bottom: 30%;
   left: 5%;
@@ -381,6 +826,10 @@ const scrollRight = () => {
   height: 22vw;
   background: radial-gradient(ellipse, rgba(213, 232, 251, 0.9) 0%, rgba(213, 232, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(12deg);
+}
+
+.cherry-blossom-active .circle4 {
+  background: radial-gradient(ellipse, rgba(245, 198, 239, 0.9) 0%, rgba(245, 198, 239, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
 }
 
 /* 추가된 타원형들 */
@@ -393,6 +842,10 @@ const scrollRight = () => {
   transform: rotate(-5deg);
 }
 
+.cherry-blossom-active .circle5 {
+  background: radial-gradient(ellipse, rgba(252, 227, 248, 0.85) 0%, rgba(252, 227, 248, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
 .circle6 {
   bottom: 50%;
   right: 30%;
@@ -402,6 +855,10 @@ const scrollRight = () => {
   transform: rotate(15deg);
 }
 
+.cherry-blossom-active .circle6 {
+  background: radial-gradient(ellipse, rgba(235, 195, 248, 0.8) 0%, rgba(235, 195, 248, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
 .circle7 {
   bottom: 10%;
   left: 40%;
@@ -409,6 +866,10 @@ const scrollRight = () => {
   height: 30vw;
   background: radial-gradient(ellipse, rgba(213, 232, 251, 0.85) 0%, rgba(213, 232, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(-12deg);
+}
+
+.cherry-blossom-active .circle7 {
+  background: radial-gradient(ellipse, rgba(245, 198, 239, 0.85) 0%, rgba(245, 198, 239, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
 }
 /* 헤더 스타일 수정 */
 .header {
@@ -567,9 +1028,7 @@ const scrollRight = () => {
   line-height: 1.2;
   margin-bottom: 2rem;
   color: #333;
-
 }
-
 
 /* 계획 시작하기 버튼 스타일 - 더 작고 연한 색상으로 수정 */
 .plan-button-container {
@@ -707,6 +1166,18 @@ const scrollRight = () => {
   z-index: 10;
 }
 
+/* 메인 이미지 강조 - 호버 시 약간 더 큰 스케일 및 z-index */
+.main-image {
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.main-image:hover {
+  transform: scale(1.08) rotate(0deg) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  z-index: 1001; /* Cherry blossom overlay보다 높게 */
+}
+
 /* 각 폴라로이드 위치 및 회전 */
 .main-image {
   top: 40px;
@@ -735,22 +1206,6 @@ const scrollRight = () => {
   transform: rotate(6deg);
   z-index: 1;
 }
-
-/* 배경에 커브 선 추가 */
-/* .hero-images::before {
-  content: '';
-  position: absolute;
-  top: 30%;
-  left: 5%;
-  width: 90%;
-  height: 50%;
-  border: 2px solid #e6d7a3;
-  border-left: none;
-  border-right: none;
-  border-bottom: none;
-  border-radius: 50% 50% 0 0;
-  z-index: 0;
-} */
 
 /* 반응형 조정 */
 @media (max-width: 768px) {
@@ -1049,6 +1504,17 @@ const scrollRight = () => {
 .reviews-title {
   font-size: 1.8rem;
   color: #333;
+}
+
+/* 체리 블라썸 활성화 시 컨텐츠 상대적 위치 유지 */
+.cherry-blossom-active .header,
+.cherry-blossom-active .hero-section,
+.cherry-blossom-active .destinations-section,
+.cherry-blossom-active .airlines-section,
+.cherry-blossom-active .vacation-planning,
+.cherry-blossom-active .reviews-section {
+  position: relative;
+  z-index: 1001;
 }
 
 /* 반응형 디자인 */
