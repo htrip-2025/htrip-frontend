@@ -1,5 +1,5 @@
 <template>
-  <div class="travel-container" :class="{ 'cherry-blossom-active': isCherryBlossomActive }">
+  <div class="travel-container" :class="{ 'cherry-blossom-active': isCherryBlossomActive, 'summer-leaves-active': isSummerLeavesActive }">
     <!-- Cherry Blossom Overlay -->
     <div class="cherry-blossom-overlay">
       <!-- 개별 꽃잎들 -->
@@ -40,6 +40,36 @@
       <div class="flower flower3"></div>
       <div class="flower flower4"></div>
       <div class="flower flower5"></div>
+    </div>
+    
+    <!-- Summer Leaves Overlay -->
+    <div class="summer-leaves-overlay">
+      <div class="corner-leaves top-left"></div>
+      <div class="corner-leaves top-right"></div>
+      <div class="corner-leaves bottom-left"></div>
+      <div class="corner-leaves bottom-right"></div>
+      
+      <!-- 날리는 나뭇잎들 -->
+      <div class="leaf leaf1"></div>
+      <div class="leaf leaf2"></div>
+      <div class="leaf leaf3"></div>
+      <div class="leaf leaf4"></div>
+      <div class="leaf leaf5"></div>
+      <div class="leaf leaf6"></div>
+      <div class="leaf leaf7"></div>
+      <div class="leaf leaf8"></div>
+      <div class="leaf leaf9"></div>
+      <div class="leaf leaf10"></div>
+      <div class="leaf leaf11"></div>
+      <div class="leaf leaf12"></div>
+      <div class="leaf leaf13"></div>
+      <div class="leaf leaf14"></div>
+      <div class="leaf leaf15"></div>
+      <div class="leaf leaf16"></div>
+      <div class="leaf leaf17"></div>
+      <div class="leaf leaf18"></div>
+      <div class="leaf leaf19"></div>
+      <div class="leaf leaf20"></div>
     </div>
     
     <!-- 배경 그라데이션 원형들 -->
@@ -99,7 +129,9 @@
             <div class="polaroid-bottom"></div>
           </div>
           
-          <div class="polaroid secondary-image">
+          <div class="polaroid secondary-image" 
+               @mouseover="activateSummerLeaves" 
+               @mouseleave="deactivateSummerLeaves">
             <img src="https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg" alt="Scenic view">
             <div class="polaroid-bottom"></div>
           </div>
@@ -116,6 +148,10 @@
         </div>
       </div>
     </section>
+
+
+
+
 
     <!-- 목적지 섹션 -->
     <section class="destinations-section">
@@ -258,8 +294,50 @@
       </div>
     </section>
 
+    <!-- 휴가 계획 섹션 -->
+    <section class="vacation-planning">
+      <div class="planning-images">
+        <div class="main-planning-image">
+          <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Traveler in nature">
+        </div>
+        <div class="secondary-planning-image">
+          <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="Scenic view">
+        </div>
+      </div>
+      
+      <div class="planning-content">
+        <h2 class="planning-subtitle">TRAVEL POINT</h2>
+        <h3 class="planning-title">We Helping You Find Your Dream Vacation 😊</h3>
+        <p class="planning-text">
+          Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type...
+        </p>
+        
+        <div class="stats-container">
+          <div class="stat-item">
+            <h3 class="stat-value">100+</h3>
+            <p class="stat-label">Holiday Package</p>
+          </div>
+          <div class="stat-item">
+            <h3 class="stat-value">230</h3>
+            <p class="stat-label">Luxury Hotel</p>
+          </div>
+          <div class="stat-item">
+            <h3 class="stat-value">12</h3>
+            <p class="stat-label">Elite Airline</p>
+          </div>
+          <div class="stat-item">
+            <h3 class="stat-value">114M+</h3>
+            <p class="stat-label">Satisfied Traveler</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    
+    <!-- 리뷰 섹션 -->
+    <section class="reviews-section">
+      <h2 class="reviews-subtitle">HAPPY TRAVELLERS</h2>
+      <h3 class="reviews-title">What Our Travellers Say 😊</h3>
+    </section>
   </div>
 </template>
 
@@ -269,6 +347,8 @@ import { onMounted, ref } from 'vue';
 
 // 체리 블라썸 효과 활성화 상태 추적
 const isCherryBlossomActive = ref(false);
+// 여름 나뭇잎 효과 활성화 상태 추적
+const isSummerLeavesActive = ref(false);
 
 // 체리 블라썸 효과 활성화 및 비활성화 함수
 const activateCherryBlossom = () => {
@@ -277,6 +357,15 @@ const activateCherryBlossom = () => {
 
 const deactivateCherryBlossom = () => {
   isCherryBlossomActive.value = false;
+};
+
+// 여름 나뭇잎 효과 활성화 및 비활성화 함수
+const activateSummerLeaves = () => {
+  isSummerLeavesActive.value = true;
+};
+
+const deactivateSummerLeaves = () => {
+  isSummerLeavesActive.value = false;
 };
 
 // 스크롤 위치 추적을 위한 ref
@@ -406,26 +495,26 @@ const scrollRight = () => {
 .petal10, .petal15, .petal25 { width: 32px; height: 32px; } /* 더 큰 꽃잎 */
 
 /* 꽃잎의 초기 위치 설정 */
-.petal1 { top: -50px; left: 10%; animation-duration: 10s; animation-delay: 0s; }
-.petal2 { top: -50px; left: 20%; animation-duration: 14s; animation-delay: 1s; }
-.petal3 { top: -50px; left: 30%; animation-duration: 12s; animation-delay: 2s; }
-.petal4 { top: -50px; left: 40%; animation-duration: 15s; animation-delay: 0.5s; }
+.petal1 { top: -50px; left: 10%; animation-duration: 10s; animation-delay: 0.5s; }
+.petal2 { top: -50px; left: 20%; animation-duration: 14s; animation-delay: 2s; }
+.petal3 { top: -50px; left: 30%; animation-duration: 12s; animation-delay: 0s; }
+.petal4 { top: -50px; left: 40%; animation-duration: 15s; animation-delay: 3s; }
 .petal5 { top: -50px; left: 50%; animation-duration: 13s; animation-delay: 1.5s; }
-.petal6 { top: -50px; left: 60%; animation-duration: 11s; animation-delay: 3s; }
-.petal7 { top: -50px; left: 70%; animation-duration: 16s; animation-delay: 2.5s; }
-.petal8 { top: -50px; left: 80%; animation-duration: 10s; animation-delay: 1.2s; }
-.petal9 { top: -50px; left: 90%; animation-duration: 13s; animation-delay: 0.8s; }
-.petal10 { top: -50px; left: 15%; animation-duration: 12s; animation-delay: 2.2s; }
-.petal11 { top: -50px; left: 35%; animation-duration: 14s; animation-delay: 1.7s; }
-.petal12 { top: -50px; left: 55%; animation-duration: 11s; animation-delay: 0.3s; }
-.petal13 { top: -50px; left: 75%; animation-duration: 15s; animation-delay: 3.5s; }
-.petal14 { top: -50px; left: 25%; animation-duration: 13s; animation-delay: 2.8s; }
-.petal15 { top: -50px; left: 85%; animation-duration: 12s; animation-delay: 1.3s; }
-.petal16 { top: -50px; left: 5%; animation-duration: 11s; animation-delay: 0.2s; }
-.petal17 { top: -50px; left: 45%; animation-duration: 15s; animation-delay: 1.9s; }
-.petal18 { top: -50px; left: 65%; animation-duration: 13s; animation-delay: 3.2s; }
-.petal19 { top: -50px; left: 95%; animation-duration: 12s; animation-delay: 2.1s; }
-.petal20 { top: -50px; left: 38%; animation-duration: 14s; animation-delay: 1.1s; }
+.petal6 { top: -50px; left: 60%; animation-duration: 11s; animation-delay: 4s; }
+.petal7 { top: -50px; left: 70%; animation-duration: 16s; animation-delay: 0.8s; }
+.petal8 { top: -50px; left: 80%; animation-duration: 10s; animation-delay: 2.5s; }
+.petal9 { top: -50px; left: 90%; animation-duration: 13s; animation-delay: 1s; }
+.petal10 { top: -50px; left: 15%; animation-duration: 12s; animation-delay: 3.5s; }
+.petal11 { top: -50px; left: 25%; animation-duration: 14s; animation-delay: 0.3s; }
+.petal12 { top: -50px; left: 35%; animation-duration: 11s; animation-delay: 2.8s; }
+.petal13 { top: -50px; left: 45%; animation-duration: 15s; animation-delay: 1.2s; }
+.petal14 { top: -50px; left: 55%; animation-duration: 13s; animation-delay: 3.8s; }
+.petal15 { top: -50px; left: 65%; animation-duration: 12s; animation-delay: 0.6s; }
+.petal16 { top: -50px; left: 75%; animation-duration: 15s; animation-delay: 2.2s; }
+.petal17 { top: -50px; left: 85%; animation-duration: 14s; animation-delay: 1.7s; }
+.petal18 { top: -50px; left: 5%; animation-duration: 13s; animation-delay: 3.2s; }
+.petal19 { top: -50px; left: 95%; animation-duration: 15s; animation-delay: 1.3s; }
+.petal20 { top: -50px; left: 55%; animation-duration: 12s; animation-delay: 2.7s; }
 .petal21 { top: -50px; left: 17%; animation-duration: 15s; animation-delay: 0.7s; }
 .petal22 { top: -50px; left: 52%; animation-duration: 12s; animation-delay: 2.6s; }
 .petal23 { top: -50px; left: 82%; animation-duration: 13s; animation-delay: 3.8s; }
@@ -462,6 +551,195 @@ const scrollRight = () => {
   }
 }
 
+
+/* 여름 나뭇잎 오버레이 */
+.summer-leaves-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgcGF0dGVyblRyYW5zZm9ybT0icm90YXRlKDQ1KSI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC44KSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjIwIiBmaWxsPSJyZ2JhKDIxMCwyNTUsMjEwLDAuMikiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=');
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  overflow: hidden;
+}
+
+.summer-leaves-active .summer-leaves-overlay {
+  opacity: 1;
+}
+
+/* 모서리 나뭇잎 장식 */
+.corner-leaves {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1s ease, transform 1s ease;
+  z-index: 101;
+}
+
+.summer-leaves-active .corner-leaves {
+  opacity: 1;
+}
+
+.top-left {
+  top: 0;
+  left: 0;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cGF0aCBkPSJNMCwwIEwxMDAsMTAwIEwwLDEwMCBaIiBmaWxsPSJyZ2JhKDEwMCwyMDAsMTAwLDAuNSkiLz48cGF0aCBkPSJNMTAsMTAgQzUwLDMwIDcwLDUwIDkwLDkwIEMzMCw3MCAyMCw0MCAxMCwxMCBaIiBmaWxsPSJyZ2JhKDgwLDE4MCw4MCwwLjgpIi8+PC9zdmc+');
+  transform: scale(0.8) translate(-30px, -30px);
+}
+
+.summer-leaves-active .top-left {
+  transform: scale(1) translate(0, 0);
+}
+
+.top-right {
+  top: 0;
+  right: 0;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cGF0aCBkPSJNMjAwLDAgTDEwMCwxMDAgTDIwMCwxMDAgWiIgZmlsbD0icmdiYSgxMjAsMjEwLDEyMCwwLjUpIi8+PHBhdGggZD0iTTE5MCwxMCBDMTUwLDMwIDEzMCw1MCAxMTAsOTAgQzE3MCw3MCAxODAsNDAgMTkwLDEwIFoiIGZpbGw9InJnYmEoMTAwLDE5MCwxMDAsMC44KSIvPjwvc3ZnPg==');
+  transform: scale(0.8) translate(30px, -30px);
+}
+
+.summer-leaves-active .top-right {
+  transform: scale(1) translate(0, 0);
+}
+
+.bottom-left {
+  bottom: 0;
+  left: 0;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cGF0aCBkPSJNMCwyMDAgTDEwMCwxMDAgTDAsMTAwIFoiIGZpbGw9InJnYmEoMTMwLDIyMCwxMzAsMC41KSIvPjxwYXRoIGQ9Ik0xMCwxOTAgQzUwLDE3MCA3MCwxNTAgOTAsMTEwIEMzMCwxMzAgMjAsMTYwIDEwLDE5MCBaIiBmaWxsPSJyZ2JhKDExMCwyMDAsMTEwLDAuOCkiLz48L3N2Zz4=');
+  transform: scale(0.8) translate(-30px, 30px);
+}
+
+.summer-leaves-active .bottom-left {
+  transform: scale(1) translate(0, 0);
+}
+
+.bottom-right {
+  bottom: 0;
+  right: 0;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cGF0aCBkPSJNMjAwLDIwMCBMMTAwLDEwMCBMMjAwLDEwMCBaIiBmaWxsPSJyZ2JhKDE0MCwyMzAsMTQwLDAuNSkiLz48cGF0aCBkPSJNMTkwLDE5MCBDMTU1LDE3MCAxMzUsMTUwIDExNSwxMTAgQzE3NSwxMzAgMTg1LDE2MCAxOTAsMTkwIFoiIGZpbGw9InJnYmEoMTIwLDIxMCwxMjAsMC44KSIvPjwvc3ZnPg==');
+  transform: scale(0.8) translate(30px, 30px);
+}
+
+.summer-leaves-active .bottom-right {
+  transform: scale(1) translate(0, 0);
+}
+
+/* 날리는 나뭇잎들 */
+.leaf {
+  position: absolute;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0;
+  animation-name: floatLeaf;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  z-index: 102;
+}
+
+.summer-leaves-active .leaf {
+  opacity: 0.8;
+}
+
+/* 다양한 나뭇잎 크기와 모양 */
+.leaf1, .leaf6, .leaf11, .leaf16 {
+  width: 30px;
+  height: 30px;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MCA1MCI+PHBhdGggZD0iTTI1LDEgQzQwLDEwIDQwLDQwIDI1LDUwIEMxMCw0MCAxMCwxMCAyNSwxIHoiIGZpbGw9InJnYmEoMTAwLDE4MCw4MCwwLjkpIi8+PHBhdGggZD0iTTI1LDEgTDI1LDUwIiBzdHJva2U9InJnYmEoODAsMTUwLDcwLDAuNikiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg==');
+}
+
+.leaf2, .leaf7, .leaf12, .leaf17 {
+  width: 40px;
+  height: 40px;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MCA1MCI+PHBhdGggZD0iTTI1LDEgQzQ1LDE1IDQ1LDM1IDI1LDUwIEM1LDM1IDUsMTUgMjUsMyB6IiBmaWxsPSJyZ2JhKDEyMCwyMDAsOTAsMC44KSIvPjxwYXRoIGQ9Ik0xMCwyNSBDMjUsMTAgNDUsMzAgMjUsNDUiIHN0cm9rZT0icmdiYSg5MCwxNjAsODAsMC43KSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIi8+PC9zdmc+');
+}
+
+.leaf3, .leaf8, .leaf13, .leaf18 {
+  width: 50px;
+  height: 25px;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MCAyNSI+PHBhdGggZD0iTTEsNSBDMTAsMCAyNSw1IDUwLDEwIEMyNSwyNSAxLDIwIDEsNSB6IiBmaWxsPSJyZ2JhKDE0MCwyMTAsMTEwLDAuOSkiLz48cGF0aCBkPSJNNSw1IEw0MCwxNSIgc3Ryb2tlPSJyZ2JhKDEyMCwxODAsMTAwLDAuNikiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==');
+}
+
+.leaf4, .leaf9, .leaf14, .leaf19 {
+  width: 35px;
+  height: 45px;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNSA0NSI+PHBhdGggZD0iTTE3LDEgQzMwLDEwIDM1LDMwIDE3LDQ1IEM1LDMwIDUsMTAgMTcsMSB6IiBmaWxsPSJyZ2JhKDgwLDE3MCw2MCwwLjkpIi8+PHBhdGggZD0iTTE3LDEgTDE3LDQ1IE01LDIwIEMxNSwxNSAyMCwxNSAzMCwyMCIgc3Ryb2tlPSJyZ2JhKDYwLDE1MCw1MCwwLjYpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48L3N2Zz4=');
+}
+
+.leaf5, .leaf10, .leaf15, .leaf20 {
+  width: 45px;
+  height: 35px;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NSAzNSI+PHBhdGggZD0iTTEsNSBDMTUsMCAzMCw1IDQ1LDEwIEMzMCwzNSAxLDMwIDEsNSB6IiBmaWxsPSJyZ2JhKDEzMCwxOTAsMTAwLDAuOSkiLz48cGF0aCBkPSJNNSw4IEwzNSwxOCIgc3Ryb2tlPSJyZ2JhKDEwMCwxNjAsODAsMC42KSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIi8+PC9zdmc+');
+}
+
+/* 나뭇잎 초기 위치 설정 */
+.leaf1 { top: -50px; left: 10%; animation-duration: 20s; animation-delay: 0.5s; }
+.leaf2 { top: -50px; left: 20%; animation-duration: 18s; animation-delay: 2s; }
+.leaf3 { top: -50px; left: 30%; animation-duration: 22s; animation-delay: 0s; }
+.leaf4 { top: -50px; left: 40%; animation-duration: 19s; animation-delay: 3s; }
+.leaf5 { top: -50px; left: 50%; animation-duration: 21s; animation-delay: 1.5s; }
+.leaf6 { top: -50px; left: 60%; animation-duration: 17s; animation-delay: 4s; }
+.leaf7 { top: -50px; left: 70%; animation-duration: 23s; animation-delay: 0.8s; }
+.leaf8 { top: -50px; left: 80%; animation-duration: 16s; animation-delay: 2.5s; }
+.leaf9 { top: -50px; left: 90%; animation-duration: 24s; animation-delay: 1s; }
+.leaf10 { top: -50px; left: 15%; animation-duration: 18s; animation-delay: 3.5s; }
+.leaf11 { top: -50px; left: 25%; animation-duration: 20s; animation-delay: 0.3s; }
+.leaf12 { top: -50px; left: 35%; animation-duration: 19s; animation-delay: 2.8s; }
+.leaf13 { top: -50px; left: 45%; animation-duration: 21s; animation-delay: 1.2s; }
+.leaf14 { top: -50px; left: 55%; animation-duration: 17s; animation-delay: 3.8s; }
+.leaf15 { top: -50px; left: 65%; animation-duration: 23s; animation-delay: 0.6s; }
+.leaf16 { top: -50px; left: 75%; animation-duration: 16s; animation-delay: 2.2s; }
+.leaf17 { top: -50px; left: 85%; animation-duration: 22s; animation-delay: 1.7s; }
+.leaf18 { top: -50px; left: 5%; animation-duration: 19s; animation-delay: 3.2s; }
+.leaf19 { top: -50px; left: 95%; animation-duration: 18s; animation-delay: 1.3s; }
+.leaf20 { top: -50px; left: 55%; animation-duration: 20s; animation-delay: 2.7s; }
+
+/* 나뭇잎이 떨어지고 좌우로 흔들리는 애니메이션 */
+@keyframes floatLeaf {
+  0% {
+    top: -50px;
+    transform: translateX(0) rotate(0deg);
+  }
+  10% {
+    transform: translateX(20px) rotate(15deg);
+  }
+  20% {
+    transform: translateX(-15px) rotate(-10deg);
+  }
+  30% {
+    transform: translateX(15px) rotate(5deg);
+  }
+  40% {
+    transform: translateX(-20px) rotate(-15deg);
+  }
+  50% {
+    transform: translateX(10px) rotate(10deg);
+  }
+  60% {
+    transform: translateX(-15px) rotate(-5deg);
+  }
+  70% {
+    transform: translateX(20px) rotate(15deg);
+  }
+  80% {
+    transform: translateX(-10px) rotate(-10deg);
+  }
+  90% {
+    transform: translateX(15px) rotate(5deg);
+  }
+  100% {
+    top: 120%;
+    transform: translateX(0) rotate(0deg);
+  }
+}
+
 /* 전체 컨테이너 */
 .travel-container {
   width: 100%;
@@ -488,6 +766,11 @@ const scrollRight = () => {
   opacity: 0.9;
 }
 
+/* Summer leaves active일 때 그라데이션 원 색상 변경 */
+.summer-leaves-active .gradient-circle {
+  opacity: 0.9;
+}
+
 /* 개별 그라데이션 타원형 위치 및 스타일 */
 .circle1 {
   top: -10%;
@@ -500,6 +783,10 @@ const scrollRight = () => {
 
 .cherry-blossom-active .circle1 {
   background: radial-gradient(ellipse, rgba(245, 198, 239, 0.9) 0%, rgba(245, 198, 239, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
+.summer-leaves-active .circle1 {
+  background: radial-gradient(ellipse, rgba(198, 245, 200, 0.9) 0%, rgba(198, 245, 200, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
 }
 
 .circle2 {
@@ -515,6 +802,10 @@ const scrollRight = () => {
   background: radial-gradient(ellipse, rgba(252, 227, 248, 0.9) 0%, rgba(252, 227, 248, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
 }
 
+.summer-leaves-active .circle2 {
+  background: radial-gradient(ellipse, rgba(185, 245, 190, 0.9) 0%, rgba(185, 245, 190, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
 .circle3 {
   top: 20%;
   right: 10%;
@@ -528,6 +819,10 @@ const scrollRight = () => {
   background: radial-gradient(ellipse, rgba(235, 195, 248, 0.85) 0%, rgba(235, 195, 248, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
 }
 
+.summer-leaves-active .circle3 {
+  background: radial-gradient(ellipse, rgba(160, 230, 170, 0.85) 0%, rgba(160, 230, 170, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
 .circle4 {
   bottom: 30%;
   left: 5%;
@@ -539,6 +834,10 @@ const scrollRight = () => {
 
 .cherry-blossom-active .circle4 {
   background: radial-gradient(ellipse, rgba(245, 198, 239, 0.9) 0%, rgba(245, 198, 239, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
+.summer-leaves-active .circle4 {
+  background: radial-gradient(ellipse, rgba(175, 235, 180, 0.9) 0%, rgba(175, 235, 180, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
 }
 
 /* 추가된 타원형들 */
@@ -555,6 +854,10 @@ const scrollRight = () => {
   background: radial-gradient(ellipse, rgba(252, 227, 248, 0.85) 0%, rgba(252, 227, 248, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
 }
 
+.summer-leaves-active .circle5 {
+  background: radial-gradient(ellipse, rgba(190, 245, 195, 0.85) 0%, rgba(190, 245, 195, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
 .circle6 {
   bottom: 50%;
   right: 30%;
@@ -566,6 +869,10 @@ const scrollRight = () => {
 
 .cherry-blossom-active .circle6 {
   background: radial-gradient(ellipse, rgba(235, 195, 248, 0.8) 0%, rgba(235, 195, 248, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
+.summer-leaves-active .circle6 {
+  background: radial-gradient(ellipse, rgba(170, 225, 175, 0.8) 0%, rgba(170, 225, 175, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
 }
 
 .circle7 {
@@ -580,6 +887,11 @@ const scrollRight = () => {
 .cherry-blossom-active .circle7 {
   background: radial-gradient(ellipse, rgba(245, 198, 239, 0.85) 0%, rgba(245, 198, 239, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
 }
+
+.summer-leaves-active .circle7 {
+  background: radial-gradient(ellipse, rgba(175, 240, 180, 0.85) 0%, rgba(175, 240, 180, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
+}
+
 /* 헤더 스타일 수정 */
 .header {
   display: flex;
@@ -1221,7 +1533,13 @@ const scrollRight = () => {
 .cherry-blossom-active .destinations-section,
 .cherry-blossom-active .airlines-section,
 .cherry-blossom-active .vacation-planning,
-.cherry-blossom-active .reviews-section {
+.cherry-blossom-active .reviews-section,
+.summer-leaves-active .header,
+.summer-leaves-active .hero-section,
+.summer-leaves-active .destinations-section,
+.summer-leaves-active .airlines-section,
+.summer-leaves-active .vacation-planning,
+.summer-leaves-active .reviews-section {
   position: relative;
   z-index: 1001;
 }
