@@ -5,6 +5,7 @@ import trip_info_page from '../views/trip_info_page.vue'
 import about from '../views/AboutView.vue'
 import MainPage01 from '@/views/mainPage01.vue'
 import boardPage from '@/views/boardPage.vue'
+import loginPage from '@/views/loginPage.vue'
 
 
 const router = createRouter({
@@ -34,6 +35,11 @@ const router = createRouter({
       path: '/board',
       name: 'board',
       component: boardPage,
+    },
+     {
+      path: '/login',
+      name: 'login',
+      component: loginPage,
     },
   ],
 })
