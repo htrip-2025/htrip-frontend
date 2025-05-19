@@ -4,6 +4,7 @@ import main_page from '../views/main_page.vue'
 import trip_info_page from '../views/trip_info_page.vue'
 import about from '../views/AboutView.vue'
 import MainPage01 from '@/views/mainPage01.vue'
+import boardPage from '@/views/boardPage.vue'
 
 
 const router = createRouter({
@@ -28,6 +29,11 @@ const router = createRouter({
       path: '/main',
       name: 'main',
       component: MainPage01,
+    },
+    {
+      path: '/board',
+      name: 'board',
+      component: boardPage,
     },
   ],
 })
