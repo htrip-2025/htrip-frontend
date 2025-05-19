@@ -217,52 +217,7 @@
       <div class="airline-logo">
         <span>✈️ GoAir</span>
       </div>
-    </section>
-
-    <!-- 휴가 계획 섹션 -->
-    <section class="vacation-planning">
-      <div class="planning-images">
-        <div class="main-planning-image">
-          <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Traveler in nature">
-        </div>
-        <div class="secondary-planning-image">
-          <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="Scenic view">
-        </div>
-      </div>
-      
-      <div class="planning-content">
-        <h2 class="planning-subtitle">TRAVEL POINT</h2>
-        <h3 class="planning-title">We Helping You Find Your Dream Vacation 😊</h3>
-        <p class="planning-text">
-          Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type...
-        </p>
-        
-        <div class="stats-container">
-          <div class="stat-item">
-            <h3 class="stat-value">100+</h3>
-            <p class="stat-label">Holiday Package</p>
-          </div>
-          <div class="stat-item">
-            <h3 class="stat-value">230</h3>
-            <p class="stat-label">Luxury Hotel</p>
-          </div>
-          <div class="stat-item">
-            <h3 class="stat-value">12</h3>
-            <p class="stat-label">Elite Airline</p>
-          </div>
-          <div class="stat-item">
-            <h3 class="stat-value">114M+</h3>
-            <p class="stat-label">Satisfied Traveler</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 리뷰 섹션 -->
-    <section class="reviews-section">
-      <h2 class="reviews-subtitle">HAPPY TRAVELLERS</h2>
-      <h3 class="reviews-title">What Our Travellers Say 😊</h3>
-    </section>
+  </section>
   </div>
 </template>
 

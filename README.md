@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # vue-project
 
 This template should help get you started developing with Vue 3 in Vite.
@@ -33,3 +34,7 @@ npm run build
 ```sh
 npm run lint
 ```
+=======
+# htrip-frontend
+htrip_FE
+>>>>>>> c4a23e6b1225189080d83fadde9b52b0ad90bbb8
