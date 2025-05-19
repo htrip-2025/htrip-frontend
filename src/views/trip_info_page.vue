@@ -40,56 +40,56 @@
           <div class="region-icon">
             <span class="region-text">서울</span>
           </div>
-          <p>서울</p>
+         
         </div>
         
         <div class="region-item">
           <div class="region-icon">
             <span class="region-text">부산</span>
           </div>
-          <p>부산</p>
+         
         </div>
         
         <div class="region-item">
           <div class="region-icon">
             <span class="region-text">제주</span>
           </div>
-          <p>제주도</p>
+         
         </div>
         
         <div class="region-item">
           <div class="region-icon">
             <span class="region-text">강원</span>
           </div>
-          <p>강원도</p>
+        
         </div>
         
         <div class="region-item">
           <div class="region-icon">
             <span class="region-text">경주</span>
           </div>
-          <p>경주</p>
+        
         </div>
         
         <div class="region-item">
           <div class="region-icon">
             <span class="region-text">전주</span>
           </div>
-          <p>전주</p>
+        
         </div>
         
         <div class="region-item">
           <div class="region-icon">
             <span class="region-text">인천</span>
           </div>
-          <p>인천</p>
+        
         </div>
         
         <div class="region-item">
           <div class="region-icon">
             <span class="region-text">경기</span>
           </div>
-          <p>경기도</p>
+         
         </div>
       </div>
     </section>

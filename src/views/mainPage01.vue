@@ -94,7 +94,7 @@
         <a href="#" class="menu-link search-icon">🔍</a>
       </div>
      <div class="login-section">
-      <a href="#" class="login-button">
+      <a href="/login" class="login-button">
         <span class="button-text">로그인</span>
       </a>
     </div>
