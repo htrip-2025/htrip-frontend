@@ -1,6 +1,6 @@
 <template>
   <div class="login-container">
-    <!-- 왼쪽 콘텐츠 영역 -->
+    <!-- 왼쪽 콘텐츠 영역은 그대로 유지 -->
     <div class="content-section">
       <div class="branding">
         <div class="logo-area">
@@ -44,68 +44,53 @@
       </div>
     </div>
 
-    <!-- 오른쪽 로그인 폼 영역 -->
+    <!-- 오른쪽 로그인 폼 영역 수정 -->
     <div class="login-form-section">
       <div class="form-container">
         <h2 class="form-title">Create an account.</h2>
         <p class="form-subtitle">Already have an account? <a href="#" class="signin-link">Sign in</a></p>
         
-        <form class="login-form">
-          <div class="form-group">
-            <input type="text" id="name" placeholder="Name" required />
-          </div>
-          
-          <div class="form-group">
-            <input type="email" id="email" placeholder="Email address" required />
-          </div>
-          
-          <div class="form-group password-group">
-            <input type="password" id="password" placeholder="Password" required />
-            <button type="button" class="show-password">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
+        <!-- 알림 메시지 -->
+        <div v-if="message" class="alert" :class="{'alert-success': isSuccess, 'alert-error': !isSuccess}">
+          {{ message }}
+        </div>
+        
+        <!-- 기존 폼 대신 소셜 로그인 버튼만 표시 -->
+        <div class="social-login-buttons">
+          <!-- Google 로그인 버튼 -->
+          <a href="#" class="social-login-btn google-btn" @click.prevent="handleGoogleLogin">
+            <div class="social-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
-            </button>
-          </div>
+            </div>
+            <span>Google로 시작하기</span>
+          </a>
           
-          <div class="terms-text">
-            <p>By login in you agree to our <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a></p>
-          </div>
+          <!-- Kakao 로그인 버튼 - 아직 구현하지 않음 -->
+          <a href="#" class="social-login-btn kakao-btn">
+            <div class="social-icon">
+              <svg width="22" height="20" viewBox="0 0 24 22" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 0C5.371 0 0 4.292 0 9.592c0 3.307 2.186 6.213 5.5 7.861l-1.401 5.194c-.122.455.385.818.774.546l5.927-3.921c.402.039.812.06 1.231.06 6.629 0 12-4.292 12-9.592S18.629 0 12 0z" fill="#371D1E"/>
+              </svg>
+            </div>
+            <span>Kakao로 시작하기</span>
+          </a>
           
-          <button type="submit" class="signup-button">Sign Up</button>
-          
-          <!-- 소셜 로그인 구분선 -->
-          <div class="social-divider">
-            <span>or sign up with</span>
-          </div>
-          
-          <!-- 소셜 로그인 버튼 영역 (기존 코드 유지) -->
-          <div class="social-buttons">
-            <!-- 깃허브 버튼 추가 -->
-            <button type="button" class="social-button github-button">
-              <div class="social-icon github-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" fill="#333"/>
-                </svg>
-              </div>
-              <span>Github</span>
-            </button>
-            
-            <!-- 구글 로그인 버튼 -->
-            <button type="button" class="social-button google-button">
-              <div class="social-icon google-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                  <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032 s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2 C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#4285F4"/>
-                  <path d="M7,10.969 L7,13.031 L10.5,13.031 L10.5,10.969 L7,10.969 Z" fill="#34A853" transform="translate(8.75, 12) scale(0.9, 0.9) translate(-8.75, -12)"/>
-                  <path d="M14,10.969 L14,13.031 L17.5,13.031 L17.5,10.969 L14,10.969 Z" fill="#FBBC05" transform="translate(15.75, 12) scale(0.9, 0.9) translate(-15.75, -12)"/>
-                  <path d="M10.5,7.469 L10.5,9.531 L17.5,9.531 L17.5,7.469 L10.5,7.469 Z" fill="#EA4335" transform="translate(14, 8.5) scale(0.9, 0.9) translate(-14, -8.5)"/>
-                </svg>
-              </div>
-              <span>Google</span>
-            </button>
-          </div>
-        </form>
+          <!-- Naver 로그인 버튼 - 아직 구현하지 않음 -->
+          <a href="#" class="social-login-btn naver-btn">
+            <div class="social-icon naver-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="0" fill="#03C75A"/>
+                <path d="M16 7L16 17L13 17L8 10L8 17L8 17L5 17L5 7L8 7L13 14L13 7L16 7Z" fill="white"/>
+              </svg>
+            </div>
+            <span>Naver로 시작하기</span>
+          </a>
+        </div>
       </div>
     </div>
     
@@ -117,12 +102,96 @@
   </div>
 </template>
 
-<script setup>
-// 필요한 Vue 관련 로직을 여기에 추가
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      message: '',
+      isSuccess: false,
+      isLoading: false
+    }
+  },
+  mounted() {
+    // URL 파라미터에서 토큰 확인 (OAuth 리다이렉트 후)
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const error = urlParams.get('error');
+    
+    if (token) {
+      this.handleLoginSuccess(token);
+    } else if (error) {
+      this.message = `로그인 실패: ${error}`;
+      this.isSuccess = false;
+    }
+  },
+  methods: {
+    async handleGoogleLogin() {
+      try {
+        this.isLoading = true;
+        
+        // 방법 1: 백엔드에서 제공하는 Google OAuth 인증 URL로 리다이렉트
+        window.location.href = `${process.env.VUE_APP_API_URL}/oauth2/authorization/google`;
+        console.log('API URL:', process.env.VUE_APP_API_URL);
+        
+        // 방법 2: 백엔드로 요청을 보내고 리다이렉트 URL을 받아서 처리
+        
+       /* const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/auth/google/url`);
+        if (response.data && response.data.authorizationUrl) {
+          window.location.href = response.data.authorizationUrl;
+        }*/
+        
+      } catch (error) {
+        console.error('Google 로그인 중 오류 발생:', error);
+        this.message = '로그인 과정에서 오류가 발생했습니다. 다시 시도해주세요.';
+        this.isSuccess = false;
+        this.isLoading = false;
+      }
+    },
+    
+    handleLoginSuccess(token) {
+      // JWT 토큰을 로컬 스토리지에 저장
+      localStorage.setItem('jwt_token', token);
+      
+      // 인증 헤더 설정 (추후 API 요청에 사용)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      this.message = '로그인에 성공했습니다.';
+      this.isSuccess = true;
+      
+      // 사용자 정보 가져오기
+      this.fetchUserInfo();
+      
+      // 로그인 후 메인 페이지로 리다이렉트 (1초 후)
+      setTimeout(() => {
+        this.$router.push('/');
+      }, 1000);
+    },
+    
+    async fetchUserInfo() {
+      try {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/user/me`);
+        // 사용자 정보 저장 (Vuex 스토어나 로컬 스토리지 등에)
+        localStorage.setItem('user', JSON.stringify(response.data));
+      } catch (error) {
+        console.error('사용자 정보 조회 실패:', error);
+      }
+    },
+    
+    // 로그아웃 기능 (필요 시 사용)
+    logout() {
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('user');
+      delete axios.defaults.headers.common['Authorization'];
+      this.$router.push('/login');
+    }
+  }
+}
 </script>
 
 <style scoped>
-/* 기본 스타일 초기화 */
+/* 기존 스타일 유지 */
 * {
   margin: 0;
   padding: 0;
@@ -130,7 +199,6 @@
   font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
 }
 
-/* 전체 로그인 컨테이너 */
 .login-container {
   display: flex;
   width: 100vw;
@@ -140,7 +208,7 @@
   overflow: hidden;
 }
 
-/* 왼쪽 콘텐츠 영역 */
+/* 왼쪽 콘텐츠 영역 스타일 유지 */
 .content-section {
   flex: 1;
   padding: 4rem;
@@ -302,132 +370,96 @@
   font-weight: 600;
 }
 
-.form-group {
-  margin-bottom: 1.2rem;
-}
-
-.form-group input {
-  width: 100%;
+/* 알림 메시지 스타일 */
+.alert {
   padding: 1rem;
-  border: 1px solid #ddd;
+  margin-bottom: 1.5rem;
   border-radius: 8px;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.3s;
-}
-
-.form-group input:focus {
-  border-color: #9581e8;
-}
-
-.password-group {
-  position: relative;
-}
-
-.show-password {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.terms-text {
-  font-size: 0.8rem;
-  color: #777;
-  margin-bottom: 1.5rem;
-}
-
-.terms-text a {
-  color: #9581e8;
-  text-decoration: none;
-}
-
-.signup-button {
-  width: 100%;
-  padding: 1rem;
-  background: #51B27C;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  margin-bottom: 1.5rem;
-}
-
-.signup-button:hover {
-  background: #44a16d;
-  box-shadow: 0 4px 10px rgba(81, 178, 124, 0.2);
-}
-
-.social-divider {
-  position: relative;
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.social-divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background-color: #eee;
-}
-
-.social-divider span {
-  display: inline-block;
-  position: relative;
-  background-color: white;
-  padding: 0 15px;
   font-size: 0.9rem;
-  color: #888;
 }
 
-.social-buttons {
+.alert-success {
+  background-color: rgba(52, 168, 83, 0.1);
+  border: 1px solid rgba(52, 168, 83, 0.3);
+  color: #34A853;
+}
+
+.alert-error {
+  background-color: rgba(234, 67, 53, 0.1);
+  border: 1px solid rgba(234, 67, 53, 0.3);
+  color: #EA4335;
+}
+
+/* 소셜 로그인 버튼 스타일 추가 */
+.social-login-buttons {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 1rem;
+  margin-top: 1.5rem;
 }
 
-.social-button {
-  flex: 1;
+.social-login-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 0.8rem;
-  border: 1px solid #eee;
+  gap: 10px;
+  width: 100%;
+  padding: 1rem;
   border-radius: 8px;
-  background-color: white;
-  cursor: pointer;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
   transition: all 0.3s;
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.social-button:hover {
-  background-color: #f9f9f9;
-  transform: translateY(-2px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
+  cursor: pointer;
 }
 
 .social-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 24px;
+  height: 24px;
 }
 
-/* 그라데이션 원형 효과 - 기존 색상 유지 */
+/* Google 버튼 스타일 */
+.google-btn {
+  background-color: #fff;
+  color: #333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.google-btn:hover {
+  background-color: #f8f8f8;
+}
+
+/* Kakao 버튼 스타일 */
+.kakao-btn {
+  background-color: #FEE500;
+  color: #000;
+}
+
+.kakao-btn:hover {
+  background-color: #FDD800;
+}
+
+/* Naver 버튼 스타일 */
+.naver-btn {
+  background-color: #03C75A;
+  color: #fff;
+}
+
+.naver-btn:hover {
+  background-color: #02B14A;
+}
+
+/* 네이버 아이콘 특별 스타일 */
+.naver-icon svg {
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* 그라데이션 원형 효과 */
 .gradient-circle {
   position: absolute;
   border-radius: 50%;
@@ -507,10 +539,6 @@
   .form-container {
     padding: 2rem;
     margin: 1.5rem;
-  }
-  
-  .social-buttons {
-    flex-direction: column;
   }
 }
 </style>
