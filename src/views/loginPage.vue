@@ -1,96 +1,119 @@
 <template>
   <div class="login-container">
-    <!-- 왼쪽 로그인 폼 영역 -->
-    <div class="login-form-section">
-      <div class="form-container">
+    <!-- 왼쪽 콘텐츠 영역 -->
+    <div class="content-section">
+      <div class="branding">
         <div class="logo-area">
           <span class="logo-icon">T</span>rip
         </div>
+        <h1 class="slogan">
+          Move Fast.<br>
+          Break Nothing.
+        </h1>
+      </div>
+      
+      <div class="features">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <div class="icon-lines">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="feature-text">
+            <h3>Remove Bottlenecks</h3>
+            <p>Release testing and approvals are the most common bottleneck for tech, but you can now remove that bottleneck with Trip.</p>
+          </div>
+        </div>
         
-        <h1 class="login-title">로그인</h1>
-        <p class="login-subtitle">계정에 로그인하여 여행을 시작하세요</p>
+        <div class="feature-item">
+          <div class="feature-icon dashboard-icon">
+            <span></span>
+            <span></span>
+          </div>
+          <div class="feature-text">
+            <h3>Access Risk Analysis</h3>
+            <p>We use machine learning and static analysis to assess risk, summarise code changes, and automate and delegate release management tasks. Integrate with a couple of clicks.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="brand-footer">
+        <div class="logo-text">Trip</div>
+      </div>
+    </div>
+
+    <!-- 오른쪽 로그인 폼 영역 -->
+    <div class="login-form-section">
+      <div class="form-container">
+        <h2 class="form-title">Create an account.</h2>
+        <p class="form-subtitle">Already have an account? <a href="#" class="signin-link">Sign in</a></p>
         
         <form class="login-form">
           <div class="form-group">
-            <label for="email">이메일</label>
-            <input type="email" id="email" placeholder="이메일을 입력하세요" required />
+            <input type="text" id="name" placeholder="Name" required />
           </div>
           
           <div class="form-group">
-            <label for="password">비밀번호</label>
-            <input type="password" id="password" placeholder="비밀번호를 입력하세요" required />
-            <div class="forgot-password">
-              <a href="#">비밀번호를 잊으셨나요?</a>
-            </div>
+            <input type="email" id="email" placeholder="Email address" required />
           </div>
           
-          <!-- 소셜 로그인 버튼 영역 -->
-          <div class="social-login-section">
-            <p class="social-login-text">간편하게 시작하기</p>
-            <div class="social-buttons">
-              <!-- 카카오 로그인 버튼 -->
-              <button type="button" class="social-button kakao-button">
-                <div class="social-icon kakao-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                    <path d="M12,3C7.03,3 3,6.16 3,10C3,12.3 4.29,14.33 6.34,15.55C6.12,16.27 5.33,18.04 5.26,18.26C5.18,18.5 5.38,18.69 5.61,18.58C5.79,18.5 8.07,17.27 9.08,16.69C10.03,16.89 11,17 12,17C16.97,17 21,13.84 21,10C21,6.16 16.97,3 12,3Z" fill="#381F1E"/>
-                  </svg>
-                </div>
-              </button>
-              
-              <!-- 네이버 로그인 버튼 -->
-              <button type="button" class="social-button naver-button">
-                <div class="social-icon naver-icon">
-                  <span>N</span>
-                </div>
-              </button>
-              
-              <!-- 구글 로그인 버튼 -->
-              <button type="button" class="social-button google-button">
-                <div class="social-icon google-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
-                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032 s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2 C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#4285F4"/>
-                    <path d="M7,10.969 L7,13.031 L10.5,13.031 L10.5,10.969 L7,10.969 Z" fill="#34A853" transform="translate(8.75, 12) scale(0.9, 0.9) translate(-8.75, -12)"/>
-                    <path d="M14,10.969 L14,13.031 L17.5,13.031 L17.5,10.969 L14,10.969 Z" fill="#FBBC05" transform="translate(15.75, 12) scale(0.9, 0.9) translate(-15.75, -12)"/>
-                    <path d="M10.5,7.469 L10.5,9.531 L17.5,9.531 L17.5,7.469 L10.5,7.469 Z" fill="#EA4335" transform="translate(14, 8.5) scale(0.9, 0.9) translate(-14, -8.5)"/>
-                  </svg>
-                </div>
-              </button>
-            </div>
+          <div class="form-group password-group">
+            <input type="password" id="password" placeholder="Password" required />
+            <button type="button" class="show-password">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="terms-text">
+            <p>By login in you agree to our <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a></p>
+          </div>
+          
+          <button type="submit" class="signup-button">Sign Up</button>
+          
+          <!-- 소셜 로그인 구분선 -->
+          <div class="social-divider">
+            <span>or sign up with</span>
+          </div>
+          
+          <!-- 소셜 로그인 버튼 영역 (기존 코드 유지) -->
+          <div class="social-buttons">
+            <!-- 깃허브 버튼 추가 -->
+            <button type="button" class="social-button github-button">
+              <div class="social-icon github-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" fill="#333"/>
+                </svg>
+              </div>
+              <span>Github</span>
+            </button>
+            
+            <!-- 구글 로그인 버튼 -->
+            <button type="button" class="social-button google-button">
+              <div class="social-icon google-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                  <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032 s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2 C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#4285F4"/>
+                  <path d="M7,10.969 L7,13.031 L10.5,13.031 L10.5,10.969 L7,10.969 Z" fill="#34A853" transform="translate(8.75, 12) scale(0.9, 0.9) translate(-8.75, -12)"/>
+                  <path d="M14,10.969 L14,13.031 L17.5,13.031 L17.5,10.969 L14,10.969 Z" fill="#FBBC05" transform="translate(15.75, 12) scale(0.9, 0.9) translate(-15.75, -12)"/>
+                  <path d="M10.5,7.469 L10.5,9.531 L17.5,9.531 L17.5,7.469 L10.5,7.469 Z" fill="#EA4335" transform="translate(14, 8.5) scale(0.9, 0.9) translate(-14, -8.5)"/>
+                </svg>
+              </div>
+              <span>Google</span>
+            </button>
           </div>
         </form>
-        
-        <div class="register-link">
-          <p>계정이 없으신가요? <a href="#">회원가입</a></p>
-        </div>
       </div>
     </div>
     
-    <!-- 오른쪽 그라데이션 영역 -->
-    <div class="visual-section">
-      <div class="gradient-circle circle1"></div>
-      <div class="gradient-circle circle2"></div>
-      <div class="gradient-circle circle3"></div>
-      <div class="gradient-circle circle4"></div>
-      
-      <!-- 흰색 곡선 SVG -->
-      <svg class="curve-container" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-        <path d="M0,300 C250,250 350,450 500,380 C650,320 750,420 1000,300" 
-              fill="none" 
-              stroke="white" 
-              stroke-width="3"
-              stroke-opacity="0.6"></path>
-        <path d="M0,600 C200,650 400,500 600,550 C800,600 900,500 1000,580" 
-              fill="none" 
-              stroke="white" 
-              stroke-width="2"
-              stroke-opacity="0.5"></path>
-      </svg>
-      
-      <div class="welcome-text">
-        <h2>Welcome</h2>
-        <p>여행을 함께 시작해요</p>
-      </div>
-    </div>
+    <!-- 배경 그라데이션 원형들 -->
+    <div class="gradient-circle circle1"></div>
+    <div class="gradient-circle circle2"></div>
+    <div class="gradient-circle circle3"></div>
+    <div class="gradient-circle circle4"></div>
   </div>
 </template>
 
@@ -112,20 +135,23 @@
   display: flex;
   width: 100vw;
   height: 100vh;
+  background: linear-gradient(120deg, #e0f7fa, #e8eaf6, #ede7f6);
+  position: relative;
+  overflow: hidden;
 }
 
-/* 왼쪽 로그인 폼 영역 */
-.login-form-section {
+/* 왼쪽 콘텐츠 영역 */
+.content-section {
   flex: 1;
+  padding: 4rem;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 10;
 }
 
-.form-container {
-  width: 100%;
-  max-width: 400px;
+.branding {
+  margin-bottom: 3rem;
 }
 
 .logo-area {
@@ -143,27 +169,141 @@
   margin-right: 2px;
 }
 
-.login-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: #333;
+.slogan {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #40316E;
+  line-height: 1.2;
+  margin-bottom: 3rem;
 }
 
-.login-subtitle {
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.feature-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(149, 129, 232, 0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+.icon-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+}
+
+.icon-lines span {
+  display: block;
+  width: 4px;
+  height: 20px;
+  background-color: #9581e8;
+  border-radius: 2px;
+}
+
+.icon-lines span:nth-child(2) {
+  height: 15px;
+  margin-left: 8px;
+}
+
+.icon-lines span:nth-child(3) {
+  height: 10px;
+}
+
+.dashboard-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.dashboard-icon span {
+  display: block;
+  width: 25px;
+  height: 6px;
+  background-color: #9581e8;
+  border-radius: 3px;
+}
+
+.dashboard-icon span:nth-child(2) {
+  width: 18px;
+}
+
+.feature-text h3 {
+  font-size: 1.3rem;
+  color: #40316E;
+  margin-bottom: 0.5rem;
+}
+
+.feature-text p {
+  font-size: 0.95rem;
   color: #666;
-  margin-bottom: 2.5rem;
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.brand-footer {
+  margin-top: 2rem;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #9581e8;
+}
+
+/* 오른쪽 로그인 폼 영역 */
+.login-form-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 450px;
+  background-color: white;
+  border-radius: 15px;
+  padding: 3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.form-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.form-subtitle {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.signin-link {
+  color: #9581e8;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #444;
+  margin-bottom: 1.2rem;
 }
 
 .form-group input {
@@ -180,146 +320,126 @@
   border-color: #9581e8;
 }
 
-.forgot-password {
-  text-align: right;
-  margin-top: 0.5rem;
+.password-group {
+  position: relative;
 }
 
-.forgot-password a {
-  color: #9581e8;
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-/* 소셜 로그인 영역 */
-.social-login-section {
-  margin-top: 2rem;
-  text-align: center;
-}
-
-.social-login-text {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 1rem;
-}
-
-.social-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-}
-
-.social-button {
-  border: none;
+.show-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
+  border: none;
   cursor: pointer;
-  padding: 0;
-  transition: transform 0.3s;
-}
-
-.social-button:hover {
-  transform: translateY(-3px);
-}
-
-.social-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  color: #999;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* 카카오 버튼 스타일 */
-.kakao-icon {
-  background-color: #FEE500;
+.terms-text {
+  font-size: 0.8rem;
+  color: #777;
+  margin-bottom: 1.5rem;
 }
 
-/* 네이버 버튼 스타일 */
-.naver-icon {
-  background-color: #03C75A;
-  color: white;
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-
-/* 구글 버튼 스타일 */
-.google-icon {
-  background-color: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-}
-
-.register-link {
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.register-link a {
+.terms-text a {
   color: #9581e8;
   text-decoration: none;
-  font-weight: 600;
 }
 
-/* 오른쪽 시각적 영역 */
-.visual-section {
-  flex: 1;
-  position: relative;
-  background-color: #f4f4f4; /* 배경색 변경 */
-  overflow: hidden;
-}
-
-/* 곡선 효과 */
-.visual-section::before {
-  content: '';
-  position: absolute;
-  top: 25%;
-  left: 10%;
-  right: 10%;
-  height: 200px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
-  border-radius: 50%;
-  transform: rotate(-5deg) scale(1, 0.2);
-  z-index: 6;
-  opacity: 0.6;
-}
-
-.visual-section::after {
-  content: '';
-  position: absolute;
-  bottom: 30%;
-  left: 5%;
-  right: 5%;
-  height: 150px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-  border-radius: 50%;
-  transform: rotate(8deg) scale(1, 0.15);
-  z-index: 6;
-  opacity: 0.5;
-}
-
-/* 추가 곡선 SVG */
-.curve-container {
-  position: absolute;
+.signup-button {
   width: 100%;
-  height: 100%;
-  z-index: 6;
-  pointer-events: none;
-  opacity: 0.7;
+  padding: 1rem;
+  background: #51B27C;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 1.5rem;
 }
 
-/* 그라데이션 원형 효과 */
+.signup-button:hover {
+  background: #44a16d;
+  box-shadow: 0 4px 10px rgba(81, 178, 124, 0.2);
+}
+
+.social-divider {
+  position: relative;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.social-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #eee;
+}
+
+.social-divider span {
+  display: inline-block;
+  position: relative;
+  background-color: white;
+  padding: 0 15px;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.social-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.social-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.8rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.social-button:hover {
+  background-color: #f9f9f9;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 그라데이션 원형 효과 - 기존 색상 유지 */
 .gradient-circle {
   position: absolute;
   border-radius: 50%;
-  filter: blur(40px);
+  filter: blur(80px);
+  opacity: 0.8;
 }
 
 .circle1 {
   width: 550px;
   height: 550px;
-  top: 45%;
-  left: 45%;
-  transform: translate(-45%, -50%);
+  top: -10%;
+  left: -10%;
   background: radial-gradient(circle at center, #b6aceb 0%, transparent 70%);
   z-index: 1;
 }
@@ -327,68 +447,70 @@
 .circle2 {
   width: 500px;
   height: 500px;
-  top: 55%;
-  left: 50%;
-  transform: translate(-45%, -45%);
+  top: 70%;
+  left: 30%;
   background: radial-gradient(circle at center, #7c8de3 0%, transparent 70%);
   z-index: 2;
 }
 
 .circle3 {
-  width: 520px;
-  height: 520px;
-  top: 40%;
-  left: 55%;
-  transform: translate(-50%, -40%);
+  width: 650px;
+  height: 650px;
+  top: 20%;
+  right: -10%;
   background: radial-gradient(circle at center, #6bd5c5 0%, transparent 70%);
-  z-index: 3;
+  z-index: 1;
 }
 
 .circle4 {
   width: 480px;
   height: 480px;
-  top: 55%;
-  left: 40%;
-  transform: translate(-40%, -55%);
+  bottom: -10%;
+  right: 10%;
   background: radial-gradient(circle at center, #bfa9e9 0%, transparent 70%);
-  z-index: 4;
-}
-
-/* 환영 텍스트 */
-.welcome-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: white;
-  font-weight: 600;
-  z-index: 5;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.welcome-text h2 {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-}
-
-.welcome-text p {
-  font-size: 1.2rem;
+  z-index: 1;
 }
 
 /* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .login-container {
+    flex-direction: column;
+  }
+  
+  .content-section {
+    padding: 2rem;
+  }
+  
+  .form-container {
+    margin: 2rem;
+    max-width: none;
+  }
+}
+
 @media (max-width: 768px) {
   .login-container {
     flex-direction: column;
   }
   
-  .visual-section {
-    display: none; /* 모바일에서는 시각적 영역 숨김 */
+  .content-section {
+    padding: 2rem 1.5rem;
   }
   
-  .login-form-section {
-    width: 100%;
-    padding: 2rem 1.5rem;
+  .slogan {
+    font-size: 2.5rem;
+  }
+  
+  .features {
+    gap: 1.5rem;
+  }
+  
+  .form-container {
+    padding: 2rem;
+    margin: 1.5rem;
+  }
+  
+  .social-buttons {
+    flex-direction: column;
   }
 }
 </style>
