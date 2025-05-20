@@ -134,8 +134,10 @@ export default {
         // 방법 1: 백엔드에서 제공하는 Google OAuth 인증 URL로 리다이렉트
        // window.location.href = `${process.env.VUE_APP_API_URL}/oauth2/authorization/google`;
        
-     window.location.href = `${import.meta.env.VITE_API_URL}/oauth2/authorization/google`;
+    // window.location.href = `${import.meta.env.VITE_API_URL}/oauth2/authorization/google`;
 
+     const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.210.243:8080';
+    window.location.href = `${apiUrl}/oauth2/authorization/google`;
      
         
         // 방법 2: 백엔드로 요청을 보내고 리다이렉트 URL을 받아서 처리
