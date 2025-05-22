@@ -180,8 +180,8 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 
-// API 기본 URL - 환경변수로 설정
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+// API 기본 URL - 환경변수로 설정 (수정됨)
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 // 상태 관리
 const selectedAreaCode = ref('');
@@ -218,33 +218,251 @@ const filteredSigungus = computed(() => {
   return sigungus.value.filter(sigungu => sigungu.areaCode === parseInt(selectedAreaCode.value));
 });
 
+// 하드코딩된 지역 데이터 (임시 - API가 준비되면 제거)
+const AREA_DATA = [
+  { areaCode: 1, name: '서울' },
+  { areaCode: 2, name: '인천' },
+  { areaCode: 3, name: '대전' },
+  { areaCode: 4, name: '대구' },
+  { areaCode: 5, name: '광주' },
+  { areaCode: 6, name: '부산' },
+  { areaCode: 7, name: '울산' },
+  { areaCode: 8, name: '세종특별자치시' },
+  { areaCode: 31, name: '경기도' },
+  { areaCode: 32, name: '강원도' },
+  { areaCode: 33, name: '충청북도' },
+  { areaCode: 34, name: '충청남도' },
+  { areaCode: 35, name: '경상북도' },
+  { areaCode: 36, name: '경상남도' },
+  { areaCode: 37, name: '전라북도' },
+  { areaCode: 38, name: '전라남도' },
+  { areaCode: 39, name: '제주도' }
+];
+
+const SIGUNGU_DATA = [
+  // 서울
+  { areaCode: 1, sigunguCode: 1, name: '강남구' },
+  { areaCode: 1, sigunguCode: 2, name: '강동구' },
+  { areaCode: 1, sigunguCode: 3, name: '강북구' },
+  { areaCode: 1, sigunguCode: 4, name: '강서구' },
+  { areaCode: 1, sigunguCode: 5, name: '관악구' },
+  { areaCode: 1, sigunguCode: 6, name: '광진구' },
+  { areaCode: 1, sigunguCode: 7, name: '구로구' },
+  { areaCode: 1, sigunguCode: 8, name: '금천구' },
+  { areaCode: 1, sigunguCode: 9, name: '노원구' },
+  { areaCode: 1, sigunguCode: 10, name: '도봉구' },
+  { areaCode: 1, sigunguCode: 11, name: '동대문구' },
+  { areaCode: 1, sigunguCode: 12, name: '동작구' },
+  { areaCode: 1, sigunguCode: 13, name: '마포구' },
+  { areaCode: 1, sigunguCode: 14, name: '서대문구' },
+  { areaCode: 1, sigunguCode: 15, name: '서초구' },
+  { areaCode: 1, sigunguCode: 16, name: '성동구' },
+  { areaCode: 1, sigunguCode: 17, name: '성북구' },
+  { areaCode: 1, sigunguCode: 18, name: '송파구' },
+  { areaCode: 1, sigunguCode: 19, name: '양천구' },
+  { areaCode: 1, sigunguCode: 20, name: '영등포구' },
+  { areaCode: 1, sigunguCode: 21, name: '용산구' },
+  { areaCode: 1, sigunguCode: 22, name: '은평구' },
+  { areaCode: 1, sigunguCode: 23, name: '종로구' },
+  { areaCode: 1, sigunguCode: 24, name: '중구' },
+  { areaCode: 1, sigunguCode: 25, name: '중랑구' },
+  
+  // 경기도 (일부만)
+  { areaCode: 31, sigunguCode: 1, name: '가평군' },
+  { areaCode: 31, sigunguCode: 2, name: '고양시' },
+  { areaCode: 31, sigunguCode: 3, name: '과천시' },
+  { areaCode: 31, sigunguCode: 4, name: '광명시' },
+  { areaCode: 31, sigunguCode: 5, name: '광주시' },
+  { areaCode: 31, sigunguCode: 6, name: '구리시' },
+  { areaCode: 31, sigunguCode: 7, name: '군포시' },
+  { areaCode: 31, sigunguCode: 8, name: '김포시' },
+  { areaCode: 31, sigunguCode: 9, name: '남양주시' },
+  { areaCode: 31, sigunguCode: 10, name: '동두천시' },
+  { areaCode: 31, sigunguCode: 11, name: '부천시' },
+  { areaCode: 31, sigunguCode: 12, name: '성남시' },
+  { areaCode: 31, sigunguCode: 13, name: '수원시' },
+  { areaCode: 31, sigunguCode: 14, name: '시흥시' },
+  { areaCode: 31, sigunguCode: 15, name: '안산시' },
+  { areaCode: 31, sigunguCode: 16, name: '안성시' },
+  { areaCode: 31, sigunguCode: 17, name: '안양시' },
+  { areaCode: 31, sigunguCode: 18, name: '양주시' },
+  { areaCode: 31, sigunguCode: 19, name: '여주시' },
+  { areaCode: 31, sigunguCode: 20, name: '오산시' },
+  { areaCode: 31, sigunguCode: 21, name: '용인시' },
+  { areaCode: 31, sigunguCode: 22, name: '의왕시' },
+  { areaCode: 31, sigunguCode: 23, name: '의정부시' },
+  { areaCode: 31, sigunguCode: 24, name: '이천시' },
+  { areaCode: 31, sigunguCode: 25, name: '파주시' },
+  { areaCode: 31, sigunguCode: 26, name: '평택시' },
+  { areaCode: 31, sigunguCode: 27, name: '포천시' },
+  { areaCode: 31, sigunguCode: 28, name: '하남시' },
+  { areaCode: 31, sigunguCode: 29, name: '화성시' },
+  
+  // 부산
+  { areaCode: 6, sigunguCode: 1, name: '해운대구' },
+  { areaCode: 6, sigunguCode: 2, name: '중구' },
+  { areaCode: 6, sigunguCode: 3, name: '동구' },
+  { areaCode: 6, sigunguCode: 4, name: '영도구' },
+  { areaCode: 6, sigunguCode: 5, name: '부산진구' },
+  { areaCode: 6, sigunguCode: 6, name: '동래구' },
+  { areaCode: 6, sigunguCode: 7, name: '남구' },
+  { areaCode: 6, sigunguCode: 8, name: '북구' },
+  { areaCode: 6, sigunguCode: 9, name: '강서구' },
+  { areaCode: 6, sigunguCode: 10, name: '금정구' },
+  { areaCode: 6, sigunguCode: 11, name: '기장군' },
+  { areaCode: 6, sigunguCode: 12, name: '연제구' },
+  { areaCode: 6, sigunguCode: 13, name: '수영구' },
+  { areaCode: 6, sigunguCode: 14, name: '사상구' },
+  { areaCode: 6, sigunguCode: 15, name: '사하구' },
+  { areaCode: 6, sigunguCode: 16, name: '서구' },
+  
+  // 제주도
+  { areaCode: 39, sigunguCode: 1, name: '서귀포시' },
+  { areaCode: 39, sigunguCode: 2, name: '제주시' }
+];
+
+// 임시 여행지 데이터
+const SAMPLE_PLACES = [
+  {
+    placeId: 1,
+    title: '경복궁',
+    address1: '서울특별시 종로구',
+    address2: '사직로 161',
+    areaCode: 1,
+    sigunguCode: 23,
+    telephone: '02-3700-3900',
+    firstImageUrl: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg',
+    category1: 'A02',
+    category2: '',
+    category3: ''
+  },
+  {
+    placeId: 2,
+    title: '해운대해수욕장',
+    address1: '부산광역시 해운대구',
+    address2: '해운대해변로 264',
+    areaCode: 6,
+    sigunguCode: 1,
+    telephone: '051-749-4000',
+    firstImageUrl: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg',
+    category1: 'A01',
+    category2: '',
+    category3: ''
+  },
+  {
+    placeId: 3,
+    title: '성산일출봉',
+    address1: '제주특별자치도 서귀포시',
+    address2: '성산읍 일출로 284-12',
+    areaCode: 39,
+    sigunguCode: 1,
+    telephone: '064-783-0959',
+    firstImageUrl: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg',
+    category1: 'A01',
+    category2: '',
+    category3: ''
+  },
+  {
+    placeId: 4,
+    title: '명동',
+    address1: '서울특별시 중구',
+    address2: '명동길',
+    areaCode: 1,
+    sigunguCode: 24,
+    telephone: '02-3396-5656',
+    firstImageUrl: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg',
+    category1: 'A04',
+    category2: '',
+    category3: ''
+  },
+  {
+    placeId: 5,
+    title: '부산타워',
+    address1: '부산광역시 중구',
+    address2: '용두산길 37-55',
+    areaCode: 6,
+    sigunguCode: 2,
+    telephone: '051-245-1744',
+    firstImageUrl: 'https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg',
+    category1: 'A02',
+    category2: '',
+    category3: ''
+  },
+  {
+    placeId: 6,
+    title: '한라산',
+    address1: '제주특별자치도 제주시',
+    address2: '1100로 2070-61',
+    areaCode: 39,
+    sigunguCode: 2,
+    telephone: '064-713-9950',
+    firstImageUrl: 'https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg',
+    category1: 'A01',
+    category2: '',
+    category3: ''
+  },
+  {
+    placeId: 7,
+    title: 'N서울타워',
+    address1: '서울특별시 용산구',
+    address2: '남산공원길 105',
+    areaCode: 1,
+    sigunguCode: 21,
+    telephone: '02-3455-9277',
+    firstImageUrl: 'https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg',
+    category1: 'A02',
+    category2: '',
+    category3: ''
+  },
+  {
+    placeId: 8,
+    title: '광안리해수욕장',
+    address1: '부산광역시 수영구',
+    address2: '광안해변로 219',
+    areaCode: 6,
+    sigunguCode: 13,
+    telephone: '051-610-4123',
+    firstImageUrl: 'https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg',
+    category1: 'A01',
+    category2: '',
+    category3: ''
+  }
+];
+
 // API 호출 함수들
 async function fetchAreas() {
   try {
-    const response = await axios.get(`${API_BASE_URL}/areas`);
+    // 실제 API 호출 시도
+    const response = await axios.get(`${API_BASE_URL}/api/areas`);
     areas.value = response.data;
+    console.log('지역 API 호출 성공');
   } catch (error) {
-    console.error('지역 정보 조회 실패:', error);
-    throw new Error('지역 정보를 불러올 수 없습니다.');
+    console.warn('지역 API 호출 실패, 임시 데이터 사용:', error.message);
+    // 에러 발생 시 하드코딩된 데이터 사용
+    areas.value = AREA_DATA;
   }
 }
 
 async function fetchSigungus() {
   try {
-    const response = await axios.get(`${API_BASE_URL}/sigungus`);
+    // 실제 API 호출 시도
+    const response = await axios.get(`${API_BASE_URL}/api/sigungus`);
     sigungus.value = response.data;
+    console.log('시군구 API 호출 성공');
   } catch (error) {
-    console.error('시군구 정보 조회 실패:', error);
-    throw new Error('시군구 정보를 불러올 수 없습니다.');
+    console.warn('시군구 API 호출 실패, 임시 데이터 사용:', error.message);
+    // 에러 발생 시 하드코딩된 데이터 사용
+    sigungus.value = SIGUNGU_DATA;
   }
 }
 
 async function fetchPlaces() {
   try {
     isLoading.value = true;
+    error.value = '';
     
     const params = {
-      page: currentPage.value - 1, // 백엔드가 0부터 시작하는 경우
+      page: currentPage.value - 1,
       size: pageSize.value,
     };
 
@@ -259,7 +477,12 @@ async function fetchPlaces() {
       params.keyword = searchKeyword.value.trim();
     }
 
-    const response = await axios.get(`${API_BASE_URL}/places`, { params });
+    console.log('여행지 API 호출 시도:', `${API_BASE_URL}/api/travel/search`, params);
+
+    // 실제 API 호출 시도
+    const response = await axios.get(`${API_BASE_URL}/api/travel/search`, { params });
+    
+    console.log('여행지 API 응답:', response.data);
     
     // 페이지네이션 응답 구조에 따라 조정
     if (response.data.content) {
@@ -274,9 +497,36 @@ async function fetchPlaces() {
       places.value = [];
       totalElements.value = 0;
     }
+    
+    console.log('여행지 API 호출 성공, 결과 수:', places.value.length);
   } catch (error) {
-    console.error('여행지 정보 조회 실패:', error);
-    throw new Error('여행지 정보를 불러올 수 없습니다.');
+    console.warn('여행지 API 호출 실패, 임시 데이터 사용:', error.message);
+    
+    // 에러 발생 시 임시 데이터 사용
+    let filteredPlaces = [...SAMPLE_PLACES];
+    
+    // 필터링 적용
+    if (selectedAreaCode.value) {
+      filteredPlaces = filteredPlaces.filter(place => place.areaCode === parseInt(selectedAreaCode.value));
+    }
+    if (selectedSigunguCode.value) {
+      filteredPlaces = filteredPlaces.filter(place => place.sigunguCode === parseInt(selectedSigunguCode.value));
+    }
+    if (searchKeyword.value.trim()) {
+      const keyword = searchKeyword.value.trim().toLowerCase();
+      filteredPlaces = filteredPlaces.filter(place => 
+        place.title.toLowerCase().includes(keyword) ||
+        place.address1.toLowerCase().includes(keyword) ||
+        place.address2?.toLowerCase().includes(keyword)
+      );
+    }
+    
+    // 페이지네이션 적용
+    const startIndex = (currentPage.value - 1) * pageSize.value;
+    const endIndex = startIndex + pageSize.value;
+    
+    places.value = filteredPlaces.slice(startIndex, endIndex);
+    totalElements.value = filteredPlaces.length;
   } finally {
     isLoading.value = false;
   }
@@ -288,13 +538,20 @@ async function fetchData() {
     error.value = '';
     isLoading.value = true;
     
+    console.log('초기 데이터 로드 시작');
+    console.log('API_BASE_URL:', API_BASE_URL);
+    
     await Promise.all([
       fetchAreas(),
-      fetchSigungus(),
-      fetchPlaces()
+      fetchSigungus()
     ]);
+    
+    await fetchPlaces();
+    
+    console.log('초기 데이터 로드 완료');
   } catch (err) {
-    error.value = err.message;
+    console.error('초기 데이터 로드 실패:', err);
+    error.value = '데이터를 불러오는 중 오류가 발생했습니다.';
   } finally {
     isLoading.value = false;
   }
@@ -351,7 +608,6 @@ function getSigunguName(areaCode, sigunguCode) {
 
 function getCategoryName(category1, category2, category3) {
   // 카테고리 코드를 실제 이름으로 변환하는 로직
-  // 백엔드에서 카테고리 정보를 별도로 제공하는 경우 해당 API 호출
   const categoryMap = {
     'A01': '자연',
     'A02': '인문(문화/예술/역사)',
@@ -366,6 +622,7 @@ function getCategoryName(category1, category2, category3) {
 
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(() => {
+  console.log('컴포넌트 마운트됨');
   fetchData();
 });
 

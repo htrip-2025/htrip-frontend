@@ -398,7 +398,7 @@ function closeSearchModal() {
 // 장소를 특정 날짜에 추가
 function addPlaceToDay(place, dayIndex) {
   // 이미 추가된 장소인지 확인
-  const isDuplicate = selectedP3laces.value[dayIndex].some(p => p.id === place.id);
+  const isDuplicate = selectedPlaces.value[dayIndex].some(p => p.id === place.id);
   
   if (!isDuplicate) {
     // 선택된 날짜의 장소 배열에 장소 추가
