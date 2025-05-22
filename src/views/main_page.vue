@@ -41,7 +41,7 @@
 
         <!-- 계획 시작하기 버튼 - 왼쪽 정렬로 변경 -->
 <div class="plan-button-container">
-  <router-link to="/info" class="plan-start-button">
+  <router-link to="/plan" class="plan-start-button">
     <span class="button-icon">✈️</span>
     <span class="button-text">여행 계획 시작하기</span>
     <span class="button-arrow">→</span>

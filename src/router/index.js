@@ -7,6 +7,7 @@ import MainPage01 from '@/views/mainPage01.vue'
 import boardPage from '@/views/boardPage.vue'
 import loginPage from '@/views/loginPage.vue'
 import myPage from '@/views/myPage.vue'
+import TripPlanPage from '@/views/TripPlanPage.vue'
 
 
 const router = createRouter({
@@ -46,6 +47,11 @@ const router = createRouter({
       path: '/mypage',
       name: 'mypage',
       component:myPage,
+    },
+    {
+      path: '/plan',
+      name: 'plan',
+      component:TripPlanPage,
     },
   ],
 })
