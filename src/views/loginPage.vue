@@ -136,7 +136,7 @@ export default {
        
     // window.location.href = `${import.meta.env.VITE_API_URL}/oauth2/authorization/google`;
 
-     const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.210.243:8080';
+     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
     window.location.href = `${apiUrl}/oauth2/authorization/google`;
      
         

@@ -18,7 +18,7 @@
   <div class="menu-items">
     <a href="#" class="menu-link">AI 추천</a>
     <a href="/info" class="menu-link">여행정보</a>
-    <a href="#" class="menu-link">여행계획</a>
+    <a href="/plan" class="menu-link">여행계획</a>
     <a href="#" class="menu-link">커뮤니티</a>
     <a href="#" class="menu-link search-icon">🔍</a>
   </div>

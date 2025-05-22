@@ -1,5 +1,5 @@
 <template>
-  <div class="travel-container">
+  <div class="info-container">
     <!-- 배경 그라데이션 원형들 -->
     <div class="gradient-circle circle1"></div>
     <div class="gradient-circle circle2"></div>
@@ -21,226 +21,237 @@
         <a href="#" class="menu-link">커뮤니티</a>
         <a href="#" class="menu-link search-icon">🔍</a>
       </div>
-      <div class="login-section">
-        <a href="#" class="login-button">
-          <span class="button-text">로그인</span>
-        </a>
-      </div>
+     <div class="login-section">
+      <a href="/login" class="login-button">
+        <span class="button-text">로그인</span>
+      </a>
+    </div>
     </header>
 
-    <!-- 한국 지역 아이콘 섹션 -->
-    <section class="region-icons">
-      <div class="region-title">
-        <h2>한국의 지역</h2>
-        <p>대한민국의 아름다운 지역을 둘러보세요</p>
+    <!-- 메인 콘텐츠 -->
+    <section class="main-content">
+      <!-- 지역 선택 필터 -->
+      <div class="filter-section">
+        <div class="filter-group">
+          <label for="province-select">도/시 선택</label>
+          <select 
+            id="province-select" 
+            v-model="selectedProvince" 
+            @change="onProvinceChange"
+            class="filter-select"
+          >
+            <option disabled value="">도 선택</option>
+            <option v-for="province in provinces" :key="province">{{ province }}</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="city-select">시/군 선택</label>
+          <select 
+            id="city-select" 
+            v-model="selectedCity"
+            class="filter-select"
+            :disabled="!selectedProvince"
+          >
+            <option disabled value="">시/군 선택</option>
+            <option v-for="city in filteredCities" :key="city">{{ city }}</option>
+          </select>
+        </div>
       </div>
       
-      <div class="region-scroll">
-        <div class="region-item">
-          <div class="region-icon">
-            <span class="region-text">서울</span>
-          </div>
-         
-        </div>
-        
-        <div class="region-item">
-          <div class="region-icon">
-            <span class="region-text">부산</span>
-          </div>
-         
-        </div>
-        
-        <div class="region-item">
-          <div class="region-icon">
-            <span class="region-text">제주</span>
-          </div>
-         
-        </div>
-        
-        <div class="region-item">
-          <div class="region-icon">
-            <span class="region-text">강원</span>
-          </div>
-        
-        </div>
-        
-        <div class="region-item">
-          <div class="region-icon">
-            <span class="region-text">경주</span>
-          </div>
-        
-        </div>
-        
-        <div class="region-item">
-          <div class="region-icon">
-            <span class="region-text">전주</span>
-          </div>
-        
-        </div>
-        
-        <div class="region-item">
-          <div class="region-icon">
-            <span class="region-text">인천</span>
-          </div>
-        
-        </div>
-        
-        <div class="region-item">
-          <div class="region-icon">
-            <span class="region-text">경기</span>
-          </div>
-         
-        </div>
-      </div>
-    </section>
-
-    <!-- 인기 여행지 섹션 -->
-    <section class="popular-destinations">
-      <div class="section-header">
-        <h2 class="section-title">인기 여행지</h2>
-        <p class="section-subtitle">한국에서 가장 인기있는 여행지를 둘러보세요</p>
+      <!-- 필터링된 결과가 없을 때 메시지 -->
+      <div v-if="filteredPlaces.length === 0 && (selectedProvince || selectedCity)" class="no-results">
+        선택한 지역에 등록된 관광지가 없습니다. 다른 지역을 선택해 주세요.
       </div>
       
-      <div class="destinations-grid">
-        <div class="destination-card">
-          <img src="https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg" alt="남산타워">
-          <div class="destination-info">
-            <h3>남산타워</h3>
-            <p>서울</p>
+      <!-- 관광지 리스트 -->
+      <div class="place-list" v-else>
+        <div 
+          v-for="place in filteredPlaces" 
+          :key="place.id" 
+          class="place-card"
+        >
+          <div class="place-image">
+            <img :src="place.imageUrl" :alt="place.name">
+          </div>
+          <div class="place-info">
+            <h3 class="place-name">{{ place.name }}</h3>
+            <div class="place-location">
+              <span class="location-icon">📍</span>
+              <span>{{ place.province }} {{ place.city }}</span>
+            </div>
+            <p class="place-description">{{ place.description }}</p>
+            <div class="place-meta">
+              <span class="place-rating">⭐ {{ place.rating }}/5</span>
+              <span class="place-visitors">👁️ {{ place.visitors }}명 방문</span>
+            </div>
           </div>
         </div>
-        
-        <div class="destination-card">
-          <img src="https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg" alt="해운대 해변">
-          <div class="destination-info">
-            <h3>해운대 해변</h3>
-            <p>부산</p>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="성산일출봉">
-          <div class="destination-info">
-            <h3>성산일출봉</h3>
-            <p>제주도</p>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <img src="https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg" alt="불국사">
-          <div class="destination-info">
-            <h3>불국사</h3>
-            <p>경주</p>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="설악산">
-          <div class="destination-info">
-            <h3>설악산</h3>
-            <p>강원도</p>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <img src="https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg" alt="한옥마을">
-          <div class="destination-info">
-            <h3>한옥마을</h3>
-            <p>전주</p>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <img src="https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg" alt="경복궁">
-          <div class="destination-info">
-            <h3>경복궁</h3>
-            <p>서울</p>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <img src="https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg" alt="송도 센트럴파크">
-          <div class="destination-info">
-            <h3>송도 센트럴파크</h3>
-            <p>인천</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 여행 팁 섹션 -->
-    <section class="travel-tips">
-      <div class="section-header">
-        <h2 class="section-title">여행 팁</h2>
-        <p class="section-subtitle">더 즐겁고 편안한 여행을 위한 팁</p>
       </div>
       
-      <div class="tips-container">
-        <div class="tip-card">
-          <div class="tip-icon">🚆</div>
-          <h3>교통 이용하기</h3>
-          <p>대중교통으로 한국 여행하기</p>
-          <a href="#" class="read-more">더 알아보기 →</a>
-        </div>
-        
-        <div class="tip-card">
-          <div class="tip-icon">🏨</div>
-          <h3>숙소 예약</h3>
-          <p>한국의 다양한 숙박 옵션</p>
-          <a href="#" class="read-more">더 알아보기 →</a>
-        </div>
-        
-        <div class="tip-card">
-          <div class="tip-icon">🍜</div>
-          <h3>현지 음식</h3>
-          <p>꼭 먹어봐야 할 한국 음식</p>
-          <a href="#" class="read-more">더 알아보기 →</a>
-        </div>
-        
-        <div class="tip-card">
-          <div class="tip-icon">🗓️</div>
-          <h3>최적의 여행 시기</h3>
-          <p>계절별 추천 여행지</p>
-          <a href="#" class="read-more">더 알아보기 →</a>
-        </div>
+      <!-- 페이지네이션 -->
+      <div class="pagination">
+        <button class="pagination-btn prev">이전</button>
+        <button class="pagination-btn active">1</button>
+        <button class="pagination-btn">2</button>
+        <button class="pagination-btn">3</button>
+        <button class="pagination-btn next">다음</button>
       </div>
     </section>
-
+    
     <!-- 푸터 -->
     <footer class="footer">
       <div class="footer-content">
         <div class="footer-logo">
           <span class="logo-icon">T</span>rip
-          <p>당신의 완벽한 여행 파트너</p>
         </div>
-        
-        <div class="footer-links">
-          <h3>바로가기</h3>
-          <a href="#">홈</a>
-          <a href="#">여행정보</a>
-          <a href="#">여행계획</a>
-          <a href="#">커뮤니티</a>
-        </div>
-        
-        <div class="footer-newsletter">
-          <h3>뉴스레터 구독</h3>
-          <p>최신 여행 정보를 받아보세요</p>
-          <div class="newsletter-form">
-            <input type="email" placeholder="이메일 주소">
-            <button>구독</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="footer-bottom">
-        <p>&copy; 2025 Trip. All rights reserved.</p>
+        <p class="copyright">© 2025 Trip. All rights reserved.</p>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup>
-// 기본 스크립트
+import { ref, computed } from 'vue';
+
+// 상태 관리
+const selectedProvince = ref('');
+const selectedCity = ref('');
+
+// 도/시 데이터
+const provinces = [
+  '서울', '경기도', '강원도', '충청북도', '충청남도',
+  '전라북도', '전라남도', '경상북도', '경상남도', '제주도',
+  '부산', '대구', '인천', '광주', '대전', '울산', '세종'
+];
+
+const citiesByProvince = {
+  '서울': ['강남구', '강동구', '강북구', '강서구', '관악구', '광진구', '구로구', '금천구',
+         '노원구', '도봉구', '동대문구', '동작구', '마포구', '서대문구', '서초구', '성동구',
+         '성북구', '송파구', '양천구', '영등포구', '용산구', '은평구', '종로구', '중구', '중랑구'],
+  '부산': ['중구', '서구', '동구', '영도구', '부산진구', '동래구', '남구', '북구',
+         '해운대구', '사하구', '금정구', '강서구', '연제구', '수영구', '사상구', '기장군'],
+  '대구': ['중구', '동구', '서구', '남구', '북구', '수성구', '달서구', '달성군'],
+  '인천': ['중구', '동구', '미추홀구', '연수구', '남동구', '부평구', '계양구', '서구', '강화군', '옹진군'],
+  '광주': ['동구', '서구', '남구', '북구', '광산구'],
+  '대전': ['동구', '중구', '서구', '유성구', '대덕구'],
+  '울산': ['중구', '남구', '동구', '북구', '울주군'],
+  '세종': ['세종시'],
+
+  '경기도': ['수원시', '성남시', '고양시', '용인시', '부천시', '안산시', '안양시', '남양주시',
+           '화성시', '평택시', '의정부시', '시흥시', '파주시', '김포시', '광주시', '광명시',
+           '군포시', '오산시', '이천시', '안성시', '의왕시', '하남시', '여주시', '양평군',
+           '동두천시', '구리시', '과천시', '연천군', '가평군', '포천시'],
+  '강원도': ['춘천시', '원주시', '강릉시', '동해시', '속초시', '삼척시', '태백시',
+           '홍천군', '철원군', '화천군', '양구군', '인제군', '고성군', '양양군', '평창군', '정선군', '영월군'],
+  '충청북도': ['청주시', '충주시', '제천시', '보은군', '옥천군', '영동군', '증평군', '진천군', '괴산군', '단양군'],
+  '충청남도': ['천안시', '아산시', '서산시', '당진시', '공주시', '보령시', '논산시', '계룡시',
+            '금산군', '부여군', '서천군', '청양군', '홍성군', '예산군', '태안군'],
+  '전라북도': ['전주시', '익산시', '군산시', '정읍시', '남원시', '김제시',
+           '완주군', '고창군', '부안군', '임실군', '순창군', '진안군', '장수군', '무주군'],
+  '전라남도': ['목포시', '여수시', '순천시', '나주시', '광양시', '담양군', '곡성군', '구례군',
+           '고흥군', '보성군', '화순군', '장흥군', '강진군', '해남군', '영암군',
+           '무안군', '함평군', '영광군', '장성군', '완도군', '진도군', '신안군'],
+  '경상북도': ['포항시', '경주시', '김천시', '안동시', '구미시', '영주시', '영천시', '상주시',
+           '문경시', '경산시', '군위군', '의성군', '청송군', '영양군', '영덕군',
+           '청도군', '고령군', '성주군', '칠곡군', '예천군', '봉화군', '울진군', '울릉군'],
+  '경상남도': ['창원시', '진주시', '통영시', '사천시', '김해시', '밀양시', '거제시', '양산시',
+           '의령군', '함안군', '창녕군', '고성군', '남해군', '하동군', '산청군',
+           '함양군', '거창군', '합천군'],
+  '제주도': ['제주시', '서귀포시']
+};
+
+
+// 샘플 관광지 데이터
+const places = [
+  {
+    id: 1,
+    name: '경복궁',
+    province: '서울',
+    city: '종로구',
+    description: '조선 왕조의 법궁으로, 조선 건국 후 첫 번째로 지어진 궁궐입니다.',
+    imageUrl: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg',
+    rating: 4.7,
+    visitors: 12500
+  },
+  {
+    id: 2,
+    name: '남산타워',
+    province: '서울',
+    city: '용산구',
+    description: '남산 정상에 위치한 높이 236.7m의 송신탑으로, 서울의 랜드마크입니다.',
+    imageUrl: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg',
+    rating: 4.5,
+    visitors: 10800
+  },
+  {
+    id: 3,
+    name: '에버랜드',
+    province: '경기도',
+    city: '용인시',
+    description: '한국 최대의 테마파크로, 5개의 테마존으로 구성되어 있습니다.',
+    imageUrl: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg',
+    rating: 4.6,
+    visitors: 15300
+  },
+  {
+    id: 4,
+    name: '해운대 해수욕장',
+    province: '경상남도',
+    city: '부산시',
+    description: '부산의 대표적인 해수욕장으로, 아름다운 해변과 다양한 축제가 열립니다.',
+    imageUrl: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg',
+    rating: 4.8,
+    visitors: 18200
+  },
+  {
+    id: 5,
+    name: '설악산',
+    province: '강원도',
+    city: '속초시',
+    description: '한국에서 세 번째로 높은 산으로, 아름다운 자연 경관을 자랑합니다.',
+    imageUrl: 'https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg',
+    rating: 4.9,
+    visitors: 8700
+  },
+  {
+    id: 6,
+    name: '한라산',
+    province: '제주도',
+    city: '제주시',
+    description: '한국에서 가장 높은 산으로, 제주도의 중앙에 위치한 휴화산입니다.',
+    imageUrl: 'https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg',
+    rating: 4.9,
+    visitors: 12100
+  }
+];
+
+// 계산된 속성
+const filteredCities = computed(() => {
+  return selectedProvince.value ? citiesByProvince[selectedProvince.value] || [] : [];
+});
+
+const filteredPlaces = computed(() => {
+  return places.filter(place => {
+    // 도가 선택되지 않았으면 모든 장소 표시
+    if (!selectedProvince.value) return true;
+    
+    // 도가 선택되었고 시/군은 선택되지 않았을 경우
+    if (selectedProvince.value && !selectedCity.value) {
+      return place.province === selectedProvince.value;
+    }
+    
+    // 도와 시/군 모두 선택된 경우
+    return place.province === selectedProvince.value && 
+           place.city === selectedCity.value;
+  });
+});
+
+// 메서드
+function onProvinceChange() {
+  // 도가 변경되면 시/군 선택 초기화
+  selectedCity.value = '';
+}
 </script>
 
 <style scoped>
@@ -253,7 +264,7 @@
 }
 
 /* 전체 컨테이너 */
-.travel-container {
+.info-container {
   width: 100%;
   margin: 0 auto;
   padding: 2rem 6rem;
@@ -269,6 +280,7 @@
   border-radius: 65% 35% 60% 40% / 60% 40% 60% 40%;
   z-index: 0;
   transform: skew(-5deg, -10deg);
+  transition: background 0.5s ease, opacity 0.5s ease;
 }
 
 /* 개별 그라데이션 타원형 위치 및 스타일 */
@@ -336,7 +348,7 @@
   transform: rotate(-12deg);
 }
 
-/* 헤더 스타일 수정 */
+/* 헤더 스타일 */
 .header {
   display: flex;
   justify-content: space-between;
@@ -377,6 +389,10 @@
 .menu-link:hover, .menu-link.active {
   color: #9581e8;
   background: none;
+}
+
+.menu-link.active {
+  font-weight: 600;
 }
 
 .search-icon {
@@ -431,326 +447,267 @@
   width: 100%;
 }
 
-.login-button:active {
-  transform: translateY(-1px);
-}
-
-/* 지역 아이콘 섹션 */
-.region-icons {
+/* 메인 콘텐츠 영역 */
+.main-content {
   position: relative;
   z-index: 1;
-  margin-bottom: 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 0;
 }
 
-.region-title {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.region-title h2 {
-  font-size: 2rem;
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
   color: #333;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
-.region-title p {
+.page-description {
+  font-size: 1.2rem;
   color: #666;
-  font-size: 1.1rem;
+  margin-bottom: 3rem;
+  text-align: center;
 }
 
-.region-scroll {
+/* 필터 섹션 */
+.filter-section {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
-  padding: 1rem 0;
-  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  max-width: 460px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.region-item {
+.filter-group {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 80px;
+  gap: 0.3rem;
+  width: 160px;
 }
 
-.region-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-}
-
-.region-text {
+.filter-group label {
   font-size: 0.9rem;
-  font-weight: 600;
-  color: #444;
-}
-
-.region-icon:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(149, 129, 232, 0.3);
-  background-color: #e8e4f5;
-}
-
-.region-item p {
-  font-size: 0.85rem;
+  color: #666;
   font-weight: 500;
-  color: #444;
 }
 
-/* 인기 여행지 섹션 */
-.popular-destinations {
-  position: relative;
-  z-index: 1;
-  margin-bottom: 5rem;
+.filter-select {
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.section-header {
+.filter-select:focus {
+  border-color: #9581e8;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(149, 129, 232, 0.2);
+}
+
+.filter-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* 결과 없음 메시지 */
+.no-results {
   text-align: center;
+  padding: 3rem;
+  color: #666;
+  font-size: 1.1rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   margin-bottom: 3rem;
 }
 
-.section-title {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.section-subtitle {
-  color: #666;
-  font-size: 1.1rem;
-}
-
-.destinations-grid {
+/* 관광지 리스트 */
+.place-list {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
+  margin-bottom: 3rem;
 }
 
-.destination-card {
-  position: relative;
-  border-radius: 10px;
+.place-card {
+  background-color: white;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  cursor: pointer;
-  height: 220px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.destination-card:hover {
+.place-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
 }
 
-.destination-card img {
+.place-image {
+  height: 200px;
+  overflow: hidden;
+}
+
+.place-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
 }
 
-.destination-card:hover img {
-  transform: scale(1.05);
+.place-card:hover .place-image img {
+  transform: scale(1.1);
 }
 
-.destination-info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+.place-info {
   padding: 1rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-  color: white;
 }
 
-.destination-info h3 {
-  font-size: 1.2rem;
-  margin-bottom: 0.2rem;
-}
-
-.destination-info p {
-  font-size: 0.9rem;
-  opacity: 0.9;
-}
-
-/* 여행 팁 섹션 */
-.travel-tips {
-  position: relative;
-  z-index: 1;
-  margin-bottom: 5rem;
-}
-
-.tips-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-}
-
-.tip-card {
-  flex: 1;
-  background-color: white;
-  border-radius: 15px;
-  padding: 2rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  text-align: center;
-  transition: transform 0.3s ease;
-}
-
-.tip-card:hover {
-  transform: translateY(-10px);
-}
-
-.tip-icon {
-  font-size: 3rem;
-  margin-bottom: 1.5rem;
-}
-
-.tip-card h3 {
-  font-size: 1.4rem;
+.place-name {
+  font-size: 1.1rem;
+  font-weight: 600;
   color: #333;
+  margin-bottom: 0.3rem;
+}
+
+.place-location {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #666;
+  font-size: 0.9rem;
   margin-bottom: 1rem;
 }
 
-.tip-card p {
-  color: #666;
-  margin-bottom: 1.5rem;
-}
-
-.read-more {
+.location-icon {
   color: #9581e8;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s;
 }
 
-.read-more:hover {
-  color: #7761c8;
+.place-description {
+  color: #666;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-bottom: 0.8rem;
+  height: 3.6rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
-/* 푸터 스타일 */
+.place-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.place-rating {
+  color: #ff9800;
+}
+
+/* 페이지네이션 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 3rem;
+}
+
+.pagination-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.prev, .next {
+  width: auto;
+  padding: 0 1rem;
+  border-radius: 20px;
+}
+
+.pagination-btn.active {
+  background-color: #9581e8;
+  color: white;
+  border-color: #9581e8;
+}
+
+.pagination-btn:hover:not(.active) {
+  background-color: #f5f5f5;
+}
+
+/* 푸터 */
 .footer {
   background-color: #f8f9fa;
-  padding: 4rem 0 2rem;
+  padding: 2rem 0;
+  margin-top: 3rem;
+  border-top: 1px solid #eee;
   position: relative;
   z-index: 1;
 }
 
 .footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 3rem;
+  align-items: center;
 }
 
 .footer-logo {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #333;
-  margin-bottom: 1rem;
 }
 
-.footer-logo p {
-  font-size: 1rem;
-  color: #666;
-  font-weight: normal;
-}
-
-.footer-links {
-  display: flex;
-  flex-direction: column;
-}
-
-.footer-links h3 {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-.footer-links a {
-  color: #666;
-  text-decoration: none;
-  margin-bottom: 0.5rem;
-  transition: color 0.3s;
-}
-
-.footer-links a:hover {
-  color: #9581e8;
-}
-
-.footer-newsletter h3 {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-.footer-newsletter p {
-  color: #666;
-  margin-bottom: 1rem;
-}
-
-.newsletter-form {
-  display: flex;
-}
-
-.newsletter-form input {
-  flex: 1;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px 0 0 5px;
-  outline: none;
-}
-
-.newsletter-form button {
-  background-color: #9581e8;
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 0 5px 5px 0;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.newsletter-form button:hover {
-  background-color: #7761c8;
-}
-
-.footer-bottom {
-  text-align: center;
-  padding-top: 2rem;
-  border-top: 1px solid #eee;
-  color: #888;
+.copyright {
+  color: #999;
+  font-size: 0.9rem;
 }
 
 /* 반응형 디자인 */
 @media (max-width: 1024px) {
-  .travel-container {
-    padding: 2rem;
+  .info-container {
+    padding: 2rem 4rem;
   }
   
-  .tips-container {
-    flex-wrap: wrap;
+  .filter-section {
+    flex-direction: column;
+    align-items: center;
   }
   
-  .tip-card {
-    flex: 0 0 calc(50% - 1rem);
+  .filter-group {
+    width: 100%;
+    max-width: 240px;
   }
   
-  .footer-content {
-    flex-wrap: wrap;
-    gap: 2rem;
-  }
-
-  .destinations-grid {
+  .place-list {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
+  .info-container {
+    padding: 2rem 2rem;
+  }
+  
   .header {
     flex-direction: column;
     gap: 1rem;
@@ -760,27 +717,24 @@
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 1rem;
   }
   
-  .region-scroll {
-    justify-content: flex-start;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 1rem;
+  .page-title {
+    font-size: 2rem;
   }
   
-  .destinations-grid {
+  .page-description {
+    font-size: 1rem;
+  }
+  
+  .place-list {
     grid-template-columns: 1fr;
-  }
-  
-  .tip-card {
-    flex: 0 0 100%;
   }
   
   .footer-content {
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
+    text-align: center;
   }
 }
 </style>
