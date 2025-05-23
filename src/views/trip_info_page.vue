@@ -23,7 +23,7 @@
         <button @click="fetchData" class="retry-button">다시 시도</button>
       </div>
 
-      <!-- 메인 콘텐츠 (로딩이 아닐 때만 표시) -->
+      <!-- 메인 콘텐츠 -->
       <div v-if="!isLoading && !error">
         <!-- 페이지 제목 -->
         <div class="page-title-section">
@@ -81,7 +81,7 @@
           </div>
         </div>
         
-        <!-- 필터링된 결과가 없을 때 메시지 -->
+        <!-- 검색 결과 없음 -->
         <div v-if="places.length === 0 && !isLoading" class="no-results">
           <p v-if="selectedAreaCode || selectedSigunguCode || searchKeyword">
             검색 조건에 맞는 여행지가 없습니다.
@@ -100,7 +100,7 @@
           >
             <div class="place-image">
               <img 
-                :src="place.firstImageUrl || '/api/placeholder/300/200'" 
+                :src="place.firstImageUrl || 'https://placehold.co/300x200?text=No+Image'" 
                 :alt="place.title"
                 @error="handleImageError"
               >
@@ -167,7 +167,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 
-// API 기본 URL - 환경변수로 설정 (수정됨)
+// API 기본 URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 // 상태 관리
@@ -205,77 +205,38 @@ const filteredSigungus = computed(() => {
   return sigungus.value.filter(sigungu => sigungu.areaCode === parseInt(selectedAreaCode.value));
 });
 
-// 하드코딩된 지역 데이터 (임시 - API가 준비되면 제거)
-const AREA_DATA = [
-  { areaCode: 1, name: '서울' },
-  { areaCode: 2, name: '인천' },
-  { areaCode: 3, name: '대전' },
-  { areaCode: 4, name: '대구' },
-  { areaCode: 5, name: '광주' },
-  { areaCode: 6, name: '부산' },
-  { areaCode: 7, name: '울산' },
-  { areaCode: 8, name: '세종특별자치시' },
-  { areaCode: 31, name: '경기도' },
-  { areaCode: 32, name: '강원도' },
-  { areaCode: 33, name: '충청북도' },
-  { areaCode: 34, name: '충청남도' },
-  { areaCode: 35, name: '경상북도' },
-  { areaCode: 36, name: '경상남도' },
-  { areaCode: 37, name: '전라북도' },
-  { areaCode: 38, name: '전라남도' },
-  { areaCode: 39, name: '제주도' }
-];
-
-const SIGUNGU_DATA = [
-  // 서울
-  { areaCode: 1, sigunguCode: 1, name: '강남구' },
-  { areaCode: 1, sigunguCode: 2, name: '강동구' },
-  { areaCode: 1, sigunguCode: 3, name: '강북구' },
-  { areaCode: 1, sigunguCode: 4, name: '강서구' },
-  { areaCode: 1, sigunguCode: 5, name: '관악구' },
-  // 더 많은 시군구 데이터...
-  // (기존 데이터 유지)
-];
-
-// 임시 여행지 데이터
-const SAMPLE_PLACES = [
-  {
-    placeId: 1,
-    title: '경복궁',
-    address1: '서울특별시 종로구',
-    address2: '사직로 161',
-    areaCode: 1,
-    sigunguCode: 23,
-    telephone: '02-3700-3900',
-    firstImageUrl: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg',
-    category1: 'A02',
-    category2: '',
-    category3: ''
-  },
-  // 더 많은 여행지 데이터...
-  // (기존 데이터 유지)
-];
-
-// API 호출 함수들 (기존과 동일)
+// API 호출 함수들
 async function fetchAreas() {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/areas`);
+    const response = await axios.get(`${API_BASE_URL}/api/region/`);
     areas.value = response.data;
-    console.log('지역 API 호출 성공');
   } catch (error) {
-    console.warn('지역 API 호출 실패, 임시 데이터 사용:', error.message);
-    areas.value = AREA_DATA;
+    console.error('지역 API 호출 실패:', error.message);
+    // 기본 지역 데이터 설정
+    areas.value = [
+      { areaCode: 1, name: '서울' },
+      { areaCode: 6, name: '부산' },
+      { areaCode: 31, name: '경기도' },
+      { areaCode: 39, name: '제주도' }
+    ];
   }
 }
 
 async function fetchSigungus() {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/sigungus`);
-    sigungus.value = response.data;
-    console.log('시군구 API 호출 성공');
+    const allSigungus = [];
+    for (const area of areas.value) {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/region/${area.areaCode}/sigungu`);
+        allSigungus.push(...response.data);
+      } catch (error) {
+        console.warn(`지역 ${area.areaCode} 시군구 API 호출 실패:`, error.message);
+      }
+    }
+    sigungus.value = allSigungus;
   } catch (error) {
-    console.warn('시군구 API 호출 실패, 임시 데이터 사용:', error.message);
-    sigungus.value = SIGUNGU_DATA;
+    console.error('시군구 API 호출 실패:', error.message);
+    sigungus.value = [];
   }
 }
 
@@ -299,11 +260,7 @@ async function fetchPlaces() {
       params.keyword = searchKeyword.value.trim();
     }
 
-    console.log('여행지 API 호출 시도:', `${API_BASE_URL}/api/travel/search`, params);
-
     const response = await axios.get(`${API_BASE_URL}/api/travel/search`, { params });
-    
-    console.log('여행지 API 응답:', response.data);
     
     if (response.data.content) {
       places.value = response.data.content;
@@ -315,33 +272,10 @@ async function fetchPlaces() {
       places.value = [];
       totalElements.value = 0;
     }
-    
-    console.log('여행지 API 호출 성공, 결과 수:', places.value.length);
   } catch (error) {
-    console.warn('여행지 API 호출 실패, 임시 데이터 사용:', error.message);
-    
-    let filteredPlaces = [...SAMPLE_PLACES];
-    
-    if (selectedAreaCode.value) {
-      filteredPlaces = filteredPlaces.filter(place => place.areaCode === parseInt(selectedAreaCode.value));
-    }
-    if (selectedSigunguCode.value) {
-      filteredPlaces = filteredPlaces.filter(place => place.sigunguCode === parseInt(selectedSigunguCode.value));
-    }
-    if (searchKeyword.value.trim()) {
-      const keyword = searchKeyword.value.trim().toLowerCase();
-      filteredPlaces = filteredPlaces.filter(place => 
-        place.title.toLowerCase().includes(keyword) ||
-        place.address1.toLowerCase().includes(keyword) ||
-        place.address2?.toLowerCase().includes(keyword)
-      );
-    }
-    
-    const startIndex = (currentPage.value - 1) * pageSize.value;
-    const endIndex = startIndex + pageSize.value;
-    
-    places.value = filteredPlaces.slice(startIndex, endIndex);
-    totalElements.value = filteredPlaces.length;
+    console.error('여행지 API 호출 실패:', error.message);
+    places.value = [];
+    totalElements.value = 0;
   } finally {
     isLoading.value = false;
   }
@@ -353,17 +287,9 @@ async function fetchData() {
     error.value = '';
     isLoading.value = true;
     
-    console.log('초기 데이터 로드 시작');
-    console.log('API_BASE_URL:', API_BASE_URL);
-    
-    await Promise.all([
-      fetchAreas(),
-      fetchSigungus()
-    ]);
-    
+    await fetchAreas();
+    await fetchSigungus();
     await fetchPlaces();
-    
-    console.log('초기 데이터 로드 완료');
   } catch (err) {
     console.error('초기 데이터 로드 실패:', err);
     error.value = '데이터를 불러오는 중 오류가 발생했습니다.';
@@ -372,7 +298,7 @@ async function fetchData() {
   }
 }
 
-// 이벤트 핸들러들 (기존과 동일)
+// 이벤트 핸들러들
 function onAreaChange() {
   selectedSigunguCode.value = '';
   currentPage.value = 1;
@@ -406,10 +332,10 @@ function changePage(page) {
 }
 
 function handleImageError(event) {
-  event.target.src = '/api/placeholder/300/200';
+  event.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
 }
 
-// 헬퍼 함수들 (기존과 동일)
+// 헬퍼 함수들
 function getAreaName(areaCode) {
   const area = areas.value.find(a => a.areaCode === areaCode);
   return area ? area.name : '';
@@ -434,7 +360,6 @@ function getCategoryName(category1, category2, category3) {
 
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(() => {
-  console.log('컴포넌트 마운트됨');
   fetchData();
 });
 
@@ -534,34 +459,12 @@ watch(currentPage, () => {
   background-color: #8470d7;
 }
 
-/* 검색 입력 그룹 */
-.search-input-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.search-button {
-  padding: 0.6rem 1rem;
-  background-color: #9581e8;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-.search-button:hover {
-  background-color: #8470d7;
-}
-
-/* 그라데이션 원형들 (기존과 동일) */
+/* 그라데이션 원형들 */
 .gradient-circle {
   position: absolute;
   border-radius: 65% 35% 60% 40% / 60% 40% 60% 40%;
   z-index: 0;
   transform: skew(-5deg, -10deg);
-  transition: background 0.5s ease, opacity 0.5s ease;
 }
 
 .circle1 {
@@ -681,6 +584,26 @@ watch(currentPage, () => {
 .filter-select:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
+}
+
+.search-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-button {
+  padding: 0.6rem 1rem;
+  background-color: #9581e8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.search-button:hover {
+  background-color: #8470d7;
 }
 
 .no-results {

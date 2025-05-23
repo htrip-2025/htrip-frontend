@@ -8,7 +8,6 @@ import loginPage from '@/views/loginPage.vue'
 import myPage from '@/views/myPage.vue'
 import TripPlanPage from '@/views/TripPlanPage.vue'
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -40,12 +39,12 @@ const router = createRouter({
     {
       path: '/mypage',
       name: 'mypage',
-      component:myPage,
+      component: myPage,
     },
     {
       path: '/plan',
       name: 'plan',
-      component:TripPlanPage,
+      component: TripPlanPage,
     },
   ],
 })
