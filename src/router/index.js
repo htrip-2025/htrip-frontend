@@ -11,8 +11,6 @@ import loginPage from '@/views/loginPage.vue'
 import myPage from '@/views/myPage.vue'
 import TripPlanPage from '@/views/TripPlanPage.vue'
 
-
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
