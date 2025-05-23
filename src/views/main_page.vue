@@ -2,6 +2,7 @@
   <div class="travel-container">
     <!-- 배경 그라데이션 원형들 -->
     <div class="gradient-circle circle1"></div>
+
     <div class="gradient-circle circle2"></div>
     <div class="gradient-circle circle3"></div>
     <div class="gradient-circle circle4"></div>
@@ -10,25 +11,7 @@
     <div class="gradient-circle circle7"></div>
     
     <!-- 헤더 -->
-   <!-- header 부분만 수정 -->
-<header class="header">
-  <div class="logo">
-    <span class="logo-icon">T</span>rip
-  </div>
-  <div class="menu-items">
-    <a href="#" class="menu-link">AI 추천</a>
-    <a href="/info" class="menu-link">여행정보</a>
-    <a href="/plan" class="menu-link">여행계획</a>
-    <a href="#" class="menu-link">커뮤니티</a>
-    <a href="#" class="menu-link search-icon">🔍</a>
-  </div>
- <div class="login-section">
-  <a href="/login" class="login-button">
-    <span class="button-text">로그인</span>
-  </a>
-</div>
-</header>
-
+ 
     <!-- 히어로 섹션 -->
     <section class="hero-section">
       <div class="hero-content">
@@ -365,132 +348,7 @@ const scrollRight = () => {
   background: radial-gradient(ellipse, rgba(213, 232, 251, 0.85) 0%, rgba(213, 232, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
   transform: rotate(-12deg);
 }
-/* 헤더 스타일 수정 */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3rem;
-  position: relative;
-  z-index: 1;
-  padding: 1rem 0;
-  border-bottom: 0.8px solid rgba(0, 0, 0, 0.2);
-}
 
-.logo {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #333;
-}
-
-.logo-icon {
-  color: #9581e8;
-  background-color: #ffefd5;
-  padding: 2px 8px;
-  border-radius: 50%;
-  margin-right: 2px;
-}
-
-.menu-items {
-  display: flex;
-  gap: 2rem;
-}
-
-.menu-link {
-  text-decoration: none;
-  color: #666;
-  font-size: 1.1rem;
-  transition: color 0.3s;
-}
-
-.menu-link:hover, .menu-link.active {
-  color: #9581e8;
-  background: none;
-}
-
-.search-icon {
-  font-size: 1.2rem;
-}
-
-.login-section {
-  display: flex;
-  align-items: center;
-}
-
-/* 로그인 버튼 스타일 업데이트 */
-.login-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #9581e8 0%, #a2b3f8 100%); /* 요청한 색상으로 변경 */
-  color: white;
-  padding: 0.6rem 1.5rem; /* 약간 작게 */
-  border-radius: 30px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 8px 20px rgba(149, 129, 232, 0.25); /* 그림자 연하게 */
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  border: none;
-  cursor: pointer;
-  z-index: 1;
-}
-
-.login-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(135deg, #a2b3f8 0%, #9581e8 100%);
-  transition: width 0.5s ease;
-  z-index: -1;
-  border-radius: 30px;
-}
-
-.login-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(149, 129, 232, 0.35);
-}
-
-.login-button:hover::before {
-  width: 100%;
-}
-
-.login-button:active {
-  transform: translateY(-1px);
-}
-
-/* 미디어 쿼리에 추가 */
-@media (max-width: 768px) {
-  .login-button {
-    padding: 0.5rem 1.2rem;
-    font-size: 0.85rem;
-  }
-}
-
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-  }
-  
-  .menu-items {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-  
-  .login-section {
-    margin-top: 0.5rem;
-  }
-}
 
 /* 히어로 섹션 */
 .hero-section {
