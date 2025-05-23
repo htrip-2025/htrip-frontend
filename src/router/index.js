@@ -5,9 +5,13 @@ import trip_info_page from '../views/trip_info_page.vue'
 import about from '../views/AboutView.vue'
 import MainPage01 from '@/views/mainPage01.vue'
 import boardPage from '@/views/boardPage.vue'
+import PostWriteView from '@/views/PostWriteView.vue'  // 글 작성 페이지
+import PostDetailView from '@/views/PostDetailView.vue'  // 글 보기 페이지
+import PostEditView from '@/views/PostEditView.vue' // 글 수정 페이지
 import loginPage from '@/views/loginPage.vue'
 import myPage from '@/views/myPage.vue'
 import TripPlanPage from '@/views/TripPlanPage.vue'
+
 
 
 const router = createRouter({
@@ -29,6 +33,11 @@ const router = createRouter({
       component: trip_info_page,
     },
     {
+      path: '/plan',
+      name: 'plan',
+      component: TripPlanPage,
+    },
+    {
       path: '/main',
       name: 'main',
       component: MainPage01,
@@ -39,6 +48,23 @@ const router = createRouter({
       component: boardPage,
     },
     {
+      path: '/board/write',
+      name: 'post-write',
+      component: PostWriteView,
+    },
+    {
+      path: '/board/:id',
+      name: 'post-detail',
+      component: PostDetailView,
+      props: true
+    },
+    {
+      path: '/board/:id/edit',
+      name: 'post-edit',
+      component: PostEditView,
+      props: true
+    },
+    {
       path: '/login',
       name: 'login',
       component: loginPage,
@@ -46,12 +72,7 @@ const router = createRouter({
     {
       path: '/mypage',
       name: 'mypage',
-      component:myPage,
-    },
-    {
-      path: '/plan',
-      name: 'plan',
-      component:TripPlanPage,
+      component: myPage,
     },
   ],
 })
