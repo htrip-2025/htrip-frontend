@@ -8,64 +8,594 @@
 
     <!-- 마이페이지 콘텐츠 -->
     <div class="mypage-content">
-      <h1 class="mypage-title">마이페이지</h1>
-      
       <div class="mypage-layout">
-        <!-- 왼쪽 박스: 프로필 정보 -->
-        <div class="profile-section">
-          <div class="profile-image">
-            <img src="" alt="프로필 이미지" ref="profileImage" />
+        <!-- 왼쪽 사이드바 -->
+        <div class="sidebar">
+          <!-- 프로필 정보 -->
+          <div class="profile-section">
+            <div class="profile-image">
+              <img src="" alt="프로필 이미지" ref="profileImage" class="avatar-img"/>
+              <button class="edit-profile-btn" title="프로필 편집">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M18.5 2.50023C18.8978 2.10243 19.4374 1.87891 20 1.87891C20.5626 1.87891 21.1022 2.10243 21.5 2.50023C21.8978 2.89804 22.1213 3.43762 22.1213 4.00023C22.1213 4.56284 21.8978 5.10243 21.5 5.50023L12 15.0002L8 16.0002L9 12.0002L18.5 2.50023Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+            <h2 class="profile-name">{{ userProfile.name }}</h2>
+            <p class="profile-email">{{ userProfile.email }}</p>
+            
+            <!-- 통계 정보 -->
+            <div class="profile-stats">
+              <div class="stat-row">
+                <span class="stat-label">총 여행 계획</span>
+                <span class="stat-value">{{ stats.totalTrips }}</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-row">
+                <span class="stat-label">찜한 여행지</span>
+                <span class="stat-value">{{ stats.totalWishlists }}</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-row">
+                <span class="stat-label">작성한 리뷰</span>
+                <span class="stat-value">{{ stats.totalReviews }}</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-row">
+                <span class="stat-label">작성한 게시글</span>
+                <span class="stat-value">{{ stats.totalPosts }}</span>
+              </div>
+            </div>
           </div>
-          <h2 class="profile-name">홍길동</h2>
-          <p class="profile-email">hong@example.com</p>
           
-          <div class="profile-buttons">
-            <button class="profile-btn">프로필 편집</button>
-            <button class="profile-btn">설정</button>
+          <!-- 네비게이션 메뉴 -->
+          <div class="navigation-menu">
+            <button 
+              v-for="tab in tabs" 
+              :key="tab.id"
+              @click="activeTab = tab.id"
+              class="nav-btn"
+              :class="{ active: activeTab === tab.id }"
+            >
+              <span class="nav-icon">{{ tab.icon }}</span>
+              <span class="nav-text">{{ tab.name }}</span>
+            </button>
           </div>
         </div>
         
-        <!-- 오른쪽 박스: 여행 계획 목록 -->
-        <div class="plans-section">
-          <h2 class="section-title">나의 여행 계획</h2>
-          
-          <div class="plan-item">
-            <div class="plan-details">
-              <h3>서울 여행</h3>
-              <p>2025.05.10 - 05.15 · 4명</p>
+        <!-- 오른쪽 콘텐츠 영역 -->
+        <div class="content-area">
+          <!-- 홈 탭 -->
+          <div v-if="activeTab === 'home'" class="home-content">
+            <!-- 요약 섹션들 -->
+            <div class="summary-sections">
+              <!-- 상단 수평 레이아웃 (최근 여행 계획 + 최근 찜한 여행지) -->
+              <div class="horizontal-summary-row">
+                <!-- 최근 여행 계획 -->
+                <div class="summary-card">
+                  <div class="summary-header">
+                    <h3>최근 여행 계획</h3>
+                    <button @click="activeTab = 'plans'" class="more-btn">더보기</button>
+                  </div>
+                  <div class="summary-list">
+                    <div v-for="plan in recentPlans.slice(0, 3)" :key="plan.id" class="summary-item home-summary-item">
+                      <div class="item-title clickable" @click="viewItem('plan', plan.id)">{{ plan.title }}</div>
+                      <div class="item-subtitle">{{ plan.date }} · {{ plan.participants }}명</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- 최근 찜한 여행지 -->
+                <div class="summary-card">
+                  <div class="summary-header">
+                    <h3>최근 찜한 여행지</h3>
+                    <button @click="activeTab = 'wishlists'" class="more-btn">더보기</button>
+                  </div>
+                  <div class="summary-grid">
+                    <div v-for="item in recentWishlists.slice(0, 4)" :key="item.id" class="wishlist-preview clickable" @click="viewItem('wishlist', item.id)">
+                      <img :src="item.image" :alt="item.title" />
+                      <div class="wishlist-title">{{ item.title }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 하단 수직 레이아웃 (리뷰, 게시글, 댓글) -->
+              <div class="vertical-summary-section">
+                <!-- 최근 리뷰 -->
+                <div class="summary-card">
+                  <div class="summary-header">
+                    <h3>최근 리뷰</h3>
+                    <button @click="activeTab = 'reviews'" class="more-btn">더보기</button>
+                  </div>
+                  <div class="summary-list">
+                    <div v-for="review in allReviews.slice(0, 3)" :key="review.id" class="summary-item">
+                      <div class="item-title clickable" @click="viewItem('review', review.id)">{{ review.placeName }}</div>
+                      <div class="item-subtitle">{{ review.date }}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- 최근 게시글 -->
+                <div class="summary-card">
+                  <div class="summary-header">
+                    <h3>최근 게시글</h3>
+                    <button @click="activeTab = 'posts'" class="more-btn">더보기</button>
+                  </div>
+                  <div class="summary-list">
+                    <div v-for="post in recentPosts.slice(0, 3)" :key="post.id" class="summary-item">
+                      <div class="item-title clickable" @click="viewItem('post', post.id)">{{ post.title }}</div>
+                      <div class="item-subtitle">{{ post.date }} · 조회 {{ post.views }}회</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- 최근 댓글 -->
+                <div class="summary-card">
+                  <div class="summary-header">
+                    <h3>최근 댓글</h3>
+                    <button @click="activeTab = 'comments'" class="more-btn">더보기</button>
+                  </div>
+                  <div class="summary-list">
+                    <div v-for="comment in allComments.slice(0, 3)" :key="comment.id" class="summary-item">
+                      <div class="item-title clickable" @click="viewItem('comment', comment.id)">{{ comment.postTitle }}</div>
+                      <div class="item-subtitle">{{ comment.date }} · 좋아요 {{ comment.likes }}개</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <button class="view-btn">보기</button>
           </div>
           
-          <div class="plan-item">
-            <div class="plan-details">
-              <h3>제주도 여행</h3>
-              <p>2025.08.15 - 08.20 · 2명</p>
+          <!-- 나의 찜 탭 -->
+          <div v-if="activeTab === 'wishlists'" class="wishlists-content">
+            <div class="content-header">
+              <h2 class="content-title">나의 찜 ({{ filteredWishlists.length }})</h2>
+              
+              <div class="content-actions">
+                <div class="search-box">
+                  <input 
+                    type="text" 
+                    v-model="searchTerms.wishlists" 
+                    placeholder="여행지명 검색..." 
+                    class="search-input"
+                  />
+                </div>
+                <button 
+                  @click="deleteSelected('wishlists')" 
+                  class="delete-btn" 
+                  :disabled="selectedItems.wishlists.length === 0"
+                >
+                  선택 삭제
+                </button>
+              </div>
+              
+              <div class="select-all-container">
+                <label class="checkbox-container">
+                  <input 
+                    type="checkbox" 
+                    :checked="isAllSelected('wishlists')" 
+                    @change="toggleSelectAll('wishlists')" 
+                  />
+                  <span class="checkmark"></span>
+                  전체 선택
+                </label>
+              </div>
             </div>
-            <button class="view-btn">보기</button>
+            
+            <div class="wishlists-grid">
+              <div v-for="item in paginatedWishlists" :key="item.id" class="wishlist-card">
+                <div class="item-checkbox">
+                  <label class="checkbox-container">
+                    <input 
+                      type="checkbox" 
+                      :checked="isSelected('wishlists', item.id)" 
+                      @change="toggleSelect('wishlists', item.id)" 
+                    />
+                    <span class="checkmark"></span>
+                  </label>
+                </div>
+                <div class="wishlist-image">
+                  <img :src="item.image" :alt="item.title" />
+                  <button class="remove-wishlist-btn" @click="removeWishlist(item.id)">❤️</button>
+                </div>
+                <div class="wishlist-info">
+                  <h4 class="clickable" @click="viewItem('wishlist', item.id)">{{ item.title }}</h4>
+                  <p>{{ item.location }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pagination-container" v-if="totalPages.wishlists > 1">
+              <div class="pagination">
+                <button 
+                  class="page-btn" 
+                  :disabled="currentPage.wishlists === 1" 
+                  @click="changePage('wishlists', currentPage.wishlists - 1)"
+                >
+                  이전
+                </button>
+                <button 
+                  v-for="page in getPageNumbers('wishlists')" 
+                  :key="page" 
+                  class="page-btn" 
+                  :class="{ active: currentPage.wishlists === page }" 
+                  @click="changePage('wishlists', page)"
+                >
+                  {{ page }}
+                </button>
+                <button 
+                  class="page-btn" 
+                  :disabled="currentPage.wishlists === totalPages.wishlists" 
+                  @click="changePage('wishlists', currentPage.wishlists + 1)"
+                >
+                  다음
+                </button>
+              </div>
+            </div>
           </div>
           
-          <div class="plan-item">
-            <div class="plan-details">
-              <h3>부산 여행 (계획 중)</h3>
-              <p>2025.09.20 - 09.25 · 미정</p>
+          <!-- 나의 여행 계획 탭 -->
+          <div v-if="activeTab === 'plans'" class="plans-content">
+            <div class="content-header">
+              <h2 class="content-title">나의 여행 계획 ({{ filteredPlans.length }})</h2>
+              
+              <div class="content-actions">
+                <div class="search-box">
+                  <input 
+                    type="text" 
+                    v-model="searchTerms.plans" 
+                    placeholder="여행 제목 검색..." 
+                    class="search-input"
+                  />
+                  <select v-model="filterStatus" class="filter-select">
+                    <option value="all">모든 상태</option>
+                    <option value="completed">완료</option>
+                    <option value="planning">계획 중</option>
+                    <option value="cancelled">취소됨</option>
+                  </select>
+                </div>
+                <button 
+                  @click="deleteSelected('plans')" 
+                  class="delete-btn" 
+                  :disabled="selectedItems.plans.length === 0"
+                >
+                  선택 삭제
+                </button>
+              </div>
+              
+              <div class="select-all-container">
+                <label class="checkbox-container">
+                  <input 
+                    type="checkbox" 
+                    :checked="isAllSelected('plans')" 
+                    @change="toggleSelectAll('plans')" 
+                  />
+                  <span class="checkmark"></span>
+                  전체 선택
+                </label>
+              </div>
             </div>
-            <button class="edit-btn">편집</button>
+            
+            <div class="plans-list">
+              <div v-for="plan in paginatedPlans" :key="plan.id" class="plan-card">
+                <div class="item-checkbox">
+                  <label class="checkbox-container">
+                    <input 
+                      type="checkbox" 
+                      :checked="isSelected('plans', plan.id)" 
+                      @change="toggleSelect('plans', plan.id)" 
+                    />
+                    <span class="checkmark"></span>
+                  </label>
+                </div>
+                <div class="plan-info">
+                  <h4 class="clickable" @click="viewItem('plan', plan.id)">{{ plan.title }}</h4>
+                  <p>{{ plan.date }} · {{ plan.participants }}명</p>
+                  <span class="plan-status" :class="plan.status">{{ getStatusText(plan.status) }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pagination-container" v-if="totalPages.plans > 1">
+              <div class="pagination">
+                <button 
+                  class="page-btn" 
+                  :disabled="currentPage.plans === 1" 
+                  @click="changePage('plans', currentPage.plans - 1)"
+                >
+                  이전
+                </button>
+                <button 
+                  v-for="page in getPageNumbers('plans')" 
+                  :key="page" 
+                  class="page-btn" 
+                  :class="{ active: currentPage.plans === page }" 
+                  @click="changePage('plans', page)"
+                >
+                  {{ page }}
+                </button>
+                <button 
+                  class="page-btn" 
+                  :disabled="currentPage.plans === totalPages.plans" 
+                  @click="changePage('plans', currentPage.plans + 1)"
+                >
+                  다음
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      
-      <!-- 찜한 여행지 섹션 -->
-      <div class="wishlist-section">
-        <h2 class="section-title">내가 찜한 여행지</h2>
-        
-        <div class="wishlist-items">
-          <div class="wishlist-item" v-for="(item, index) in wishlists" :key="index">
-            <div class="wishlist-image">
-              <img :src="item.image" :alt="item.title" />
+          
+          <!-- 나의 리뷰 탭 -->
+          <div v-if="activeTab === 'reviews'" class="reviews-content">
+            <div class="content-header">
+              <h2 class="content-title">나의 리뷰 ({{ filteredReviews.length }})</h2>
+              
+              <div class="content-actions">
+                <div class="search-box">
+                  <input 
+                    type="text" 
+                    v-model="searchTerms.reviews" 
+                    placeholder="장소명 검색..." 
+                    class="search-input"
+                  />
+                </div>
+                <button 
+                  @click="deleteSelected('reviews')" 
+                  class="delete-btn" 
+                  :disabled="selectedItems.reviews.length === 0"
+                >
+                  선택 삭제
+                </button>
+              </div>
+              
+              <div class="select-all-container">
+                <label class="checkbox-container">
+                  <input 
+                    type="checkbox" 
+                    :checked="isAllSelected('reviews')" 
+                    @change="toggleSelectAll('reviews')" 
+                  />
+                  <span class="checkmark"></span>
+                  전체 선택
+                </label>
+              </div>
             </div>
-            <div class="wishlist-overlay">
-              <h3>{{ item.title }}</h3>
+            
+            <div class="reviews-list">
+              <div v-for="review in paginatedReviews" :key="review.id" class="review-card">
+                <div class="item-checkbox">
+                  <label class="checkbox-container">
+                    <input 
+                      type="checkbox" 
+                      :checked="isSelected('reviews', review.id)" 
+                      @change="toggleSelect('reviews', review.id)" 
+                    />
+                    <span class="checkmark"></span>
+                  </label>
+                </div>
+                <div class="review-image">
+                  <img :src="review.image" :alt="review.placeName" />
+                </div>
+                <div class="review-info">
+                  <h4 class="clickable" @click="viewItem('review', review.id)">{{ review.placeName }}</h4>
+                  <p class="review-text">{{ review.content }}</p>
+                  <div class="review-date">{{ review.date }}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pagination-container" v-if="totalPages.reviews > 1">
+              <div class="pagination">
+                <button 
+                  class="page-btn" 
+                  :disabled="currentPage.reviews === 1" 
+                  @click="changePage('reviews', currentPage.reviews - 1)"
+                >
+                  이전
+                </button>
+                <button 
+                  v-for="page in getPageNumbers('reviews')" 
+                  :key="page" 
+                  class="page-btn" 
+                  :class="{ active: currentPage.reviews === page }" 
+                  @click="changePage('reviews', page)"
+                >
+                  {{ page }}
+                </button>
+                <button 
+                  class="page-btn" 
+                  :disabled="currentPage.reviews === totalPages.reviews" 
+                  @click="changePage('reviews', currentPage.reviews + 1)"
+                >
+                  다음
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 나의 게시글 탭 -->
+          <div v-if="activeTab === 'posts'" class="posts-content">
+            <div class="content-header">
+              <h2 class="content-title">나의 게시글 ({{ filteredPosts.length }})</h2>
+              
+              <div class="content-actions">
+                <div class="search-box">
+                  <input 
+                    type="text" 
+                    v-model="searchTerms.posts" 
+                    placeholder="제목 검색..." 
+                    class="search-input"
+                  />
+                  <select v-model="categoryFilter" class="filter-select">
+                    <option value="all">모든 카테고리</option>
+                    <option value="여행팁">여행팁</option>
+                    <option value="맛집">맛집</option>
+                    <option value="추천">추천</option>
+                    <option value="후기">후기</option>
+                  </select>
+                </div>
+                <button 
+                  @click="deleteSelected('posts')" 
+                  class="delete-btn" 
+                  :disabled="selectedItems.posts.length === 0"
+                >
+                  선택 삭제
+                </button>
+              </div>
+              
+              <div class="select-all-container">
+                <label class="checkbox-container">
+                  <input 
+                    type="checkbox" 
+                    :checked="isAllSelected('posts')" 
+                    @change="toggleSelectAll('posts')" 
+                  />
+                  <span class="checkmark"></span>
+                  전체 선택
+                </label>
+              </div>
+            </div>
+            
+            <div class="posts-list">
+              <div v-for="post in paginatedPosts" :key="post.id" class="post-card">
+                <div class="item-checkbox">
+                  <label class="checkbox-container">
+                    <input 
+                      type="checkbox" 
+                      :checked="isSelected('posts', post.id)" 
+                      @change="toggleSelect('posts', post.id)" 
+                    />
+                    <span class="checkmark"></span>
+                  </label>
+                </div>
+                <div class="post-info">
+                  <span class="post-category">{{ post.category }}</span>
+                  <h4 class="clickable" @click="viewItem('post', post.id)">{{ post.title }}</h4>
+                  <div class="post-meta">
+                    <span>{{ post.date }}</span>
+                    <span>조회 {{ post.views }}회</span>
+                    <span>댓글 {{ post.comments }}개</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pagination-container" v-if="totalPages.posts > 1">
+              <div class="pagination">
+                <button 
+                  class="page-btn" 
+                  :disabled="currentPage.posts === 1" 
+                  @click="changePage('posts', currentPage.posts - 1)"
+                >
+                  이전
+                </button>
+                <button 
+                  v-for="page in getPageNumbers('posts')" 
+                  :key="page" 
+                  class="page-btn" 
+                  :class="{ active: currentPage.posts === page }" 
+                  @click="changePage('posts', page)"
+                >
+                  {{ page }}
+                </button>
+                <button 
+                  class="page-btn" 
+                  :disabled="currentPage.posts === totalPages.posts" 
+                  @click="changePage('posts', currentPage.posts + 1)"
+                >
+                  다음
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 나의 댓글 탭 -->
+          <div v-if="activeTab === 'comments'" class="comments-content">
+            <div class="content-header">
+              <h2 class="content-title">나의 댓글 ({{ filteredComments.length }})</h2>
+              
+              <div class="content-actions">
+                <div class="search-box">
+                  <input 
+                    type="text" 
+                    v-model="searchTerms.comments" 
+                    placeholder="내용 검색..." 
+                    class="search-input"
+                  />
+                </div>
+                <button 
+                  @click="deleteSelected('comments')" 
+                  class="delete-btn" 
+                  :disabled="selectedItems.comments.length === 0"
+                >
+                  선택 삭제
+                </button>
+              </div>
+              
+              <div class="select-all-container">
+                <label class="checkbox-container">
+                  <input 
+                    type="checkbox" 
+                    :checked="isAllSelected('comments')" 
+                    @change="toggleSelectAll('comments')" 
+                  />
+                  <span class="checkmark"></span>
+                  전체 선택
+                </label>
+              </div>
+            </div>
+            
+            <div class="comments-list">
+              <div v-for="comment in paginatedComments" :key="comment.id" class="comment-card">
+                <div class="item-checkbox">
+                  <label class="checkbox-container">
+                    <input 
+                      type="checkbox" 
+                      :checked="isSelected('comments', comment.id)" 
+                      @change="toggleSelect('comments', comment.id)" 
+                    />
+                    <span class="checkmark"></span>
+                  </label>
+                </div>
+                <div class="comment-info">
+                  <h4 class="clickable" @click="viewItem('comment', comment.id)">{{ comment.postTitle }}</h4>
+                  <p class="comment-text">{{ comment.content }}</p>
+                  <div class="comment-meta">
+                    <span>{{ comment.date }}</span>
+                    <span>좋아요 {{ comment.likes }}개</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pagination-container" v-if="totalPages.comments > 1">
+              <div class="pagination">
+                <button 
+                  class="page-btn" 
+                  :disabled="currentPage.comments === 1" 
+                  @click="changePage('comments', currentPage.comments - 1)"
+                >
+                  이전
+                </button>
+                <button 
+                  v-for="page in getPageNumbers('comments')" 
+                  :key="page" 
+                  class="page-btn" 
+                  :class="{ active: currentPage.comments === page }" 
+                  @click="changePage('comments', page)"
+                >
+                  {{ page }}
+                </button>
+                <button 
+                  class="page-btn" 
+                  :disabled="currentPage.comments === totalPages.comments" 
+                  @click="changePage('comments', currentPage.comments + 1)"
+                >
+                  다음
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -75,26 +605,130 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
-// 찜한 여행지 데이터 (랜덤 이미지 사용)
-const wishlists = ref([
-  {
-    title: '경복궁',
-    image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg'
-  },
-  {
-    title: '해운대 해수욕장',
-    image: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg'
-  },
-  {
-    title: '명동',
-    image: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg'
-  },
-  {
-    title: '성산일출봉',
-    image: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg'
-  }
+const router = useRouter();
+
+// 탭 정의
+const tabs = ref([
+  { id: 'home', name: '홈', icon: '🏠' },
+  { id: 'wishlists', name: '나의 찜', icon: '❤️' },
+  { id: 'plans', name: '나의 여행 계획', icon: '✈️' },
+  { id: 'reviews', name: '나의 리뷰', icon: '⭐' },
+  { id: 'posts', name: '나의 게시글', icon: '📝' },
+  { id: 'comments', name: '나의 댓글', icon: '💬' }
+]);
+
+// 활성 탭
+const activeTab = ref('home');
+
+// 사용자 프로필
+const userProfile = ref({
+  name: '홍길동',
+  email: 'hong@example.com'
+});
+
+// 통계 데이터
+const stats = ref({
+  totalTrips: 5,
+  totalWishlists: 12,
+  totalReviews: 8,
+  totalPosts: 15
+});
+
+// 최근 여행 계획
+const recentPlans = ref([
+  { id: 1, title: '서울 여행', date: '2025.05.10 - 05.15', participants: 4 },
+  { id: 2, title: '제주도 여행', date: '2025.08.15 - 08.20', participants: 2 },
+  { id: 3, title: '부산 여행 (계획 중)', date: '2025.09.20 - 09.25', participants: 3 }
+]);
+
+// 모든 여행 계획
+const allPlans = ref([
+  { id: 1, title: '서울 여행', date: '2025.05.10 - 05.15', participants: 4, status: 'completed' },
+  { id: 2, title: '제주도 여행', date: '2025.08.15 - 08.20', participants: 2, status: 'completed' },
+  { id: 3, title: '부산 여행', date: '2025.09.20 - 09.25', participants: 3, status: 'planning' },
+  { id: 4, title: '강릉 여행', date: '2025.10.05 - 10.07', participants: 2, status: 'planning' },
+  { id: 5, title: '전주 여행', date: '2025.11.15 - 11.17', participants: 4, status: 'planning' }
+]);
+
+// 최근 찜한 여행지
+const recentWishlists = ref([
+  { id: 1, title: '경복궁', image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg' },
+  { id: 2, title: '해운대', image: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg' },
+  { id: 3, title: '명동', image: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg' },
+  { id: 4, title: '성산일출봉', image: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg' }
+]);
+
+// 모든 찜한 여행지
+const allWishlists = ref([
+  { id: 1, title: '경복궁', location: '서울 종로구', image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg' },
+  { id: 2, title: '해운대 해수욕장', location: '부산 해운대구', image: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg' },
+  { id: 3, title: '명동', location: '서울 중구', image: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg' },
+  { id: 4, title: '성산일출봉', location: '제주 서귀포시', image: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg' },
+  { id: 5, title: '광안리 해수욕장', location: '부산 수영구', image: 'https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg' },
+  { id: 6, title: '한라산', location: '제주 서귀포시', image: 'https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg' },
+  { id: 7, title: '남산타워', location: '서울 용산구', image: 'https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg' },
+  { id: 8, title: '북촌한옥마을', location: '서울 종로구', image: 'https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg' },
+  { id: 9, title: '송정해변', location: '부산 해운대구', image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg' },
+  { id: 10, title: '청계천', location: '서울 중구', image: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg' },
+  { id: 11, title: '제주 올레길', location: '제주 서귀포시', image: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg' },
+  { id: 12, title: '경주 불국사', location: '경주 진구', image: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg' }
+]);
+
+// 최근 게시글
+const recentPosts = ref([
+  { id: 1, title: '제주도 여행 후기', date: '2025.05.10', views: 234 },
+  { id: 2, title: '부산 맛집 추천', date: '2025.05.08', views: 156 },
+  { id: 3, title: '서울 가볼만한 곳', date: '2025.05.05', views: 89 }
+]);
+
+// 모든 게시글
+const allPosts = ref([
+  { id: 1, title: '제주도 여행 후기', category: '여행팁', date: '2025.05.10', views: 234, comments: 12 },
+  { id: 2, title: '부산 맛집 추천', category: '맛집', date: '2025.05.08', views: 156, comments: 8 },
+  { id: 3, title: '서울 가볼만한 곳', category: '추천', date: '2025.05.05', views: 89, comments: 5 },
+  { id: 4, title: '제주도 드라이브 코스', category: '여행팁', date: '2025.05.03', views: 201, comments: 15 },
+  { id: 5, title: '강릉 바다 여행', category: '후기', date: '2025.04.28', views: 178, comments: 9 },
+  { id: 6, title: '전주 한옥마을 맛집', category: '맛집', date: '2025.04.22', views: 145, comments: 7 },
+  { id: 7, title: '여수 밤바다 추천 코스', category: '추천', date: '2025.04.15', views: 167, comments: 11 },
+  { id: 8, title: '경주 역사 여행', category: '여행팁', date: '2025.04.10', views: 132, comments: 6 },
+  { id: 9, title: '속초 맛집 베스트 5', category: '맛집', date: '2025.04.05', views: 210, comments: 14 },
+  { id: 10, title: '울산 여행 후기', category: '후기', date: '2025.03.28', views: 98, comments: 4 },
+  { id: 11, title: '인천 차이나타운 방문기', category: '후기', date: '2025.03.22', views: 122, comments: 8 },
+  { id: 12, title: '제주 한달살이 꿀팁', category: '여행팁', date: '2025.03.15', views: 256, comments: 18 },
+  { id: 13, title: '태안 해안길 드라이브', category: '추천', date: '2025.03.10', views: 143, comments: 9 },
+  { id: 14, title: '춘천 닭갈비 맛집 순위', category: '맛집', date: '2025.03.05', views: 187, comments: 12 },
+  { id: 15, title: '포항 호미곶 일출 여행', category: '여행팁', date: '2025.02.28', views: 134, comments: 7 }
+]);
+
+// 모든 리뷰
+const allReviews = ref([
+  { id: 1, placeName: '경복궁', rating: 5, content: '정말 아름다운 궁궐이었습니다. 역사적 가치도 높고 볼거리가 많아 하루 종일 있어도 지루하지 않았어요.', date: '2025.05.10', image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg' },
+  { id: 2, placeName: '해운대 해수욕장', rating: 4, content: '바다가 정말 깨끗하고 모래사장도 좋았어요. 주변에 맛집도 많아 즐겁게 놀다 왔습니다.', date: '2025.05.08', image: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg' },
+  { id: 3, placeName: '명동 거리', rating: 4, content: '쇼핑하기 정말 좋은 곳이네요. 다양한 브랜드가 있어서 원하는 물건은 다 살 수 있었어요.', date: '2025.05.05', image: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg' },
+  { id: 4, placeName: '한라산', rating: 5, content: '등산하기 좋은 코스가 잘 정비되어 있었고, 정상에서 보는 경치가 정말 장관이었습니다.', date: '2025.05.01', image: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg' },
+  { id: 5, placeName: '광안리 해수욕장', rating: 4, content: '야경이 정말 예쁜 곳이에요. 다리 조명이 특히 아름다웠습니다.', date: '2025.04.28', image: 'https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg' },
+  { id: 6, placeName: '남산타워', rating: 4, content: '서울 전경을 한눈에 볼 수 있어 좋았습니다. 저녁에 가면 야경도 멋져요.', date: '2025.04.20', image: 'https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg' },
+  { id: 7, placeName: '북촌한옥마을', rating: 5, content: '전통적인 한옥을 체험할 수 있어 좋았습니다. 사진 찍기에도 정말 좋은 장소예요.', date: '2025.04.15', image: 'https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg' },
+  { id: 8, placeName: '청계천', rating: 4, content: '도심 속 휴식처로 정말 좋았어요. 걷기 좋게 잘 정비되어 있었습니다.', date: '2025.04.10', image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg' }
+]);
+
+// 모든 댓글
+const allComments = ref([
+  { id: 1, postTitle: '제주도 맛집 추천', content: '정말 유용한 정보네요! 다음 주에 제주도 가는데 꼭 가보겠습니다.', date: '2025.05.10', likes: 5 },
+  { id: 2, postTitle: '부산 여행 코스 추천', content: '해운대는 정말 좋죠! 광안리도 추천드려요.', date: '2025.05.08', likes: 3 },
+  { id: 3, postTitle: '서울 한강 공원 추천', content: '한강에서 치킨 먹으면 정말 맛있어요 ㅎㅎ', date: '2025.05.05', likes: 8 },
+  { id: 4, postTitle: '강릉 카페 추천해주세요', content: '안목 커피거리 꼭 가보세요! 바다 보면서 커피 마시는 느낌이 정말 좋아요.', date: '2025.05.01', likes: 4 },
+  { id: 5, postTitle: '제주도 렌트카 문의', content: '저도 이번에 렌트카 이용했는데 정말 편했어요! 추천합니다.', date: '2025.04.28', likes: 2 },
+  { id: 6, postTitle: '전주 한옥마을 맛집', content: '콩나물국밥 정말 맛있었어요! 다음에 가면 또 먹을 예정입니다.', date: '2025.04.25', likes: 6 },
+  { id: 7, postTitle: '여수 밤바다 후기', content: '여수 밤바다 정말 로맨틱하죠! 저도 좋은 추억 만들고 왔어요.', date: '2025.04.20', likes: 9 },
+  { id: 8, postTitle: '속초 맛집 추천', content: '아바이 마을 가면 꼭 아바이 순대 드세요! 정말 맛있어요.', date: '2025.04.15', likes: 7 },
+  { id: 9, postTitle: '제주 숙소 추천 부탁드려요', content: '저는 서귀포쪽 펜션 이용했는데 조용하고 좋았어요.', date: '2025.04.10', likes: 3 },
+  { id: 10, postTitle: '경주 여행 후기', content: '불국사랑 석굴암은 꼭 같이 보시는걸 추천해요!', date: '2025.04.05', likes: 4 },
+  { id: 11, postTitle: '울산 가볼만한 곳', content: '대왕암공원 정말 좋았어요! 바다 경치가 끝내줍니다.', date: '2025.03.30', likes: 5 },
+  { id: 12, postTitle: '인천 차이나타운 맛집', content: '공화춘 짜장면 먹어보셨나요? 정말 맛있더라구요!', date: '2025.03.25', likes: 6 }
 ]);
 
 // 이미지 배열
@@ -107,14 +741,311 @@ const images = [
 
 const profileImage = ref(null);
 
+// 페이지네이션 설정
+const itemsPerPage = 6;
+
+// 필터 및 검색 상태
+const searchTerms = ref({
+  wishlists: '',
+  plans: '',
+  reviews: '',
+  posts: '',
+  comments: ''
+});
+
+const filterStatus = ref('all');
+const categoryFilter = ref('all');
+
+// 현재 페이지 상태
+const currentPage = ref({
+  wishlists: 1,
+  plans: 1,
+  reviews: 1,
+  posts: 1,
+  comments: 1
+});
+
+// 선택된 항목 상태
+const selectedItems = ref({
+  wishlists: [],
+  plans: [],
+  reviews: [],
+  posts: [],
+  comments: []
+});
+
+// 메서드 - 상태 텍스트 변환
+const getStatusText = (status) => {
+  const statusMap = {
+    'completed': '완료',
+    'planning': '계획 중',
+    'cancelled': '취소됨'
+  };
+  return statusMap[status] || status;
+};
+
+// 메서드 - 항목 보기
+const viewItem = (type, id) => {
+  console.log(`Viewing ${type} with ID ${id}`);
+  // 실제로는 라우터를 통해 해당 항목 페이지로 이동
+  // router.push(`/${type}/${id}`);
+};
+
+// 메서드 - 찜 항목 삭제
+const removeWishlist = (id) => {
+  if (confirm('찜 목록에서 제거하시겠습니까?')) {
+    const index = allWishlists.value.findIndex(item => item.id === id);
+    if (index > -1) {
+      allWishlists.value.splice(index, 1);
+      stats.value.totalWishlists--;
+    }
+  }
+};
+
+// 필터링된 컬렉션 계산
+const filteredWishlists = computed(() => {
+  if (!searchTerms.value.wishlists) return allWishlists.value;
+  return allWishlists.value.filter(item => 
+    item.title.toLowerCase().includes(searchTerms.value.wishlists.toLowerCase()) ||
+    item.location.toLowerCase().includes(searchTerms.value.wishlists.toLowerCase())
+  );
+});
+
+const filteredPlans = computed(() => {
+  let result = allPlans.value;
+  
+  // 검색어 필터링
+  if (searchTerms.value.plans) {
+    result = result.filter(plan => 
+      plan.title.toLowerCase().includes(searchTerms.value.plans.toLowerCase())
+    );
+  }
+  
+  // 상태 필터링
+  if (filterStatus.value !== 'all') {
+    result = result.filter(plan => plan.status === filterStatus.value);
+  }
+  
+  return result;
+});
+
+const filteredReviews = computed(() => {
+  if (!searchTerms.value.reviews) return allReviews.value;
+  return allReviews.value.filter(review => 
+    review.placeName.toLowerCase().includes(searchTerms.value.reviews.toLowerCase()) ||
+    review.content.toLowerCase().includes(searchTerms.value.reviews.toLowerCase())
+  );
+});
+
+const filteredPosts = computed(() => {
+  let result = allPosts.value;
+  
+  // 검색어 필터링
+  if (searchTerms.value.posts) {
+    result = result.filter(post => 
+      post.title.toLowerCase().includes(searchTerms.value.posts.toLowerCase())
+    );
+  }
+  
+  // 카테고리 필터링
+  if (categoryFilter.value !== 'all') {
+    result = result.filter(post => post.category === categoryFilter.value);
+  }
+  
+  return result;
+});
+
+const filteredComments = computed(() => {
+  if (!searchTerms.value.comments) return allComments.value;
+  return allComments.value.filter(comment => 
+    comment.postTitle.toLowerCase().includes(searchTerms.value.comments.toLowerCase()) ||
+    comment.content.toLowerCase().includes(searchTerms.value.comments.toLowerCase())
+  );
+});
+
+// 페이지네이션된 컬렉션 계산
+const paginatedWishlists = computed(() => {
+  const start = (currentPage.value.wishlists - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredWishlists.value.slice(start, end);
+});
+
+const paginatedPlans = computed(() => {
+  const start = (currentPage.value.plans - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredPlans.value.slice(start, end);
+});
+
+const paginatedReviews = computed(() => {
+  const start = (currentPage.value.reviews - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredReviews.value.slice(start, end);
+});
+
+const paginatedPosts = computed(() => {
+  const start = (currentPage.value.posts - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredPosts.value.slice(start, end);
+});
+
+const paginatedComments = computed(() => {
+  const start = (currentPage.value.comments - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredComments.value.slice(start, end);
+});
+
+// 총 페이지 수 계산
+const totalPages = computed(() => {
+  return {
+    wishlists: Math.ceil(filteredWishlists.value.length / itemsPerPage),
+    plans: Math.ceil(filteredPlans.value.length / itemsPerPage),
+    reviews: Math.ceil(filteredReviews.value.length / itemsPerPage),
+    posts: Math.ceil(filteredPosts.value.length / itemsPerPage),
+    comments: Math.ceil(filteredComments.value.length / itemsPerPage)
+  };
+});
+
+// 페이지 번호 배열 생성 (최대 5개만 표시)
+const getPageNumbers = (type) => {
+  const total = totalPages.value[type];
+  const current = currentPage.value[type];
+  
+  if (total <= 5) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  
+  if (current <= 3) {
+    return [1, 2, 3, 4, 5];
+  }
+  
+  if (current >= total - 2) {
+    return [total - 4, total - 3, total - 2, total - 1, total];
+  }
+  
+  return [current - 2, current - 1, current, current + 1, current + 2];
+};
+
+// 페이지 변경 메서드
+const changePage = (type, page) => {
+  currentPage.value[type] = page;
+};
+
+// 선택 상태 확인
+const isSelected = (type, id) => {
+  return selectedItems.value[type].includes(id);
+};
+
+// 모두 선택되었는지 확인
+const isAllSelected = (type) => {
+  const items = getPaginatedItems(type);
+  return items.length > 0 && items.every(item => selectedItems.value[type].includes(item.id));
+};
+
+// 현재 페이지의 항목들 가져오기 (타입에 따라)
+const getPaginatedItems = (type) => {
+  switch (type) {
+    case 'wishlists': return paginatedWishlists.value;
+    case 'plans': return paginatedPlans.value;
+    case 'reviews': return paginatedReviews.value;
+    case 'posts': return paginatedPosts.value;
+    case 'comments': return paginatedComments.value;
+    default: return [];
+  }
+};
+
+// 항목 선택/해제
+const toggleSelect = (type, id) => {
+  const index = selectedItems.value[type].indexOf(id);
+  if (index === -1) {
+    selectedItems.value[type].push(id);
+  } else {
+    selectedItems.value[type].splice(index, 1);
+  }
+};
+
+// 모든 항목 선택/해제
+const toggleSelectAll = (type) => {
+  const items = getPaginatedItems(type);
+  
+  if (isAllSelected(type)) {
+    // 모두 선택되어 있으면 해제
+    selectedItems.value[type] = selectedItems.value[type].filter(id => 
+      !items.some(item => item.id === id)
+    );
+  } else {
+    // 선택되지 않은 항목들 추가
+    const currentIds = selectedItems.value[type];
+    const newIds = items.filter(item => !currentIds.includes(item.id)).map(item => item.id);
+    selectedItems.value[type] = [...currentIds, ...newIds];
+  }
+};
+
+// 선택된 항목 삭제
+const deleteSelected = (type) => {
+  if (selectedItems.value[type].length === 0) return;
+  
+  if (!confirm(`선택한 ${selectedItems.value[type].length}개의 항목을 삭제하시겠습니까?`)) {
+    return;
+  }
+  
+  const collectionMap = {
+    'wishlists': allWishlists,
+    'plans': allPlans,
+    'reviews': allReviews,
+    'posts': allPosts,
+    'comments': allComments
+  };
+  
+  // 선택된 항목 삭제
+  const collection = collectionMap[type];
+  collection.value = collection.value.filter(item => !selectedItems.value[type].includes(item.id));
+  
+  // 통계 업데이트
+  if (type === 'wishlists') stats.value.totalWishlists = allWishlists.value.length;
+  if (type === 'plans') stats.value.totalTrips = allPlans.value.length;
+  if (type === 'reviews') stats.value.totalReviews = allReviews.value.length;
+  if (type === 'posts') stats.value.totalPosts = allPosts.value.length;
+  
+  // 선택 목록 초기화
+  selectedItems.value[type] = [];
+  
+  // 현재 페이지 조정 (항목이 없는 페이지에 있으면 이전 페이지로)
+  const totalPagesNew = Math.ceil(collection.value.length / itemsPerPage);
+  if (currentPage.value[type] > totalPagesNew && totalPagesNew > 0) {
+    currentPage.value[type] = totalPagesNew;
+  }
+};
+
+// 검색어 변경 시 페이지 초기화
+watch(searchTerms, (newTerms, oldTerms) => {
+  for (const type in newTerms) {
+    if (newTerms[type] !== oldTerms[type]) {
+      currentPage.value[type] = 1;
+    }
+  }
+}, { deep: true });
+
+// 필터 변경 시 페이지 초기화
+watch(filterStatus, () => {
+  currentPage.value.plans = 1;
+});
+
+watch(categoryFilter, () => {
+  currentPage.value.posts = 1;
+});
+
+// 탭 변경 시 선택 항목 초기화
+watch(activeTab, (newTab) => {
+  for (const type in selectedItems.value) {
+    selectedItems.value[type] = [];
+  }
+});
+
 onMounted(() => {
   // 프로필 이미지 랜덤 선택
   if (profileImage.value) {
     profileImage.value.src = images[Math.floor(Math.random() * images.length)];
   }
-  
-  // 찜한 여행지 이미지를 랜덤으로 섞기
-  wishlists.value.sort(() => Math.random() - 0.5);
 });
 </script>
 
@@ -127,17 +1058,17 @@ onMounted(() => {
   font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
 }
 
-/* 마이페이지 컨테이너 (loginPage.vue와 동일한 배경) */
+/* 마이페이지 컨테이너 */
 .mypage-container {
   width: 100%;
   min-height: 100vh;
   background: linear-gradient(120deg, #e0f7fa, #e8eaf6, #ede7f6);
   position: relative;
   overflow: hidden;
-  padding: 2rem 6rem;
+  padding: 1.5rem 6rem;
 }
 
-/* 그라데이션 원형 효과 (loginPage.vue에서 가져옴) */
+/* 그라데이션 원형 효과 */
 .gradient-circle {
   position: absolute;
   border-radius: 50%;
@@ -182,7 +1113,7 @@ onMounted(() => {
 .mypage-content {
   position: relative;
   z-index: 10;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -190,22 +1121,28 @@ onMounted(() => {
   font-size: 2.5rem;
   font-weight: 700;
   color: #333;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
 }
 
 .mypage-layout {
   display: flex;
-  gap: 2rem;
-  margin-bottom: 3rem;
+  gap: 1.5rem;
 }
 
-/* 프로필 섹션 스타일 */
+/* 왼쪽 사이드바 */
+.sidebar {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* 프로필 섹션 */
 .profile-section {
-  flex: 1;
   background-color: white;
   border-radius: 15px;
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
@@ -213,13 +1150,74 @@ onMounted(() => {
 }
 
 .profile-image {
-  width: 150px;
-  height: 150px;
+  position: relative;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  overflow: hidden;
-  margin-bottom: 1.5rem;
   background-color: #f0f0f0;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  /* overflow: visible; (기본) */
+}
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;   /* 이미지 자체만 동그랗게 자름 */
+  display: block;
+}
+/* edit-profile-btn 는 그대로 유지 (z-index:10) */
+
+.edit-profile-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #333;
+  color: white;
+  border: 2px solid white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
+  z-index: 10;
+}
+
+.edit-profile-btn:hover {
+  background-color: #222;
+  transform: scale(1.1);
+}
+
+/* 프로필 통계 */
+.profile-stats {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.stat-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #9581e8;
+}
+
+.stat-divider {
+  height: 1px;
+  background-color: #e9ecef;
+  margin: 0;
 }
 
 .profile-image img {
@@ -229,143 +1227,355 @@ onMounted(() => {
 }
 
 .profile-name {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #333;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .profile-email {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #666;
-  margin-bottom: 2rem;
+  margin-bottom: 0.8rem;
 }
 
-.profile-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-}
-
-.profile-btn {
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  background-color: #f6f6f6;
-  color: #333;
-  border: 1px solid #eee;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.profile-btn:hover {
-  background-color: #efefef;
-  transform: translateY(-2px);
-}
-
-/* 여행 계획 섹션 스타일 */
-.plans-section {
-  flex: 2;
+/* 네비게이션 메뉴 */
+.navigation-menu {
   background-color: white;
   border-radius: 15px;
-  padding: 2rem;
+  padding: 0.5rem 0;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
-.section-title {
-  font-size: 1.5rem;
-  font-weight: 700;
+.nav-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.nav-btn:hover {
+  background-color: #f8f9fa;
   color: #333;
+}
+
+.nav-btn.active {
+  background-color: #9581e8;
+  color: white;
+}
+
+.nav-icon {
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* 오른쪽 콘텐츠 영역 */
+.content-area {
+  flex: 1;
+  background-color: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* 컨텐츠 헤더 */
+.content-header {
+  display: flex;
+  flex-direction: column;
   margin-bottom: 1.5rem;
 }
 
-.plan-item {
+.content-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.content-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-radius: 10px;
-  margin-bottom: 1rem;
-  background-color: #f9f9f9;
+  margin-bottom: 0.8rem;
+}
+
+.search-box {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+  max-width: 500px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.filter-select {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  min-width: 120px;
+}
+
+.delete-btn {
+  padding: 0.6rem 1.2rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
   transition: all 0.3s;
 }
 
-.plan-item:hover {
-  background-color: #f0f0f0;
-  transform: translateY(-2px);
+.delete-btn:hover:not(:disabled) {
+  background-color: #c82333;
 }
 
-.plan-details h3 {
+.delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.select-all-container {
+  margin-bottom: 1rem;
+}
+
+/* 체크박스 스타일 */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #666;
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: relative;
+  height: 18px;
+  width: 18px;
+  background-color: #eee;
+  border-radius: 3px;
+  transition: all 0.3s;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #9581e8;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-container .checkmark:after {
+  left: 6px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* 아이템 체크박스 공통 스타일 */
+.item-checkbox {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+}
+
+/* 홈 콘텐츠 스타일 */
+.home-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 요약 섹션 */
+.summary-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* 수평 레이아웃 (최근 여행 계획 + 최근 찜한 여행지) */
+.horizontal-summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* 수직 레이아웃 (리뷰, 게시글, 댓글) */
+.vertical-summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.summary-card {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.summary-header h3 {
   font-size: 1.2rem;
+  color: #333;
+}
+
+.more-btn {
+  background-color: #9581e8;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.more-btn:hover {
+  background-color: #8571d8;
+}
+
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summary-item {
+  background-color: white;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border-left: 4px solid #9581e8;
+}
+
+/* 홈 섹션의 아이템 높이 조정 */
+.home-summary-item {
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.item-title {
   font-weight: 600;
   color: #333;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
-.plan-details p {
+.clickable {
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.clickable:hover {
+  color: #9581e8;
+  text-decoration: underline;
+}
+
+.item-subtitle {
   font-size: 0.9rem;
   color: #666;
 }
 
-.view-btn, .edit-btn {
-  padding: 0.6rem 1.2rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.view-btn {
-  background-color: #9581e8;
-}
-
-.edit-btn {
-  background-color: #7c8de3;
-}
-
-.view-btn:hover, .edit-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
-}
-
-/* 찜한 여행지 섹션 */
-.wishlist-section {
-  background-color: white;
-  border-radius: 15px;
-  padding: 2rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  margin-bottom: 3rem;
-}
-
-.wishlist-items {
+.summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
 }
 
-.wishlist-item {
+.wishlist-preview {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.wishlist-preview:hover {
+  transform: translateY(-3px);
+}
+
+.wishlist-preview img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.wishlist-title {
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  color: #333;
+  text-align: center;
+}
+
+/* 찜 목록 스타일 */
+.wishlists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.wishlist-card {
+  background-color: #f8f9fa;
   border-radius: 10px;
   overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
   position: relative;
-  height: 200px;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.wishlist-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+.wishlist-card:hover {
+  transform: translateY(-3px);
 }
 
 .wishlist-image {
-  width: 100%;
-  height: 100%;
+  position: relative;
+  height: 160px;
 }
 
 .wishlist-image img {
@@ -374,29 +1584,227 @@ onMounted(() => {
   object-fit: cover;
 }
 
-.wishlist-overlay {
+.remove-wishlist-btn {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 1rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-  color: white;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+  font-size: 1rem;
 }
 
-.wishlist-overlay h3 {
+.wishlist-info {
+  padding: 0.8rem;
+}
+
+.wishlist-info h4 {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.3rem;
+}
+
+.wishlist-info p {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* 여행 계획 스타일 */
+.plans-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.plan-card {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.2rem 1.2rem 1.2rem 3rem;
+  position: relative;
+}
+
+.plan-info h4 {
   font-size: 1.2rem;
-  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.plan-info p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.plan-status {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.plan-status.completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.plan-status.planning {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+/* 리뷰 스타일 */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.review-card {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.2rem 1.2rem 1.2rem 3rem;
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+.review-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.review-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.review-info {
+  flex: 1;
+}
+
+.review-info h4 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.review-text {
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+
+.review-date {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+/* 게시글/댓글 스타일 */
+.posts-list, .comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.post-card, .comment-card {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.2rem 1.2rem 1.2rem 3rem;
+  position: relative;
+}
+
+.post-category {
+  display: inline-block;
+  background-color: #9581e8;
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.post-info h4, .comment-info h4 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.post-meta, .comment-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.comment-text {
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+
+/* 페이지네이션 */
+.pagination-container {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.page-btn {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: #e9ecef;
+}
+
+.page-btn.active {
+  background-color: #9581e8;
+  color: white;
+  border-color: #9581e8;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* 반응형 디자인 */
 @media (max-width: 1200px) {
   .mypage-container {
-    padding: 2rem;
+    padding: 1.5rem;
   }
   
-  .wishlist-items {
-    grid-template-columns: repeat(3, 1fr);
+  .horizontal-summary-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -405,33 +1813,84 @@ onMounted(() => {
     flex-direction: column;
   }
   
-  .wishlist-items {
-    grid-template-columns: repeat(2, 1fr);
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    gap: 0.8rem;
+  }
+  
+  .profile-section {
+    flex: 1;
+  }
+  
+  .navigation-menu {
+    flex: 2;
+    display: flex;
+    overflow-x: auto;
+    padding: 0.5rem;
+  }
+  
+  .nav-btn {
+    white-space: nowrap;
+    min-width: 120px;
+    justify-content: center;
+  }
+  
+  .wishlists-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .header {
+  .sidebar {
     flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .menu-items {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-  
-  .login-section {
-    margin-top: 0.5rem;
   }
   
   .mypage-title {
     font-size: 2rem;
   }
   
-  .wishlist-items {
+  .horizontal-summary-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .wishlists-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .content-actions {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+  
+  .search-box {
+    width: 100%;
+    max-width: none;
+  }
+  
+  .review-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .review-image {
+    width: 100%;
+    height: 160px;
+  }
+  
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-grid {
     grid-template-columns: 1fr;
   }
 }
