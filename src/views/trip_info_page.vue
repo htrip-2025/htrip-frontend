@@ -208,7 +208,7 @@ const filteredSigungus = computed(() => {
 // API 호출 함수들
 async function fetchAreas() {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/region/`);
+    const response = await axios.get(`${API_BASE_URL}/api/region`);
     areas.value = response.data;
   } catch (error) {
     console.error('지역 API 호출 실패:', error.message);

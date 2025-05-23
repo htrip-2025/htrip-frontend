@@ -1,6 +1,8 @@
+// App.vue에서 특정 페이지들에 대해서만 헤더를 숨기도록 수정
+
 <template>
   <div id="app">
-    <!-- 로그인 페이지가 아닐 때만 헤더 표시 -->
+    <!-- 특정 페이지가 아닐 때만 헤더 표시 -->
     <header v-if="!shouldHideHeader" class="header">
       <div class="logo" @click="goToHome">
         <span class="logo-icon">T</span>rip
@@ -29,7 +31,7 @@
     </header>
     
     <!-- 페이지 콘텐츠 -->
-    <main :class="{ 'with-header': !isLoginPage, 'login-page': isLoginPage }">
+    <main :class="{ 'with-header': !shouldHideHeader, 'no-header': shouldHideHeader }">
       <RouterView />
     </main>
   </div>
@@ -43,53 +45,77 @@ import axios from 'axios';
 const route = useRoute();
 const router = useRouter();
 
+// API 기본 URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 // 상태 관리
 const isLoggedIn = ref(false);
-const userName = ref('');
+const userInfo = ref(null);
+const isCheckingAuth = ref(true);
 
-// 로그인 페이지인지 확인
+// 헤더를 숨겨야 하는 페이지들 정의
 const shouldHideHeader = computed(() => {
-  return route.name === 'login';
+  return route.name === 'login'; // 로그인 페이지에서만 헤더 숨김
 });
 
+// 사용자 이름 계산
+const userName = computed(() => {
+  if (!userInfo.value) return '';
+  return userInfo.value.nickname || userInfo.value.name || '사용자';
+});
+
+// axios 기본 설정 - 쿠키 포함
+axios.defaults.withCredentials = true;
+
 // 사용자 정보 확인
-const checkUserInfo = () => {
-  const token = localStorage.getItem('jwt_token');
-  const user = localStorage.getItem('user');
-  
-  if (token && user) {
-    try {
-      const userInfo = JSON.parse(user);
-      isLoggedIn.value = true;
-      userName.value = userInfo.name || userInfo.nickname || '사용자';
-      
-      // axios 기본 헤더에 토큰 설정
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } catch (error) {
-      console.error('사용자 정보 파싱 오류:', error);
-      logout();
-    }
-  } else {
+const checkUserInfo = async () => {
+  try {
+    isCheckingAuth.value = true;
+    
+    console.log('사용자 정보 확인 중...');
+    const response = await axios.get(`${API_BASE_URL}/api/member`);
+    
+    console.log('사용자 정보 응답:', response.data);
+    
+    // API 응답이 성공하면 로그인 상태로 설정
+    isLoggedIn.value = true;
+    userInfo.value = response.data;
+    
+    console.log('로그인 상태:', isLoggedIn.value);
+    console.log('사용자 이름:', userName.value);
+    
+  } catch (error) {
+    console.log('사용자 정보 확인 실패:', error.response?.status || error.message);
+    
+    // API 호출 실패시 로그아웃 상태로 설정
     isLoggedIn.value = false;
-    userName.value = '';
+    userInfo.value = null;
+  } finally {
+    isCheckingAuth.value = false;
   }
 };
 
 // 로그아웃 함수
-const logout = () => {
-  // 로컬 스토리지에서 토큰과 사용자 정보 제거
-  localStorage.removeItem('jwt_token');
-  localStorage.removeItem('user');
-  
-  // axios 기본 헤더에서 Authorization 제거
-  delete axios.defaults.headers.common['Authorization'];
-  
-  // 상태 업데이트
-  isLoggedIn.value = false;
-  userName.value = '';
-  
-  // 홈페이지로 이동
-  router.push('/');
+const logout = async () => {
+  try {
+    console.log('로그아웃 시도...');
+    
+    // 로그아웃 API 호출 (백그라운드에서만)
+    await axios.post(`${API_BASE_URL}/logout`, {}, {
+      withCredentials: true
+    });
+    
+    console.log('로그아웃 성공');
+  } catch (error) {
+    console.log('로그아웃 API 호출 실패:', error.message);
+  } finally {
+    // 상태 초기화
+    isLoggedIn.value = false;
+    userInfo.value = null;
+    
+    // 프론트엔드 홈으로 이동 (8080이 아닌 5173)
+    router.push('/');
+  }
 };
 
 // 홈으로 이동
@@ -104,19 +130,15 @@ onMounted(() => {
 
 // 라우트 변경 시 사용자 정보 다시 확인 (로그인 후 리다이렉트 등)
 watch(route, () => {
-  checkUserInfo();
-});
-
-// 로컬 스토리지 변경 감지 (다른 탭에서 로그인/로그아웃 시)
-window.addEventListener('storage', (e) => {
-  if (e.key === 'jwt_token' || e.key === 'user') {
+  // 로그인 페이지에서 다른 페이지로 이동할 때만 재확인
+  if (route.name !== 'login') {
     checkUserInfo();
   }
 });
 </script>
 
 <style scoped>
-/* 전체 화면 스타일 재설정 */
+/* 기존 스타일 유지 */
 html, body {
   width: 100%;
   margin: 0;
@@ -302,7 +324,7 @@ main.with-header {
   min-height: calc(100vh - 80px);
 }
 
-main.login-page {
+main.no-header {
   min-height: 100vh;
 }
 
