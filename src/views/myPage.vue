@@ -607,17 +607,22 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 const router = useRouter();
+const api = axios.create({
+ baseURL: 'http://localhost:8080',
+ withCredentials: true
+});
 
 // 탭 정의
 const tabs = ref([
-  { id: 'home', name: '홈', icon: '🏠' },
-  { id: 'wishlists', name: '나의 찜', icon: '❤️' },
-  { id: 'plans', name: '나의 여행 계획', icon: '✈️' },
-  { id: 'reviews', name: '나의 리뷰', icon: '⭐' },
-  { id: 'posts', name: '나의 게시글', icon: '📝' },
-  { id: 'comments', name: '나의 댓글', icon: '💬' }
+ { id: 'home', name: '홈', icon: '🏠' },
+ { id: 'wishlists', name: '나의 찜', icon: '❤️' },
+ { id: 'plans', name: '나의 여행 계획', icon: '✈️' },
+ { id: 'reviews', name: '나의 리뷰', icon: '⭐' },
+ { id: 'posts', name: '나의 게시글', icon: '📝' },
+ { id: 'comments', name: '나의 댓글', icon: '💬' }
 ]);
 
 // 활성 탭
@@ -625,132 +630,62 @@ const activeTab = ref('home');
 
 // 사용자 프로필
 const userProfile = ref({
-  name: '홍길동',
-  email: 'hong@example.com'
+ name: '',
+ email: ''
 });
 
 // 통계 데이터
 const stats = ref({
-  totalTrips: 5,
-  totalWishlists: 12,
-  totalReviews: 8,
-  totalPosts: 15
+ totalTrips: 0,
+ totalWishlists: 0,
+ totalReviews: 0,
+ totalPosts: 0
 });
 
 // 최근 여행 계획
-const recentPlans = ref([
-  { id: 1, title: '서울 여행', date: '2025.05.10 - 05.15', participants: 4 },
-  { id: 2, title: '제주도 여행', date: '2025.08.15 - 08.20', participants: 2 },
-  { id: 3, title: '부산 여행 (계획 중)', date: '2025.09.20 - 09.25', participants: 3 }
-]);
+const recentPlans = ref([]);
 
 // 모든 여행 계획
-const allPlans = ref([
-  { id: 1, title: '서울 여행', date: '2025.05.10 - 05.15', participants: 4, status: 'completed' },
-  { id: 2, title: '제주도 여행', date: '2025.08.15 - 08.20', participants: 2, status: 'completed' },
-  { id: 3, title: '부산 여행', date: '2025.09.20 - 09.25', participants: 3, status: 'planning' },
-  { id: 4, title: '강릉 여행', date: '2025.10.05 - 10.07', participants: 2, status: 'planning' },
-  { id: 5, title: '전주 여행', date: '2025.11.15 - 11.17', participants: 4, status: 'planning' }
-]);
+const allPlans = ref([]);
 
 // 최근 찜한 여행지
-const recentWishlists = ref([
-  { id: 1, title: '경복궁', image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg' },
-  { id: 2, title: '해운대', image: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg' },
-  { id: 3, title: '명동', image: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg' },
-  { id: 4, title: '성산일출봉', image: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg' }
-]);
+const recentWishlists = ref([]);
 
 // 모든 찜한 여행지
-const allWishlists = ref([
-  { id: 1, title: '경복궁', location: '서울 종로구', image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg' },
-  { id: 2, title: '해운대 해수욕장', location: '부산 해운대구', image: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg' },
-  { id: 3, title: '명동', location: '서울 중구', image: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg' },
-  { id: 4, title: '성산일출봉', location: '제주 서귀포시', image: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg' },
-  { id: 5, title: '광안리 해수욕장', location: '부산 수영구', image: 'https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg' },
-  { id: 6, title: '한라산', location: '제주 서귀포시', image: 'https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg' },
-  { id: 7, title: '남산타워', location: '서울 용산구', image: 'https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg' },
-  { id: 8, title: '북촌한옥마을', location: '서울 종로구', image: 'https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg' },
-  { id: 9, title: '송정해변', location: '부산 해운대구', image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg' },
-  { id: 10, title: '청계천', location: '서울 중구', image: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg' },
-  { id: 11, title: '제주 올레길', location: '제주 서귀포시', image: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg' },
-  { id: 12, title: '경주 불국사', location: '경주 진구', image: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg' }
-]);
+const allWishlists = ref([]);
 
 // 최근 게시글
-const recentPosts = ref([
-  { id: 1, title: '제주도 여행 후기', date: '2025.05.10', views: 234 },
-  { id: 2, title: '부산 맛집 추천', date: '2025.05.08', views: 156 },
-  { id: 3, title: '서울 가볼만한 곳', date: '2025.05.05', views: 89 }
-]);
+const recentPosts = ref([]);
 
 // 모든 게시글
-const allPosts = ref([
-  { id: 1, title: '제주도 여행 후기', category: '여행팁', date: '2025.05.10', views: 234, comments: 12 },
-  { id: 2, title: '부산 맛집 추천', category: '맛집', date: '2025.05.08', views: 156, comments: 8 },
-  { id: 3, title: '서울 가볼만한 곳', category: '추천', date: '2025.05.05', views: 89, comments: 5 },
-  { id: 4, title: '제주도 드라이브 코스', category: '여행팁', date: '2025.05.03', views: 201, comments: 15 },
-  { id: 5, title: '강릉 바다 여행', category: '후기', date: '2025.04.28', views: 178, comments: 9 },
-  { id: 6, title: '전주 한옥마을 맛집', category: '맛집', date: '2025.04.22', views: 145, comments: 7 },
-  { id: 7, title: '여수 밤바다 추천 코스', category: '추천', date: '2025.04.15', views: 167, comments: 11 },
-  { id: 8, title: '경주 역사 여행', category: '여행팁', date: '2025.04.10', views: 132, comments: 6 },
-  { id: 9, title: '속초 맛집 베스트 5', category: '맛집', date: '2025.04.05', views: 210, comments: 14 },
-  { id: 10, title: '울산 여행 후기', category: '후기', date: '2025.03.28', views: 98, comments: 4 },
-  { id: 11, title: '인천 차이나타운 방문기', category: '후기', date: '2025.03.22', views: 122, comments: 8 },
-  { id: 12, title: '제주 한달살이 꿀팁', category: '여행팁', date: '2025.03.15', views: 256, comments: 18 },
-  { id: 13, title: '태안 해안길 드라이브', category: '추천', date: '2025.03.10', views: 143, comments: 9 },
-  { id: 14, title: '춘천 닭갈비 맛집 순위', category: '맛집', date: '2025.03.05', views: 187, comments: 12 },
-  { id: 15, title: '포항 호미곶 일출 여행', category: '여행팁', date: '2025.02.28', views: 134, comments: 7 }
-]);
+const allPosts = ref([]);
 
 // 모든 리뷰
-const allReviews = ref([
-  { id: 1, placeName: '경복궁', rating: 5, content: '정말 아름다운 궁궐이었습니다. 역사적 가치도 높고 볼거리가 많아 하루 종일 있어도 지루하지 않았어요.', date: '2025.05.10', image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg' },
-  { id: 2, placeName: '해운대 해수욕장', rating: 4, content: '바다가 정말 깨끗하고 모래사장도 좋았어요. 주변에 맛집도 많아 즐겁게 놀다 왔습니다.', date: '2025.05.08', image: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg' },
-  { id: 3, placeName: '명동 거리', rating: 4, content: '쇼핑하기 정말 좋은 곳이네요. 다양한 브랜드가 있어서 원하는 물건은 다 살 수 있었어요.', date: '2025.05.05', image: 'https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg' },
-  { id: 4, placeName: '한라산', rating: 5, content: '등산하기 좋은 코스가 잘 정비되어 있었고, 정상에서 보는 경치가 정말 장관이었습니다.', date: '2025.05.01', image: 'https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg' },
-  { id: 5, placeName: '광안리 해수욕장', rating: 4, content: '야경이 정말 예쁜 곳이에요. 다리 조명이 특히 아름다웠습니다.', date: '2025.04.28', image: 'https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg' },
-  { id: 6, placeName: '남산타워', rating: 4, content: '서울 전경을 한눈에 볼 수 있어 좋았습니다. 저녁에 가면 야경도 멋져요.', date: '2025.04.20', image: 'https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg' },
-  { id: 7, placeName: '북촌한옥마을', rating: 5, content: '전통적인 한옥을 체험할 수 있어 좋았습니다. 사진 찍기에도 정말 좋은 장소예요.', date: '2025.04.15', image: 'https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg' },
-  { id: 8, placeName: '청계천', rating: 4, content: '도심 속 휴식처로 정말 좋았어요. 걷기 좋게 잘 정비되어 있었습니다.', date: '2025.04.10', image: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg' }
-]);
+const allReviews = ref([]);
 
 // 모든 댓글
-const allComments = ref([
-  { id: 1, postTitle: '제주도 맛집 추천', content: '정말 유용한 정보네요! 다음 주에 제주도 가는데 꼭 가보겠습니다.', date: '2025.05.10', likes: 5 },
-  { id: 2, postTitle: '부산 여행 코스 추천', content: '해운대는 정말 좋죠! 광안리도 추천드려요.', date: '2025.05.08', likes: 3 },
-  { id: 3, postTitle: '서울 한강 공원 추천', content: '한강에서 치킨 먹으면 정말 맛있어요 ㅎㅎ', date: '2025.05.05', likes: 8 },
-  { id: 4, postTitle: '강릉 카페 추천해주세요', content: '안목 커피거리 꼭 가보세요! 바다 보면서 커피 마시는 느낌이 정말 좋아요.', date: '2025.05.01', likes: 4 },
-  { id: 5, postTitle: '제주도 렌트카 문의', content: '저도 이번에 렌트카 이용했는데 정말 편했어요! 추천합니다.', date: '2025.04.28', likes: 2 },
-  { id: 6, postTitle: '전주 한옥마을 맛집', content: '콩나물국밥 정말 맛있었어요! 다음에 가면 또 먹을 예정입니다.', date: '2025.04.25', likes: 6 },
-  { id: 7, postTitle: '여수 밤바다 후기', content: '여수 밤바다 정말 로맨틱하죠! 저도 좋은 추억 만들고 왔어요.', date: '2025.04.20', likes: 9 },
-  { id: 8, postTitle: '속초 맛집 추천', content: '아바이 마을 가면 꼭 아바이 순대 드세요! 정말 맛있어요.', date: '2025.04.15', likes: 7 },
-  { id: 9, postTitle: '제주 숙소 추천 부탁드려요', content: '저는 서귀포쪽 펜션 이용했는데 조용하고 좋았어요.', date: '2025.04.10', likes: 3 },
-  { id: 10, postTitle: '경주 여행 후기', content: '불국사랑 석굴암은 꼭 같이 보시는걸 추천해요!', date: '2025.04.05', likes: 4 },
-  { id: 11, postTitle: '울산 가볼만한 곳', content: '대왕암공원 정말 좋았어요! 바다 경치가 끝내줍니다.', date: '2025.03.30', likes: 5 },
-  { id: 12, postTitle: '인천 차이나타운 맛집', content: '공화춘 짜장면 먹어보셨나요? 정말 맛있더라구요!', date: '2025.03.25', likes: 6 }
-]);
+const allComments = ref([]);
 
 // 이미지 배열
 const images = [
-  'https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg',
-  'https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg',
-  'https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg',
-  'https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg'
+ 'https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg',
+ 'https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg',
+ 'https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg',
+ 'https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg'
 ];
 
 const profileImage = ref(null);
 
 // 페이지네이션 설정
-const itemsPerPage = 6;
+const itemsPerPage = 10;
 
 // 필터 및 검색 상태
 const searchTerms = ref({
-  wishlists: '',
-  plans: '',
-  reviews: '',
-  posts: '',
-  comments: ''
+ wishlists: '',
+ plans: '',
+ reviews: '',
+ posts: '',
+ comments: ''
 });
 
 const filterStatus = ref('all');
@@ -758,294 +693,633 @@ const categoryFilter = ref('all');
 
 // 현재 페이지 상태
 const currentPage = ref({
-  wishlists: 1,
-  plans: 1,
-  reviews: 1,
-  posts: 1,
-  comments: 1
+ wishlists: 1,
+ plans: 1,
+ reviews: 1,
+ posts: 1,
+ comments: 1
+});
+
+// 총 페이지 수
+const totalPages = ref({
+ wishlists: 1,
+ plans: 1,
+ reviews: 1,
+ posts: 1,
+ comments: 1
 });
 
 // 선택된 항목 상태
 const selectedItems = ref({
-  wishlists: [],
-  plans: [],
-  reviews: [],
-  posts: [],
-  comments: []
+ wishlists: [],
+ plans: [],
+ reviews: [],
+ posts: [],
+ comments: []
 });
 
-// 메서드 - 상태 텍스트 변환
+// API 호출 함수들
+const fetchProfileAndStats = async () => {
+ try {
+   const profileRes = await api.get('/api/member');
+   const statsRes = await api.get('/api/member/stats');
+   
+   userProfile.value = profileRes.data;
+   stats.value = {
+     totalTrips: statsRes.data.planCount || 0,
+     totalWishlists: statsRes.data.favoriteCount || 0,
+     totalReviews: statsRes.data.reviewCount || 0,
+     totalPosts: statsRes.data.boardCount || 0
+   };
+ } catch (error) {
+   console.error('프로필 정보 조회 실패:', error);
+ }
+};
+
+const fetchDashboard = async () => {
+ try {
+   const res = await api.get('/api/member/dashboard');
+   const data = res.data;
+   
+   // 최근 여행 계획 데이터 매핑
+   if (data.recentPlans && data.recentPlans.content) {
+     recentPlans.value = data.recentPlans.content.map(plan => ({
+       id: plan.planId,
+       title: plan.title,
+       date: `${formatDate(plan.startDate)} - ${formatDate(plan.endDate)}`,
+       participants: plan.members ? plan.members.length : 1
+     }));
+   }
+   
+   // 최근 찜한 여행지 데이터 매핑
+   if (data.recentFavorites && data.recentFavorites.content) {
+     recentWishlists.value = data.recentFavorites.content.map(favorite => ({
+       id: favorite.favoriteNo,
+       title: favorite.attraction.title,
+       image: favorite.attraction.firstImageUrl || 'https://via.placeholder.com/150'
+     }));
+   }
+   
+   // 최근 리뷰 데이터 매핑
+   if (data.recentReviews && data.recentReviews.content) {
+     allReviews.value = data.recentReviews.content.map(review => ({
+       id: review.reviewId,
+       placeName: review.placeName,
+       content: review.content,
+       date: formatDate(review.createDate),
+       image: review.imageUrl || 'https://via.placeholder.com/150'
+     }));
+   }
+   
+   // 최근 게시글 데이터 매핑 (해당 API가 있는 경우)
+   if (data.recentPosts && data.recentPosts.content) {
+     recentPosts.value = data.recentPosts.content.map(post => ({
+       id: post.boardNo,
+       title: post.title,
+       date: formatDate(post.writeDate),
+       views: post.views,
+       category: post.category
+     }));
+   }
+   
+   // 최근 댓글 데이터 매핑 (해당 API가 있는 경우)
+   if (data.recentComments && data.recentComments.content) {
+     allComments.value = data.recentComments.content.map(comment => ({
+       id: comment.commentId,
+       postTitle: comment.postTitle,
+       content: comment.content,
+       date: formatDate(comment.writeDate),
+       likes: comment.likes || 0
+     }));
+   }
+ } catch (error) {
+   console.error('대시보드 데이터 조회 실패:', error);
+ }
+};
+
+// 찜 목록 조회
+const fetchWishlists = async () => {
+ try {
+   const res = await api.get(`/api/member/favorite?page=${currentPage.value.wishlists - 1}&size=${itemsPerPage}`);
+   const data = res.data;
+   
+   allWishlists.value = data.content.map(favorite => ({
+     id: favorite.favoriteNo,
+     title: favorite.attraction.title,
+     location: favorite.attraction.address1 || '주소 정보 없음',
+     image: favorite.attraction.firstImageUrl || 'https://via.placeholder.com/150'
+   }));
+   
+   totalPages.value.wishlists = data.totalPages;
+ } catch (error) {
+   console.error('찜 목록 조회 실패:', error);
+ }
+};
+
+// 여행 계획 조회
+const fetchPlans = async () => {
+ try {
+   // 필터가 있는 경우 쿼리 파라미터 추가
+   let url = `/api/plan/my?page=${currentPage.value.plans - 1}&size=${itemsPerPage}`;
+   if (filterStatus.value !== 'all') {
+     url += `&status=${filterStatus.value}`;
+   }
+   if (searchTerms.value.plans) {
+     url += `&keyword=${encodeURIComponent(searchTerms.value.plans)}`;
+   }
+   
+   const res = await api.get(url);
+   const data = res.data;
+   
+   allPlans.value = data.content.map(plan => ({
+     id: plan.planId,
+     title: plan.title,
+     date: `${formatDate(plan.startDate)} - ${formatDate(plan.endDate)}`,
+     participants: plan.members ? plan.members.length : 1,
+     status: determineStatus(plan.startDate, plan.endDate)
+   }));
+   
+   totalPages.value.plans = data.totalPages;
+ } catch (error) {
+   console.error('여행 계획 조회 실패:', error);
+ }
+};
+
+// 계획 상태 결정 함수
+const determineStatus = (startDate, endDate) => {
+ const now = new Date();
+ const start = new Date(startDate);
+ const end = new Date(endDate);
+ 
+ if (end < now) return 'completed';
+ if (start > now) return 'planning';
+ return 'ongoing';
+};
+
+// 리뷰 조회
+const fetchReviews = async () => {
+ try {
+   let url = `/api/reviews/my?page=${currentPage.value.reviews - 1}&size=${itemsPerPage}`;
+   if (searchTerms.value.reviews) {
+     url += `&keyword=${encodeURIComponent(searchTerms.value.reviews)}`;
+   }
+   
+   const res = await api.get(url);
+   const data = res.data;
+   
+   allReviews.value = data.content.map(review => ({
+     id: review.reviewId,
+     placeName: review.placeName,
+     content: review.content,
+     date: formatDate(review.createDate),
+     image: review.imageUrl || 'https://via.placeholder.com/150'
+   }));
+   
+   totalPages.value.reviews = data.totalPages;
+ } catch (error) {
+   console.error('리뷰 조회 실패:', error);
+ }
+};
+
+// 게시글 조회
+const fetchPosts = async () => {
+ try {
+   let url = `/api/board/my?page=${currentPage.value.posts - 1}&size=${itemsPerPage}`;
+   if (categoryFilter.value !== 'all') {
+     url += `&category=${categoryFilter.value}`;
+   }
+   if (searchTerms.value.posts) {
+     url += `&keyword=${encodeURIComponent(searchTerms.value.posts)}`;
+   }
+   
+   const res = await api.get(url);
+   const data = res.data;
+   
+   allPosts.value = data.content.map(post => ({
+     id: post.boardNo,
+     title: post.title,
+     category: post.category,
+     date: formatDate(post.writeDate),
+     views: post.views,
+     comments: post.commentCount || 0
+   }));
+   
+   totalPages.value.posts = data.totalPages;
+ } catch (error) {
+   console.error('게시글 조회 실패:', error);
+ }
+};
+
+// 댓글 조회
+const fetchComments = async () => {
+ try {
+   let url = `/api/comment/my?page=${currentPage.value.comments - 1}&size=${itemsPerPage}S`;
+   if (searchTerms.value.comments) {
+     url += `&keyword=${encodeURIComponent(searchTerms.value.comments)}`;
+   }
+   
+   const res = await api.get(url);
+   const data = res.data;
+   
+   allComments.value = data.content.map(comment => ({
+     id: comment.commentId,
+     postTitle: comment.postTitle,
+     content: comment.content,
+     date: formatDate(comment.writeDate),
+     likes: comment.likes || 0
+   }));
+   
+   totalPages.value.comments = data.totalPages;
+ } catch (error) {
+   console.error('댓글 조회 실패:', error);
+ }
+};
+
+// 날짜 포맷 함수
+const formatDate = (dateString) => {
+ if (!dateString) return '';
+ const date = new Date(dateString);
+ return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+};
+
+// 상태 텍스트 변환
 const getStatusText = (status) => {
-  const statusMap = {
-    'completed': '완료',
-    'planning': '계획 중',
-    'cancelled': '취소됨'
-  };
-  return statusMap[status] || status;
+ const statusMap = {
+   'completed': '완료',
+   'planning': '계획 중',
+   'ongoing': '진행 중',
+   'cancelled': '취소됨'
+ };
+ return statusMap[status] || status;
 };
 
-// 메서드 - 항목 보기
+// 항목 보기
 const viewItem = (type, id) => {
-  console.log(`Viewing ${type} with ID ${id}`);
-  // 실제로는 라우터를 통해 해당 항목 페이지로 이동
-  // router.push(`/${type}/${id}`);
+ console.log(`Viewing ${type} with ID ${id}`);
+ switch (type) {
+   case 'plan':
+     router.push(`/plan/${id}`);
+     break;
+   case 'wishlist':
+     router.push(`/travel/${id}`);
+     break;
+   case 'review':
+     router.push(`/travel/${id}`);
+     break;
+   case 'post':
+     router.push(`/board/${id}`);
+     break;
+   case 'comment':
+     router.push(`/board/${id}`);
+     break;
+   default:
+     break;
+ }
 };
 
-// 메서드 - 찜 항목 삭제
-const removeWishlist = (id) => {
-  if (confirm('찜 목록에서 제거하시겠습니까?')) {
-    const index = allWishlists.value.findIndex(item => item.id === id);
-    if (index > -1) {
-      allWishlists.value.splice(index, 1);
-      stats.value.totalWishlists--;
-    }
-  }
+// 찜 항목 삭제
+const removeWishlist = async (id) => {
+ if (confirm('찜 목록에서 제거하시겠습니까?')) {
+   try {
+     await api.delete(`/api/member/favorite/${id}`);
+     // 화면에서 제거
+     allWishlists.value = allWishlists.value.filter(item => item.id !== id);
+     // 통계 업데이트
+     if (stats.value.totalWishlists > 0) {
+       stats.value.totalWishlists--;
+     }
+     // 필터링된 목록도 업데이트
+     if (activeTab.value === 'wishlists') {
+       fetchWishlists();
+     }
+   } catch (error) {
+     console.error('찜 삭제 실패:', error);
+   }
+ }
 };
 
 // 필터링된 컬렉션 계산
 const filteredWishlists = computed(() => {
-  if (!searchTerms.value.wishlists) return allWishlists.value;
-  return allWishlists.value.filter(item => 
-    item.title.toLowerCase().includes(searchTerms.value.wishlists.toLowerCase()) ||
-    item.location.toLowerCase().includes(searchTerms.value.wishlists.toLowerCase())
-  );
+ if (!searchTerms.value.wishlists) return allWishlists.value;
+ return allWishlists.value.filter(item => 
+   item.title.toLowerCase().includes(searchTerms.value.wishlists.toLowerCase()) ||
+   item.location.toLowerCase().includes(searchTerms.value.wishlists.toLowerCase())
+ );
 });
 
 const filteredPlans = computed(() => {
-  let result = allPlans.value;
-  
-  // 검색어 필터링
-  if (searchTerms.value.plans) {
-    result = result.filter(plan => 
-      plan.title.toLowerCase().includes(searchTerms.value.plans.toLowerCase())
-    );
-  }
-  
-  // 상태 필터링
-  if (filterStatus.value !== 'all') {
-    result = result.filter(plan => plan.status === filterStatus.value);
-  }
-  
-  return result;
+ let result = allPlans.value;
+ 
+ // 검색어 필터링
+ if (searchTerms.value.plans) {
+   result = result.filter(plan => 
+     plan.title.toLowerCase().includes(searchTerms.value.plans.toLowerCase())
+   );
+ }
+ 
+ // 상태 필터링
+ if (filterStatus.value !== 'all') {
+   result = result.filter(plan => plan.status === filterStatus.value);
+ }
+ 
+ return result;
 });
 
 const filteredReviews = computed(() => {
-  if (!searchTerms.value.reviews) return allReviews.value;
-  return allReviews.value.filter(review => 
-    review.placeName.toLowerCase().includes(searchTerms.value.reviews.toLowerCase()) ||
-    review.content.toLowerCase().includes(searchTerms.value.reviews.toLowerCase())
-  );
+ if (!searchTerms.value.reviews) return allReviews.value;
+ return allReviews.value.filter(review => 
+   review.placeName.toLowerCase().includes(searchTerms.value.reviews.toLowerCase()) ||
+   review.content.toLowerCase().includes(searchTerms.value.reviews.toLowerCase())
+ );
 });
 
 const filteredPosts = computed(() => {
-  let result = allPosts.value;
-  
-  // 검색어 필터링
-  if (searchTerms.value.posts) {
-    result = result.filter(post => 
-      post.title.toLowerCase().includes(searchTerms.value.posts.toLowerCase())
-    );
-  }
-  
-  // 카테고리 필터링
-  if (categoryFilter.value !== 'all') {
-    result = result.filter(post => post.category === categoryFilter.value);
-  }
-  
-  return result;
+ let result = allPosts.value;
+ 
+ // 검색어 필터링
+ if (searchTerms.value.posts) {
+   result = result.filter(post => 
+     post.title.toLowerCase().includes(searchTerms.value.posts.toLowerCase())
+   );
+ }
+ 
+ // 카테고리 필터링
+ if (categoryFilter.value !== 'all') {
+   result = result.filter(post => post.category === categoryFilter.value);
+ }
+ 
+ return result;
 });
 
 const filteredComments = computed(() => {
-  if (!searchTerms.value.comments) return allComments.value;
-  return allComments.value.filter(comment => 
-    comment.postTitle.toLowerCase().includes(searchTerms.value.comments.toLowerCase()) ||
-    comment.content.toLowerCase().includes(searchTerms.value.comments.toLowerCase())
-  );
+ if (!searchTerms.value.comments) return allComments.value;
+ return allComments.value.filter(comment => 
+   comment.postTitle.toLowerCase().includes(searchTerms.value.comments.toLowerCase()) ||
+   comment.content.toLowerCase().includes(searchTerms.value.comments.toLowerCase())
+ );
 });
 
 // 페이지네이션된 컬렉션 계산
 const paginatedWishlists = computed(() => {
-  const start = (currentPage.value.wishlists - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredWishlists.value.slice(start, end);
+ return filteredWishlists.value;
 });
 
 const paginatedPlans = computed(() => {
-  const start = (currentPage.value.plans - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredPlans.value.slice(start, end);
+ return filteredPlans.value;
 });
 
 const paginatedReviews = computed(() => {
-  const start = (currentPage.value.reviews - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredReviews.value.slice(start, end);
+ return filteredReviews.value;
 });
 
 const paginatedPosts = computed(() => {
-  const start = (currentPage.value.posts - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredPosts.value.slice(start, end);
+ return filteredPosts.value;
 });
 
 const paginatedComments = computed(() => {
-  const start = (currentPage.value.comments - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredComments.value.slice(start, end);
-});
-
-// 총 페이지 수 계산
-const totalPages = computed(() => {
-  return {
-    wishlists: Math.ceil(filteredWishlists.value.length / itemsPerPage),
-    plans: Math.ceil(filteredPlans.value.length / itemsPerPage),
-    reviews: Math.ceil(filteredReviews.value.length / itemsPerPage),
-    posts: Math.ceil(filteredPosts.value.length / itemsPerPage),
-    comments: Math.ceil(filteredComments.value.length / itemsPerPage)
-  };
+ return filteredComments.value;
 });
 
 // 페이지 번호 배열 생성 (최대 5개만 표시)
 const getPageNumbers = (type) => {
-  const total = totalPages.value[type];
-  const current = currentPage.value[type];
-  
-  if (total <= 5) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-  
-  if (current <= 3) {
-    return [1, 2, 3, 4, 5];
-  }
-  
-  if (current >= total - 2) {
-    return [total - 4, total - 3, total - 2, total - 1, total];
-  }
-  
-  return [current - 2, current - 1, current, current + 1, current + 2];
+ const total = totalPages.value[type];
+ const current = currentPage.value[type];
+ 
+ if (total <= 5) {
+   return Array.from({ length: total }, (_, i) => i + 1);
+ }
+ 
+ if (current <= 3) {
+   return [1, 2, 3, 4, 5];
+ }
+ 
+ if (current >= total - 2) {
+   return [total - 4, total - 3, total - 2, total - 1, total];
+ }
+ 
+ return [current - 2, current - 1, current, current + 1, current + 2];
 };
 
 // 페이지 변경 메서드
 const changePage = (type, page) => {
-  currentPage.value[type] = page;
+ currentPage.value[type] = page;
+ 
+ // 각 타입에 맞는 API 호출
+ switch (type) {
+   case 'wishlists':
+     fetchWishlists();
+     break;
+   case 'plans':
+     fetchPlans();
+     break;
+   case 'reviews':
+     fetchReviews();
+     break;
+   case 'posts':
+     fetchPosts();
+     break;
+   case 'comments':
+     fetchComments();
+     break;
+ }
 };
 
 // 선택 상태 확인
 const isSelected = (type, id) => {
-  return selectedItems.value[type].includes(id);
+ return selectedItems.value[type].includes(id);
 };
 
 // 모두 선택되었는지 확인
 const isAllSelected = (type) => {
-  const items = getPaginatedItems(type);
-  return items.length > 0 && items.every(item => selectedItems.value[type].includes(item.id));
+ const items = getPaginatedItems(type);
+ return items.length > 0 && items.every(item => selectedItems.value[type].includes(item.id));
 };
 
 // 현재 페이지의 항목들 가져오기 (타입에 따라)
 const getPaginatedItems = (type) => {
-  switch (type) {
-    case 'wishlists': return paginatedWishlists.value;
-    case 'plans': return paginatedPlans.value;
-    case 'reviews': return paginatedReviews.value;
-    case 'posts': return paginatedPosts.value;
-    case 'comments': return paginatedComments.value;
-    default: return [];
-  }
+ switch (type) {
+   case 'wishlists': return paginatedWishlists.value;
+   case 'plans': return paginatedPlans.value;
+   case 'reviews': return paginatedReviews.value;
+   case 'posts': return paginatedPosts.value;
+   case 'comments': return paginatedComments.value;
+   default: return [];
+ }
 };
 
 // 항목 선택/해제
 const toggleSelect = (type, id) => {
-  const index = selectedItems.value[type].indexOf(id);
-  if (index === -1) {
-    selectedItems.value[type].push(id);
-  } else {
-    selectedItems.value[type].splice(index, 1);
-  }
+ const index = selectedItems.value[type].indexOf(id);
+ if (index === -1) {
+   selectedItems.value[type].push(id);
+ } else {
+   selectedItems.value[type].splice(index, 1);
+ }
 };
 
 // 모든 항목 선택/해제
 const toggleSelectAll = (type) => {
-  const items = getPaginatedItems(type);
-  
-  if (isAllSelected(type)) {
-    // 모두 선택되어 있으면 해제
-    selectedItems.value[type] = selectedItems.value[type].filter(id => 
-      !items.some(item => item.id === id)
-    );
-  } else {
-    // 선택되지 않은 항목들 추가
-    const currentIds = selectedItems.value[type];
-    const newIds = items.filter(item => !currentIds.includes(item.id)).map(item => item.id);
-    selectedItems.value[type] = [...currentIds, ...newIds];
-  }
+ const items = getPaginatedItems(type);
+ 
+ if (isAllSelected(type)) {
+   // 모두 선택되어 있으면 해제
+   selectedItems.value[type] = selectedItems.value[type].filter(id => 
+     !items.some(item => item.id === id)
+   );
+ } else {
+   // 선택되지 않은 항목들 추가
+   const currentIds = selectedItems.value[type];
+   const newIds = items.filter(item => !currentIds.includes(item.id)).map(item => item.id);
+   selectedItems.value[type] = [...currentIds, ...newIds];
+ }
 };
 
 // 선택된 항목 삭제
-const deleteSelected = (type) => {
-  if (selectedItems.value[type].length === 0) return;
-  
-  if (!confirm(`선택한 ${selectedItems.value[type].length}개의 항목을 삭제하시겠습니까?`)) {
-    return;
-  }
-  
-  const collectionMap = {
-    'wishlists': allWishlists,
-    'plans': allPlans,
-    'reviews': allReviews,
-    'posts': allPosts,
-    'comments': allComments
-  };
-  
-  // 선택된 항목 삭제
-  const collection = collectionMap[type];
-  collection.value = collection.value.filter(item => !selectedItems.value[type].includes(item.id));
-  
-  // 통계 업데이트
-  if (type === 'wishlists') stats.value.totalWishlists = allWishlists.value.length;
-  if (type === 'plans') stats.value.totalTrips = allPlans.value.length;
-  if (type === 'reviews') stats.value.totalReviews = allReviews.value.length;
-  if (type === 'posts') stats.value.totalPosts = allPosts.value.length;
-  
-  // 선택 목록 초기화
-  selectedItems.value[type] = [];
-  
-  // 현재 페이지 조정 (항목이 없는 페이지에 있으면 이전 페이지로)
-  const totalPagesNew = Math.ceil(collection.value.length / itemsPerPage);
-  if (currentPage.value[type] > totalPagesNew && totalPagesNew > 0) {
-    currentPage.value[type] = totalPagesNew;
-  }
+const deleteSelected = async (type) => {
+ if (selectedItems.value[type].length === 0) return;
+ 
+ if (!confirm(`선택한 ${selectedItems.value[type].length}개의 항목을 삭제하시겠습니까?`)) {
+   return;
+ }
+ 
+ // 각 타입별 삭제 API 호출
+ try {
+   const deletePromises = selectedItems.value[type].map(id => {
+     switch (type) {
+       case 'wishlists':
+         return api.delete(`/api/member/favorite/${id}`);
+       case 'plans':
+         return api.delete(`/api/plan/${id}`);
+       case 'reviews':
+         return api.delete(`/api/reviews/${id}`);
+       case 'posts':
+         return api.delete(`/api/board/${id}`);
+       case 'comments':
+         return api.delete(`/api/comment/${id}`);
+     }
+   });
+   
+   await Promise.all(deletePromises);
+   
+   // 삭제 후 데이터 다시 조회
+   switch (type) {
+     case 'wishlists':
+       fetchWishlists();
+       if (stats.value.totalWishlists >= selectedItems.value[type].length) {
+         stats.value.totalWishlists -= selectedItems.value[type].length;
+       }
+       break;
+     case 'plans':
+       fetchPlans();
+       if (stats.value.totalTrips >= selectedItems.value[type].length) {
+         stats.value.totalTrips -= selectedItems.value[type].length;
+       }
+       break;
+     case 'reviews':
+       fetchReviews();
+       if (stats.value.totalReviews >= selectedItems.value[type].length) {
+         stats.value.totalReviews -= selectedItems.value[type].length;
+       }
+       break;
+     case 'posts':
+       fetchPosts();
+       if (stats.value.totalPosts >= selectedItems.value[type].length) {
+         stats.value.totalPosts -= selectedItems.value[type].length;
+       }
+       break;
+     case 'comments':
+       fetchComments();
+       break;
+   }
+   
+   // 선택 목록 초기화
+   selectedItems.value[type] = [];
+ } catch (error) {
+   console.error(`${type} 삭제 실패:`, error);
+ }
 };
 
 // 검색어 변경 시 페이지 초기화
 watch(searchTerms, (newTerms, oldTerms) => {
-  for (const type in newTerms) {
-    if (newTerms[type] !== oldTerms[type]) {
-      currentPage.value[type] = 1;
-    }
-  }
+ for (const type in newTerms) {
+   if (newTerms[type] !== oldTerms[type]) {
+     currentPage.value[type] = 1;
+     
+     // 각 타입별 데이터 다시 조회
+     switch (type) {
+       case 'wishlists':
+         fetchWishlists();
+         break;
+       case 'plans':
+         fetchPlans();
+         break;
+       case 'reviews':
+         fetchReviews();
+         break;
+       case 'posts':
+         fetchPosts();
+         break;
+       case 'comments':
+         fetchComments();
+         break;
+     }
+   }
+ }
 }, { deep: true });
 
 // 필터 변경 시 페이지 초기화
 watch(filterStatus, () => {
-  currentPage.value.plans = 1;
+ currentPage.value.plans = 1;
+ fetchPlans();
 });
 
 watch(categoryFilter, () => {
-  currentPage.value.posts = 1;
+ currentPage.value.posts = 1;
+ fetchPosts();
 });
 
-// 탭 변경 시 선택 항목 초기화
+// 탭 변경 시 선택 항목 초기화 및 데이터 로드
 watch(activeTab, (newTab) => {
-  for (const type in selectedItems.value) {
-    selectedItems.value[type] = [];
-  }
+ // 선택 항목 초기화
+ for (const type in selectedItems.value) {
+   selectedItems.value[type] = [];
+ }
+ 
+ // 홈 탭은 대시보드 데이터 조회
+ if (newTab === 'home') {
+   fetchDashboard();
+   return;
+ }
+ 
+ // 각 탭에 맞는 데이터 조회
+ switch (newTab) {
+   case 'wishlists':
+     fetchWishlists();
+     break;
+   case 'plans':
+     fetchPlans();
+     break;
+   case 'reviews':
+     fetchReviews();
+     break;
+   case 'posts':
+     fetchPosts();
+     break;
+   case 'comments':
+     fetchComments();
+     break;
+ }
 });
 
 onMounted(() => {
-  // 프로필 이미지 랜덤 선택
-  if (profileImage.value) {
-    profileImage.value.src = images[Math.floor(Math.random() * images.length)];
-  }
+ // 프로필 이미지 랜덤 선택
+ if (profileImage.value) {
+   profileImage.value.src = images[Math.floor(Math.random() * images.length)];
+ }
+ 
+ // 초기 데이터 로드
+ fetchProfileAndStats();
+ fetchDashboard();
 });
 </script>
 
