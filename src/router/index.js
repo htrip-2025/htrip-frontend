@@ -11,11 +11,6 @@ import loginPage from '@/views/loginPage.vue'
 import myPage from '@/views/myPage.vue'
 import TripPlanPage from '@/views/TripPlanPage.vue'
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> c8aa121 (무한루프해결)
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -70,15 +65,7 @@ const router = createRouter({
       path: '/mypage',
       name: 'mypage',
       component: myPage,
-<<<<<<< HEAD
-=======
-    },
-    {
-      path: '/plan',
-      name: 'plan',
-      component: TripPlanPage,
->>>>>>> c8aa121 (무한루프해결)
-    },
+    }
   ],
 })
 
