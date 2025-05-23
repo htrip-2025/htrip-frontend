@@ -5,26 +5,7 @@
     <div class="gradient-circle circle2"></div>
     <div class="gradient-circle circle3"></div>
     <div class="gradient-circle circle4"></div>
-    
-    <!-- 헤더 (메인페이지와 동일) -->
-    <header class="header">
-      <div class="logo">
-        <span class="logo-icon">T</span>rip
-      </div>
-      <div class="menu-items">
-        <a href="#" class="menu-link">AI 추천</a>
-        <a href="/info" class="menu-link">여행정보</a>
-        <a href="#" class="menu-link">여행계획</a>
-        <a href="#" class="menu-link">커뮤니티</a>
-        <a href="#" class="menu-link search-icon">🔍</a>
-      </div>
-      <div class="login-section">
-        <a href="/login" class="login-button">
-          <span class="button-text">로그인</span>
-        </a>
-      </div>
-    </header>
-    
+
     <!-- 마이페이지 콘텐츠 -->
     <div class="mypage-content">
       <h1 class="mypage-title">마이페이지</h1>
@@ -195,100 +176,6 @@ onMounted(() => {
   bottom: -10%;
   right: 10%;
   background: radial-gradient(circle at center, #bfa9e9 0%, transparent 70%);
-}
-
-/* 헤더 스타일 (mainPage.vue와 동일) */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3rem;
-  position: relative;
-  z-index: 10;
-  padding: 1rem 0;
-  border-bottom: 0.8px solid rgba(0, 0, 0, 0.2);
-}
-
-.logo {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #333;
-}
-
-.logo-icon {
-  color: #9581e8;
-  background-color: #ffefd5;
-  padding: 2px 8px;
-  border-radius: 50%;
-  margin-right: 2px;
-}
-
-.menu-items {
-  display: flex;
-  gap: 2rem;
-}
-
-.menu-link {
-  text-decoration: none;
-  color: #666;
-  font-size: 1.1rem;
-  transition: color 0.3s;
-}
-
-.menu-link:hover, .menu-link.active {
-  color: #9581e8;
-  background: none;
-}
-
-.search-icon {
-  font-size: 1.2rem;
-}
-
-.login-section {
-  display: flex;
-  align-items: center;
-}
-
-.login-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #9581e8 0%, #a2b3f8 100%);
-  color: white;
-  padding: 0.6rem 1.5rem;
-  border-radius: 30px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 8px 20px rgba(149, 129, 232, 0.25);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  border: none;
-  cursor: pointer;
-  z-index: 1;
-}
-
-.login-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(135deg, #a2b3f8 0%, #9581e8 100%);
-  transition: width 0.5s ease;
-  z-index: -1;
-  border-radius: 30px;
-}
-
-.login-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(149, 129, 232, 0.35);
-}
-
-.login-button:hover::before {
-  width: 100%;
 }
 
 /* 마이페이지 콘텐츠 스타일 */
