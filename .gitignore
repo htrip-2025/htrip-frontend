@@ -1,0 +1,20 @@
+# dependencies
+/node_modules/
+
+# production build
+/dist/
+
+# local env files
+/.env.local
+/.env.*.local
+
+# Editor dirs and files
+/.vscode/
+/.idea/
+/*.suo
+/*.ntvs*
+*.log
+
+# OS generated
+.DS_Store
+Thumbs.db
