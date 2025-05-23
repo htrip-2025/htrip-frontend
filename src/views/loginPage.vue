@@ -70,8 +70,8 @@
             <span>Google로 시작하기</span>
           </a>
           
-          <!-- Kakao 로그인 버튼 - 아직 구현하지 않음 -->
-          <a href="#" class="social-login-btn kakao-btn">
+          <!-- Kakao 로그인 버튼 -->
+          <a href="#" class="social-login-btn kakao-btn" @click.prevent="handleKakaoLogin">
             <div class="social-icon">
               <svg width="22" height="20" viewBox="0 0 24 22" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 0C5.371 0 0 4.292 0 9.592c0 3.307 2.186 6.213 5.5 7.861l-1.401 5.194c-.122.455.385.818.774.546l5.927-3.921c.402.039.812.06 1.231.06 6.629 0 12-4.292 12-9.592S18.629 0 12 0z" fill="#371D1E"/>
@@ -81,7 +81,7 @@
           </a>
           
           <!-- Naver 로그인 버튼 - 아직 구현하지 않음 -->
-          <a href="#" class="social-login-btn naver-btn">
+          <a href="#" class="social-login-btn naver-btn" @click.prevent="handleNaverLogin">
             <div class="social-icon naver-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <rect width="24" height="24" rx="0" fill="#03C75A"/>
@@ -114,13 +114,13 @@ export default {
     }
   },
   mounted() {
-    // URL 파라미터에서 토큰 확인 (OAuth 리다이렉트 후)
+    // URL 파라미터에서 결과 확인 (OAuth 리다이렉트 후)
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
+    const success = urlParams.get('success');
     const error = urlParams.get('error');
     
-    if (token) {
-      this.handleLoginSuccess(token);
+    if (success === 'true') {
+      this.handleLoginSuccess();
     } else if (error) {
       this.message = `로그인 실패: ${error}`;
       this.isSuccess = false;
@@ -131,23 +131,9 @@ export default {
       try {
         this.isLoading = true;
         
-        // 방법 1: 백엔드에서 제공하는 Google OAuth 인증 URL로 리다이렉트
-       // window.location.href = `${process.env.VUE_APP_API_URL}/oauth2/authorization/google`;
-       
-    // window.location.href = `${import.meta.env.VITE_API_URL}/oauth2/authorization/google`;
-
-     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-    window.location.href = `${apiUrl}/oauth2/authorization/google`;
-
-    
-     
-        
-        // 방법 2: 백엔드로 요청을 보내고 리다이렉트 URL을 받아서 처리
-        
-       /* const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/auth/google/url`);
-        if (response.data && response.data.authorizationUrl) {
-          window.location.href = response.data.authorizationUrl;
-        }*/
+        // Google OAuth 인증 URL로 리다이렉트
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+        window.location.href = `${apiUrl}/oauth2/authorization/google`;
         
       } catch (error) {
         console.error('Google 로그인 중 오류 발생:', error);
@@ -156,42 +142,57 @@ export default {
         this.isLoading = false;
       }
     },
-    
-    handleLoginSuccess(token) {
-      // JWT 토큰을 로컬 스토리지에 저장
-      localStorage.setItem('jwt_token', token);
-      
-      // 인증 헤더 설정 (추후 API 요청에 사용)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
-      this.message = '로그인에 성공했습니다.';
-      this.isSuccess = true;
-      
-      // 사용자 정보 가져오기
-      this.fetchUserInfo();
-      
-      // 로그인 후 메인 페이지로 리다이렉트 (1초 후)
-      setTimeout(() => {
-        this.$router.push('/');
-      }, 1000);
-    },
-    
-    async fetchUserInfo() {
+
+    async handleKakaoLogin() {
       try {
-        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/user/me`);
-        // 사용자 정보 저장 (Vuex 스토어나 로컬 스토리지 등에)
-        localStorage.setItem('user', JSON.stringify(response.data));
+        this.isLoading = true;
+        
+        // Kakao OAuth 인증 URL로 리다이렉트
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+        window.location.href = `${apiUrl}/oauth2/authorization/kakao`;
+        
       } catch (error) {
-        console.error('사용자 정보 조회 실패:', error);
+        console.error('Kakao 로그인 중 오류 발생:', error);
+        this.message = '로그인 과정에서 오류가 발생했습니다. 다시 시도해주세요.';
+        this.isSuccess = false;
+        this.isLoading = false;
+      }
+    },
+
+    async handleNaverLogin() {
+      try {
+        this.isLoading = true;
+        
+        // Naver OAuth 인증 URL로 리다이렉트
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+        window.location.href = `${apiUrl}/oauth2/authorization/naver`;
+        
+      } catch (error) {
+        console.error('Naver 로그인 중 오류 발생:', error);
+        this.message = '로그인 과정에서 오류가 발생했습니다. 다시 시도해주세요.';
+        this.isSuccess = false;
+        this.isLoading = false;
       }
     },
     
-    // 로그아웃 기능 (필요 시 사용)
-    logout() {
-      localStorage.removeItem('jwt_token');
-      localStorage.removeItem('user');
-      delete axios.defaults.headers.common['Authorization'];
-      this.$router.push('/login');
+    async handleLoginSuccess() {
+      try {
+        // 로그인 성공 메시지 표시
+        this.message = '로그인에 성공했습니다.';
+        this.isSuccess = true;
+        
+        console.log('로그인 성공, 메인 페이지로 이동');
+        
+        // 1초 후 메인 페이지로 리다이렉트
+        setTimeout(() => {
+          this.$router.push('/');
+        }, 1000);
+        
+      } catch (error) {
+        console.error('로그인 처리 중 오류:', error);
+        this.message = '로그인 처리 중 오류가 발생했습니다.';
+        this.isSuccess = false;
+      }
     }
   }
 }
