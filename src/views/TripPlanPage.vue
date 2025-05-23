@@ -1,8 +1,5 @@
 <template>
   <div class="trip-planner-container">
-    <!-- 헤더 -->
-   
-
     <!-- 메인 콘텐츠 영역 -->
     <div class="main-content">
       <!-- 왼쪽 여행 계획 패널 -->
@@ -108,9 +105,7 @@
                 </option>
               </select>
             </div>
-          </div>
 
-          <div class="filter-row">
             <div class="filter-group">
               <label>카테고리</label>
               <select v-model="selectedCategory" @change="onCategoryChange" class="filter-select">
@@ -161,7 +156,7 @@
             @click="addPlaceToDay(place, selectedDay)"
           >
             <div class="modal-result-image">
-              <img :src="place.firstImageUrl || 'https://placehold.co/80x80?text=No+Image'" :alt="place.title" @error="handleImageError">
+              <img :src="place.firstImageUrl || 'https://placehold.co/250x150?text=No+Image'" :alt="place.title" @error="handleImageError">
             </div>
             <div class="modal-result-content">
               <div class="modal-result-name">{{ place.title }}</div>
@@ -275,6 +270,9 @@ async function searchPlacesAPI() {
     }
     if (selectedSigunguCode.value) {
       params.sigunguCode = selectedSigunguCode.value;
+    }
+    if (selectedCategory.value) {
+      params.category1 = selectedCategory.value;
     }
     if (modalSearchQuery.value.trim()) {
       params.keyword = modalSearchQuery.value.trim();
@@ -421,13 +419,20 @@ function addMarkerToMap(place) {
 
 // 이미지 에러 핸들링
 function handleImageError(event) {
-  event.target.src = 'https://placehold.co/80x80?text=No+Image';
+  event.target.src = 'https://placehold.co/250x150?text=No+Image';
 }
 
 // 카테고리 이름 가져오기
 function getCategoryName(categoryCode) {
-  const category = categories.value.find(c => c.code === categoryCode);
-  return category ? category.name : '기타';
+  const categoryMap = {
+    'A01': '자연',
+    'A02': '인문(문화/예술/역사)', 
+    'A03': '레포츠',
+    'A04': '쇼핑',
+    'A05': '음식'
+  };
+  
+  return categoryMap[categoryCode] || '기타';
 }
 
 // 컴포넌트 마운트 시 초기화
@@ -469,91 +474,6 @@ watch([startDate, endDate], () => {
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
-}
-
-/* 헤더 스타일 */
-
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #333;
-}
-
-.logo-icon {
-  color: #9581e8;
-  background-color: #ffefd5;
-  padding: 2px 6px;
-  border-radius: 50%;
-  margin-right: 2px;
-}
-
-.trip-title-container {
-  flex: 1;
-  margin: 0 2rem;
-}
-
-.trip-title-input {
-  width: 100%;
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.save-button, .share-button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.save-button {
-  background-color: #9581e8;
-  color: white;
-}
-
-.save-button:hover {
-  background-color: #8470d7;
-}
-
-.share-button {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.share-button:hover {
-  background-color: #e0e0e0;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.profile-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #9581e8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
 }
 
 /* 메인 콘텐츠 영역 */
@@ -820,7 +740,7 @@ watch([startDate, endDate], () => {
 }
 
 .modal-content {
-  width: 700px;
+  width: 900px;
   max-width: 90%;
   max-height: 90vh;
   background-color: #fff;
@@ -875,10 +795,6 @@ watch([startDate, endDate], () => {
 .filter-row {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.filter-row:last-child {
   margin-bottom: 0;
 }
 
@@ -968,9 +884,13 @@ watch([startDate, endDate], () => {
   overflow-y: auto;
   padding: 1rem 1.5rem;
   max-height: 50vh;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
 }
 
 .loading {
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -995,6 +915,7 @@ watch([startDate, endDate], () => {
 }
 
 .no-results, .search-prompt {
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1016,29 +937,30 @@ watch([startDate, endDate], () => {
 
 .modal-result-item {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 1rem;
-  border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: 8px;
-  margin-bottom: 0.5rem;
   position: relative;
+  border: 1px solid #eee;
+  background-color: white;
+  height: fit-content;
 }
 
 .modal-result-item:hover {
   background-color: #f8f9fa;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #9581e8;
 }
 
 .modal-result-image {
-  width: 80px;
-  height: 80px;
+  width: 100%;
+  height: 150px;
   border-radius: 8px;
   overflow: hidden;
-  margin-right: 1rem;
-  flex-shrink: 0;
+  margin-bottom: 1rem;
 }
 
 .modal-result-image img {
@@ -1052,19 +974,21 @@ watch([startDate, endDate], () => {
 }
 
 .modal-result-name {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #333;
   margin-bottom: 0.5rem;
+  line-height: 1.2;
 }
 
 .modal-result-category {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #666;
   margin-bottom: 0.5rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .category-badge {
@@ -1072,8 +996,9 @@ watch([startDate, endDate], () => {
   color: #1976d2;
   padding: 0.2rem 0.5rem;
   border-radius: 12px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .modal-result-phone {
@@ -1085,16 +1010,17 @@ watch([startDate, endDate], () => {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background-color: #9581e8;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* 미디어 쿼리 */
@@ -1126,6 +1052,20 @@ watch([startDate, endDate], () => {
   
   .modal-search {
     flex-direction: column;
+  }
+
+  .modal-results {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .filter-row {
+    flex-wrap: wrap;
+  }
+  
+  .filter-group {
+    min-width: 200px;
   }
 }
 </style>
