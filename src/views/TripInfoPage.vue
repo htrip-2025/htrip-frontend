@@ -335,7 +335,7 @@ function handleImageError(event) {
   event.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
 }
 
-// 헬퍼 함수들
+// 헬퍼 함수들들
 function getAreaName(areaCode) {
   const area = areas.value.find(a => a.areaCode === areaCode);
   return area ? area.name : '';
