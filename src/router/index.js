@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import main_page from '../views/main_page.vue'
-import trip_info_page from '../views/trip_info_page.vue'
+import main_page from '../views/MainPage.vue'
+import trip_info_page from '../views/TripInfoPage.vue'
 import MainPage01 from '@/views/mainPage01.vue'
 import boardPage from '@/views/boardPage.vue'
 import PostWriteView from '@/views/PostWriteView.vue'  // 글 작성 페이지
@@ -10,6 +10,7 @@ import PostEditView from '@/views/PostEditView.vue' // 글 수정 페이지
 import loginPage from '@/views/loginPage.vue'
 import myPage from '@/views/myPage.vue'
 import TripPlanPage from '@/views/TripPlanPage.vue'
+import TripPlanMainPage from '@/views/TripPlanMainPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -66,6 +67,11 @@ const router = createRouter({
       name: 'mypage',
       component: myPage,
     },
+    {
+      path: '/tripmain',
+      name: 'tripmain',
+      component: TripPlanMainPage,
+    }
   ],
 })
 

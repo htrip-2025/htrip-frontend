@@ -10,7 +10,7 @@
       <div class="menu-items">
         <router-link to="#" class="menu-link">AI 추천</router-link>
         <router-link to="/info" class="menu-link">여행정보</router-link>
-        <router-link to="/plan" class="menu-link">여행계획</router-link>
+        <router-link to="/tripmain" class="menu-link">여행계획</router-link>
         <router-link to="/board" class="menu-link">커뮤니티</router-link>
         <a href="#" class="menu-link search-icon">🔍</a>
       </div>
