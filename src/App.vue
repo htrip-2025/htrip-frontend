@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- 로그인 페이지가 아닐 때만 헤더 표시 -->
-    <header v-if="!isLoginPage" class="header">
+    <header v-if="!shouldHideHeader" class="header">
       <div class="logo" @click="goToHome">
         <span class="logo-icon">T</span>rip
       </div>
@@ -48,7 +48,7 @@ const isLoggedIn = ref(false);
 const userName = ref('');
 
 // 로그인 페이지인지 확인
-const isLoginPage = computed(() => {
+const shouldHideHeader = computed(() => {
   return route.name === 'login';
 });
 
