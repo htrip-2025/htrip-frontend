@@ -138,6 +138,8 @@ export default {
 
      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
     window.location.href = `${apiUrl}/oauth2/authorization/google`;
+
+    
      
         
         // 방법 2: 백엔드로 요청을 보내고 리다이렉트 URL을 받아서 처리
