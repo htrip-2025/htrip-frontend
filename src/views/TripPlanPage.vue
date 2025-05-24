@@ -74,9 +74,6 @@
             <button v-if="mapError" @click="retryMapInit" class="retry-btn">다시 시도</button>
           </div>
           <!-- 지도가 표시될 곳 -->
-          <!-- <div class="map-overlay-text" v-if="!hasMarkers && mapLoaded && !mapLoading && !mapError">
-            장소를 추가하면 지도에 표시됩니다
-          </div> -->
         </div>
       </div>
     </div>
@@ -187,7 +184,7 @@ import axios from 'axios';
 // API 기본 URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-// 카카오 지도 API 키 - 수정된 부분
+// 카카오 지도 API 키
 const KAKAO_MAP_API_KEY = import.meta.env.VITE_KAKAO_MAP_API_KEY;
 
 // 상태 관리
@@ -202,7 +199,7 @@ const mapContainer = ref(null);
 const isSearching = ref(false);
 const hasSearched = ref(false);
 
-// 지도 관련 상태 - 개선된 부분
+// 지도 관련 상태
 const mapLoading = ref(false);
 const mapLoaded = ref(false);
 const mapError = ref('');
@@ -238,7 +235,7 @@ const filteredSigungus = computed(() => {
   return sigungus.value.filter(sigungu => sigungu.areaCode === parseInt(selectedAreaCode.value));
 });
 
-// 카카오 지도 스크립트 로드 - 개선된 함수
+// 카카오 지도 스크립트 로드
 const loadKakaoMapScript = () => {
   return new Promise((resolve, reject) => {
     console.log('🔍 카카오 지도 API 로드 시작');
@@ -301,7 +298,7 @@ const loadKakaoMapScript = () => {
   });
 };
 
-// 지도 초기화 - 개선된 함수
+// 지도 초기화
 const initializeMap = async () => {
   try {
     mapLoading.value = true;
@@ -362,7 +359,46 @@ const retryMapInit = () => {
   initializeMap();
 };
 
-// 지도에서 기존 마커들 제거 - 개선된 함수
+// 장소들 사이에 경로선 그리기 기능 추가
+const drawRouteBetweenMarkers = (places) => {
+  if (!kakaoMap.value || !places || places.length < 2) {
+    console.log('경로를 그리기 위한 조건이 충족되지 않았습니다.');
+    return;
+  }
+
+  try {
+    // 기존 경로선 제거
+    if (window.routePolyline) {
+      window.routePolyline.setMap(null);
+    }
+
+    // 경로 좌표 배열 생성
+    const linePath = places.map(place => {
+      return new window.kakao.maps.LatLng(
+        parseFloat(place.mapY), 
+        parseFloat(place.mapX)
+      );
+    });
+
+    // 경로선 생성
+    window.routePolyline = new window.kakao.maps.Polyline({
+      path: linePath,
+      strokeWeight: 3,        // 선 두께
+      strokeColor: '#5882fa', // 선 색상 (파란색)
+      strokeOpacity: 0.8,     // 선 투명도
+      strokeStyle: 'solid'    // 선 스타일
+    });
+
+    // 지도에 경로선 표시
+    window.routePolyline.setMap(kakaoMap.value);
+    
+    console.log('✅ 경로선 그리기 완료');
+  } catch (error) {
+    console.error('경로선 그리기 실패:', error);
+  }
+};
+
+// 지도에서 기존 마커들과 경로선 제거
 const clearMarkers = () => {
   if (markers.value && markers.value.length > 0) {
     markers.value.forEach(markerInfo => {
@@ -378,9 +414,15 @@ const clearMarkers = () => {
     });
     markers.value = [];
   }
+  
+  // 경로선 제거
+  if (window.routePolyline) {
+    window.routePolyline.setMap(null);
+    window.routePolyline = null;
+  }
 };
 
-// 지도에 마커 추가 - 개선된 함수
+// 지도에 마커 추가
 const addMarkersToMap = (places) => {
   if (!kakaoMap.value || !places || places.length === 0) {
     console.log('지도 또는 장소 정보가 없어 마커를 추가할 수 없습니다.');
@@ -471,6 +513,11 @@ const addMarkersToMap = (places) => {
           kakaoMap.value.setLevel(4);
         }, 100);
       }
+      
+      // 경로선 그리기 (마커가 2개 이상일 때)
+      if (validPlaces >= 2) {
+        drawRouteBetweenMarkers(places);
+      }
     }
   } catch (error) {
     console.error('마커 추가 중 오류:', error);
@@ -548,6 +595,17 @@ async function searchPlacesAPI() {
     searchResults.value = [];
   } finally {
     isSearching.value = false;
+  }
+}
+
+// 장소 상세 정보 가져오기
+async function fetchPlaceDetails(placeId) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/travel/${placeId}`);
+    return response.data;
+  } catch (error) {
+    console.error('장소 상세 정보 가져오기 실패:', error);
+    throw error;
   }
 }
 
@@ -647,13 +705,36 @@ function addPlaceToDay(place, dayIndex) {
   const isDuplicate = selectedPlaces.value[dayIndex].some(p => p.placeId === place.placeId);
   
   if (!isDuplicate) {
-    selectedPlaces.value[dayIndex].push({ ...place });
-    closeSearchModal();
-    
-    // 현재 선택된 날짜의 장소들을 지도에 업데이트
-    if (selectedDay.value === dayIndex) {
-      const placesForDay = getSelectedPlacesByDay(dayIndex);
-      addMarkersToMap(placesForDay);
+    // 좌표 정보 확인
+    if (!place.mapY || !place.mapX) {
+      // 좌표 정보가 없는 경우, API를 통해 좌표 정보를 가져오기
+      fetchPlaceDetails(place.placeId)
+        .then(detailedPlace => {
+          selectedPlaces.value[dayIndex].push({ ...detailedPlace });
+          closeSearchModal();
+          
+          // 현재 선택된 날짜의 장소들을 지도에 업데이트
+          if (selectedDay.value === dayIndex) {
+            const placesForDay = getSelectedPlacesByDay(dayIndex);
+            addMarkersToMap(placesForDay);
+          }
+        })
+        .catch(error => {
+          console.error('장소 상세 정보 가져오기 실패:', error);
+          // 실패해도 일단 추가 (좌표 없이)
+          selectedPlaces.value[dayIndex].push({ ...place });
+          closeSearchModal();
+        });
+    } else {
+      // 좌표 정보가 이미 있는 경우
+      selectedPlaces.value[dayIndex].push({ ...place });
+      closeSearchModal();
+      
+      // 현재 선택된 날짜의 장소들을 지도에 업데이트
+      if (selectedDay.value === dayIndex) {
+        const placesForDay = getSelectedPlacesByDay(dayIndex);
+        addMarkersToMap(placesForDay);
+      }
     }
   } else {
     alert('이미 추가된 장소입니다.');
@@ -1018,20 +1099,6 @@ watch(selectedDay, (newDay) => {
   width: 100%;
   height: 100%;
 }
-
-/* .map-overlay-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #888;
-  font-size: 1rem;
-  text-align: center;
-  z-index: 10;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 1rem 2rem;
-  border-radius: 8px;
-} */
 
 .map-loading {
   position: absolute;
