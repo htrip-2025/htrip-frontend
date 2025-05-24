@@ -67,14 +67,15 @@
       <!-- 오른쪽 지도 패널 -->
       <div class="map-panel">
         <div class="map-container" ref="mapContainer" id="kakao-map">
-          <!-- 지도가 표시될 곳 -->
-          <div class="map-overlay-text" v-if="selectedPlaces.flat().length === 0 && !mapLoaded">
-            장소를 추가하면 지도에 표시됩니다
-          </div>
           <!-- 지도 로딩 중 표시 -->
-          <div class="map-loading" v-if="mapLoading">
+          <div class="map-loading" v-if="mapLoading || !mapLoaded">
             <div class="loading-spinner"></div>
-            <p>지도를 불러오는 중...</p>
+            <p>{{ mapError || '지도를 불러오는 중...' }}</p>
+            <button v-if="mapError" @click="retryMapInit" class="retry-btn">다시 시도</button>
+          </div>
+          <!-- 지도가 표시될 곳 -->
+          <div class="map-overlay-text" v-if="selectedPlaces.flat().length === 0 && mapLoaded && !mapLoading">
+            장소를 추가하면 지도에 표시됩니다
           </div>
         </div>
       </div>
@@ -180,13 +181,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue';
+import { ref, computed, onMounted, watch, nextTick, onUnmounted } from 'vue';
 import axios from 'axios';
 
 // API 기본 URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-// 카카오 지도 API 키 (환경변수에서 가져오기) - 수정된 부분
+// 카카오 지도 API 키 - 수정된 부분
 const KAKAO_MAP_API_KEY = import.meta.env.VITE_KAKAO_MAP_API_KEY;
 
 // 상태 관리
@@ -201,11 +202,13 @@ const mapContainer = ref(null);
 const isSearching = ref(false);
 const hasSearched = ref(false);
 
-// 지도 관련 상태
+// 지도 관련 상태 - 개선된 부분
 const mapLoading = ref(false);
 const mapLoaded = ref(false);
+const mapError = ref('');
 const kakaoMap = ref(null);
 const markers = ref([]);
+const kakaoLoaded = ref(false);
 
 // 지역 관련
 const selectedAreaCode = ref('');
@@ -235,59 +238,95 @@ const filteredSigungus = computed(() => {
   return sigungus.value.filter(sigungu => sigungu.areaCode === parseInt(selectedAreaCode.value));
 });
 
-// 카카오 지도 스크립트 로드 - 수정된 함수
+// 카카오 지도 스크립트 로드 - 개선된 함수
 const loadKakaoMapScript = () => {
   return new Promise((resolve, reject) => {
-    // 디버깅용 로그 추가
-    console.log('🔍 API 키 확인:', KAKAO_MAP_API_KEY);
-    console.log('🔍 환경변수 전체:', import.meta.env);
+    console.log('🔍 카카오 지도 API 로드 시작');
+    console.log('🔍 API 키 확인:', KAKAO_MAP_API_KEY ? '설정됨' : '없음');
     
-    // API 키 확인 - 수정된 조건
-    if (!KAKAO_MAP_API_KEY || KAKAO_MAP_API_KEY === 'YOUR_KAKAO_API_KEY_HERE') {
-      console.error('❌ API 키가 없습니다:', KAKAO_MAP_API_KEY);
-      reject(new Error('카카오 지도 API 키가 설정되지 않았습니다. 환경변수를 확인하세요.'));
+    // API 키 확인
+    if (!KAKAO_MAP_API_KEY) {
+      const error = '카카오 지도 API 키가 설정되지 않았습니다.';
+      console.error('❌', error);
+      reject(new Error(error));
       return;
     }
 
-    if (window.kakao && window.kakao.maps) {
+    // 이미 로드된 경우
+    if (window.kakao && window.kakao.maps && kakaoLoaded.value) {
       console.log('✅ 카카오 지도 이미 로드됨');
       resolve();
       return;
     }
 
+    // 기존 스크립트 제거 (있는 경우)
+    const existingScript = document.querySelector('script[src*="dapi.kakao.com"]');
+    if (existingScript) {
+      existingScript.remove();
+    }
+
     const script = document.createElement('script');
-    // HTTPS 프로토콜 명시적 사용
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_API_KEY}&autoload=false`;
+    script.async = true;
     
     script.onload = () => {
       console.log('✅ 카카오 지도 스크립트 로드 성공');
-      window.kakao.maps.load(() => {
-        console.log('✅ 카카오 지도 API 로드 완료');
-        resolve();
-      });
+      
+      if (window.kakao && window.kakao.maps) {
+        window.kakao.maps.load(() => {
+          console.log('✅ 카카오 지도 API 초기화 완료');
+          kakaoLoaded.value = true;
+          resolve();
+        });
+      } else {
+        const error = '카카오 지도 객체를 찾을 수 없습니다.';
+        console.error('❌', error);
+        reject(new Error(error));
+      }
     };
     
     script.onerror = (error) => {
-      console.error('❌ 스크립트 로드 실패:', error);
-      console.error('❌ 요청 URL:', script.src);
-      reject(new Error('카카오 지도 스크립트 로드 실패 - API 키를 확인하세요.'));
+      console.error('❌ 카카오 지도 스크립트 로드 실패:', error);
+      reject(new Error('카카오 지도 스크립트 로드 실패'));
     };
     
     document.head.appendChild(script);
+    
+    // 타임아웃 설정 (10초)
+    setTimeout(() => {
+      if (!kakaoLoaded.value) {
+        reject(new Error('카카오 지도 로드 타임아웃'));
+      }
+    }, 10000);
   });
 };
 
-// 지도 초기화
+// 지도 초기화 - 개선된 함수
 const initializeMap = async () => {
   try {
     mapLoading.value = true;
+    mapError.value = '';
     
-    // 카카오 지도 스크립트 로드
+    console.log('🗺️ 지도 초기화 시작');
+    
+    // 카카오 지도 스크립트 로드 대기
     await loadKakaoMapScript();
     
+    // DOM 요소 확인
     if (!mapContainer.value) {
       throw new Error('지도 컨테이너를 찾을 수 없습니다.');
     }
+
+    // 카카오 지도 API 확인
+    if (!window.kakao || !window.kakao.maps || !window.kakao.maps.Map) {
+      throw new Error('카카오 지도 API가 준비되지 않았습니다.');
+    }
+
+    // 기존 지도 정리
+    if (kakaoMap.value) {
+      kakaoMap.value = null;
+    }
+    clearMarkers();
 
     // 지도 옵션 설정 (서울 시청을 기본 중심으로)
     const mapOption = {
@@ -300,98 +339,141 @@ const initializeMap = async () => {
     mapLoaded.value = true;
     
     console.log('✅ 카카오 지도 초기화 완료');
+    
+    // 현재 선택된 날짜의 장소들을 지도에 표시
+    const placesForDay = getSelectedPlacesByDay(selectedDay.value);
+    if (placesForDay.length > 0) {
+      addMarkersToMap(placesForDay);
+    }
+    
   } catch (error) {
     console.error('❌ 지도 초기화 실패:', error);
-    alert('지도를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해주세요.');
+    mapError.value = error.message || '지도를 불러오는 중 오류가 발생했습니다.';
+    mapLoaded.value = false;
   } finally {
     mapLoading.value = false;
   }
 };
 
-// 지도에서 기존 마커들 제거
-const clearMarkers = () => {
-  markers.value.forEach(marker => {
-    marker.setMap(null);
-  });
-  markers.value = [];
+// 지도 재시도 함수
+const retryMapInit = () => {
+  console.log('🔄 지도 초기화 재시도');
+  kakaoLoaded.value = false;
+  initializeMap();
 };
 
-// 지도에 마커 추가
+// 지도에서 기존 마커들 제거 - 개선된 함수
+const clearMarkers = () => {
+  if (markers.value && markers.value.length > 0) {
+    markers.value.forEach(markerInfo => {
+      if (markerInfo.marker) {
+        markerInfo.marker.setMap(null);
+      }
+      if (markerInfo.customOverlay) {
+        markerInfo.customOverlay.setMap(null);
+      }
+      if (markerInfo.infowindow) {
+        markerInfo.infowindow.close();
+      }
+    });
+    markers.value = [];
+  }
+};
+
+// 지도에 마커 추가 - 개선된 함수
 const addMarkersToMap = (places) => {
-  if (!kakaoMap.value || !places || places.length === 0) return;
+  if (!kakaoMap.value || !places || places.length === 0) {
+    console.log('지도 또는 장소 정보가 없어 마커를 추가할 수 없습니다.');
+    return;
+  }
 
-  // 기존 마커 제거
-  clearMarkers();
+  if (!window.kakao || !window.kakao.maps) {
+    console.error('카카오 지도 API가 로드되지 않았습니다.');
+    return;
+  }
 
-  const bounds = new window.kakao.maps.LatLngBounds();
-  let validPlaces = 0;
+  try {
+    // 기존 마커 제거
+    clearMarkers();
 
-  places.forEach((place, index) => {
-    // mapY(위도), mapX(경도) 확인
-    if (!place.mapY || !place.mapX) {
-      console.warn(`장소 "${place.title}"의 좌표 정보가 없습니다.`);
-      return;
-    }
+    const bounds = new window.kakao.maps.LatLngBounds();
+    let validPlaces = 0;
 
-    const position = new window.kakao.maps.LatLng(
-      parseFloat(place.mapY), 
-      parseFloat(place.mapX)
-    );
+    places.forEach((place, index) => {
+      // mapY(위도), mapX(경도) 확인
+      if (!place.mapY || !place.mapX) {
+        console.warn(`장소 "${place.title}"의 좌표 정보가 없습니다.`);
+        return;
+      }
 
-    // 마커 생성
-    const marker = new window.kakao.maps.Marker({
-      position: position,
-      map: kakaoMap.value
+      try {
+        const position = new window.kakao.maps.LatLng(
+          parseFloat(place.mapY), 
+          parseFloat(place.mapX)
+        );
+
+        // 마커 생성
+        const marker = new window.kakao.maps.Marker({
+          position: position,
+          map: kakaoMap.value
+        });
+
+        // 마커에 번호 표시 (커스텀 오버레이 사용)
+        const customOverlay = new window.kakao.maps.CustomOverlay({
+          position: position,
+          content: `<div class="map-marker-number">${index + 1}</div>`,
+          yAnchor: 2.3,
+          xAnchor: 0.5
+        });
+        customOverlay.setMap(kakaoMap.value);
+
+        // 인포윈도우 생성
+        const infowindow = new window.kakao.maps.InfoWindow({
+          content: `<div class="map-info-window">
+                      <div class="info-title">${place.title}</div>
+                      <div class="info-address">${place.address1 || ''}</div>
+                    </div>`
+        });
+
+        // 마커 클릭 이벤트
+        window.kakao.maps.event.addListener(marker, 'click', () => {
+          // 다른 인포윈도우 닫기
+          markers.value.forEach(m => {
+            if (m.infowindow) {
+              m.infowindow.close();
+            }
+          });
+          
+          infowindow.open(kakaoMap.value, marker);
+        });
+
+        // 마커 배열에 추가
+        markers.value.push({
+          marker,
+          customOverlay,
+          infowindow
+        });
+
+        bounds.extend(position);
+        validPlaces++;
+      } catch (markerError) {
+        console.error(`마커 생성 실패 (${place.title}):`, markerError);
+      }
     });
 
-    // 마커에 번호 표시 (커스텀 오버레이 사용)
-    const customOverlay = new window.kakao.maps.CustomOverlay({
-      position: position,
-      content: `<div class="map-marker-number">${index + 1}</div>`,
-      yAnchor: 2.3,
-      xAnchor: 0.5
-    });
-    customOverlay.setMap(kakaoMap.value);
-
-    // 인포윈도우 생성
-    const infowindow = new window.kakao.maps.InfoWindow({
-      content: `<div class="map-info-window">
-                  <div class="info-title">${place.title}</div>
-                  <div class="info-address">${place.address1 || ''}</div>
-                </div>`
-    });
-
-    // 마커 클릭 이벤트
-    window.kakao.maps.event.addListener(marker, 'click', () => {
-      // 다른 인포윈도우 닫기
-      markers.value.forEach(m => {
-        if (m.infowindow) {
-          m.infowindow.close();
-        }
-      });
+    // 마커가 있으면 지도 범위 조정
+    if (validPlaces > 0) {
+      kakaoMap.value.setBounds(bounds);
       
-      infowindow.open(kakaoMap.value, marker);
-    });
-
-    // 마커 배열에 추가 (나중에 제거하기 위해)
-    markers.value.push({
-      marker,
-      customOverlay,
-      infowindow
-    });
-
-    bounds.extend(position);
-    validPlaces++;
-  });
-
-  // 마커가 있으면 지도 범위 조정
-  if (validPlaces > 0) {
-    kakaoMap.value.setBounds(bounds);
-    
-    // 마커가 1개인 경우 확대 레벨 조정
-    if (validPlaces === 1) {
-      kakaoMap.value.setLevel(4);
+      // 마커가 1개인 경우 확대 레벨 조정
+      if (validPlaces === 1) {
+        setTimeout(() => {
+          kakaoMap.value.setLevel(4);
+        }, 100);
+      }
     }
+  } catch (error) {
+    console.error('마커 추가 중 오류:', error);
   }
 };
 
@@ -600,19 +682,17 @@ function getSelectedPlacesByDay(dayIndex) {
 function selectPlace(place) {
   if (!kakaoMap.value || !place.mapY || !place.mapX) return;
   
-  // 지도 중심을 선택된 장소로 이동
-  const position = new window.kakao.maps.LatLng(
-    parseFloat(place.mapY), 
-    parseFloat(place.mapX)
-  );
-  kakaoMap.value.setCenter(position);
-  kakaoMap.value.setLevel(4);
-}
-
-// 지도에 마커 추가하는 함수 (기존 함수, 호환성 유지)
-function addMarkerToMap(place) {
-  console.log('Added marker for:', place.title);
-  // 실제 구현은 addMarkersToMap에서 처리
+  try {
+    // 지도 중심을 선택된 장소로 이동
+    const position = new window.kakao.maps.LatLng(
+      parseFloat(place.mapY), 
+      parseFloat(place.mapX)
+    );
+    kakaoMap.value.setCenter(position);
+    kakaoMap.value.setLevel(4);
+  } catch (error) {
+    console.error('장소 선택 중 오류:', error);
+  }
 }
 
 // 이미지 에러 핸들링
@@ -633,6 +713,15 @@ function getCategoryName(categoryCode) {
   return categoryMap[categoryCode] || '기타';
 }
 
+// 컴포넌트 언마운트 시 정리
+onUnmounted(() => {
+  clearMarkers();
+  if (kakaoMap.value) {
+    kakaoMap.value = null;
+  }
+  kakaoLoaded.value = false;
+});
+
 // 컴포넌트 마운트 시 초기화
 onMounted(async () => {
   // 오늘 날짜를 기본값으로 설정
@@ -649,9 +738,11 @@ onMounted(async () => {
   await fetchAreas();
   await fetchSigungus();
   
-  // 지도 초기화
+  // 지도 초기화는 DOM이 준비된 후 실행
   await nextTick();
-  await initializeMap();
+  setTimeout(() => {
+    initializeMap();
+  }, 100);
 });
 
 // 날짜가 변경될 때마다 기간 재계산
@@ -661,8 +752,10 @@ watch([startDate, endDate], () => {
 
 // 선택된 날짜가 변경될 때 지도 업데이트
 watch(selectedDay, (newDay) => {
-  const placesForDay = getSelectedPlacesByDay(newDay);
-  addMarkersToMap(placesForDay);
+  if (mapLoaded.value) {
+    const placesForDay = getSelectedPlacesByDay(newDay);
+    addMarkersToMap(placesForDay);
+  }
 });
 </script>
 
@@ -953,6 +1046,22 @@ watch(selectedDay, (newDay) => {
   background-color: rgba(255, 255, 255, 0.9);
   padding: 2rem;
   border-radius: 8px;
+  text-align: center;
+}
+
+.retry-btn {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #9581e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.retry-btn:hover {
+  background-color: #8470d7;
 }
 
 /* 검색 모달 */
