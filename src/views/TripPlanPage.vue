@@ -68,15 +68,15 @@
       <div class="map-panel">
         <div class="map-container" ref="mapContainer" id="kakao-map">
           <!-- 지도 로딩 중 표시 -->
-          <div class="map-loading" v-if="mapLoading || !mapLoaded">
-            <div class="loading-spinner"></div>
+          <div class="map-loading" v-if="mapLoading || mapError">
+            <div class="loading-spinner" v-if="mapLoading"></div>
             <p>{{ mapError || '지도를 불러오는 중...' }}</p>
             <button v-if="mapError" @click="retryMapInit" class="retry-btn">다시 시도</button>
           </div>
           <!-- 지도가 표시될 곳 -->
-          <div class="map-overlay-text" v-if="selectedPlaces.flat().length === 0 && mapLoaded && !mapLoading">
+          <!-- <div class="map-overlay-text" v-if="!hasMarkers && mapLoaded && !mapLoading && !mapError">
             장소를 추가하면 지도에 표시됩니다
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -1019,7 +1019,7 @@ watch(selectedDay, (newDay) => {
   height: 100%;
 }
 
-.map-overlay-text {
+/* .map-overlay-text {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1031,7 +1031,7 @@ watch(selectedDay, (newDay) => {
   background-color: rgba(255, 255, 255, 0.9);
   padding: 1rem 2rem;
   border-radius: 8px;
-}
+} */
 
 .map-loading {
   position: absolute;
