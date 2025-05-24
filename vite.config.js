@@ -25,5 +25,11 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '/api')
       }
     }
+  },
+  define: {
+    __KAKAO_API_KEY__: JSON.stringify(process.env.VITE_KAKAO_MAP_API_KEY)
   }
+
 })
+
+
