@@ -106,14 +106,14 @@
             <div class="rating-display">
               <span class="rating-score">{{ reviewStats.averageRating.toFixed(1) }}</span>
               <div class="stars">
-                <span v-for="n in 5" :key="n" class="star" :class="{ filled: n <= Math.round(reviewStats.averageRating) }">⭐</span>
+                <span v-for="n in 5" :key="n" class="star" :class="{ filled: n <= Math.round(reviewStats.averageRating) }">★</span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- 리뷰 작성 -->
-        <div class="review-write" v-if="isLoggedIn">
+        <div class="review-write" v-if="isLoggedIn && !editingReview">
           <h3>리뷰 작성하기</h3>
           <div class="rating-input">
             <span>평점: </span>
@@ -122,10 +122,13 @@
                 v-for="n in 5" 
                 :key="n" 
                 class="star-input" 
-                :class="{ active: n <= newReview.rating }"
+                :class="{ active: n <= newReview.rating, empty: n > newReview.rating }"
                 @click="setRating(n)"
-              >⭐</span>
+                @mouseover="hoverRating = n"
+                @mouseleave="hoverRating = 0"
+              >★</span>
             </div>
+            <span class="rating-text">{{ getRatingText(newReview.rating) }}</span>
           </div>
           <textarea 
             v-model="newReview.content" 
@@ -146,7 +149,45 @@
           </div>
         </div>
 
-        <div v-else class="login-prompt">
+        <!-- 리뷰 수정 폼 -->
+        <div class="review-write" v-if="editingReview">
+          <h3>리뷰 수정하기</h3>
+          <div class="rating-input">
+            <span>평점: </span>
+            <div class="star-rating">
+              <span 
+                v-for="n in 5" 
+                :key="n" 
+                class="star-input" 
+                :class="{ active: n <= editReview.rating, empty: n > editReview.rating }"
+                @click="setEditRating(n)"
+              >★</span>
+            </div>
+            <span class="rating-text">{{ getRatingText(editReview.rating) }}</span>
+          </div>
+          <textarea 
+            v-model="editReview.content" 
+            placeholder="이곳에 대한 경험을 공유해주세요..."
+            class="review-textarea"
+            rows="4"
+            maxlength="1000"
+          ></textarea>
+          <div class="review-actions">
+            <div class="char-count">{{ editReview.content.length }}/1000</div>
+            <div class="review-edit-buttons">
+              <button @click="cancelEdit" class="cancel-edit-btn">취소</button>
+              <button 
+                @click="updateReview" 
+                class="submit-review-btn"
+                :disabled="reviewSubmitting || !editReview.content.trim() || editReview.rating === 0"
+              >
+                {{ reviewSubmitting ? '수정 중...' : '수정 완료' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div v-else-if="!isLoggedIn" class="login-prompt">
           <p>리뷰를 작성하려면 <router-link to="/login">로그인</router-link>이 필요합니다.</p>
         </div>
 
@@ -174,9 +215,16 @@
                   <div class="review-date">{{ formatDate(review.createDate) }}</div>
                 </div>
               </div>
-              <div class="review-rating">
-                <div class="stars">
-                  <span v-for="n in 5" :key="n" class="star" :class="{ filled: n <= review.rating }">⭐</span>
+              <div class="review-rating-and-actions">
+                <div class="review-rating">
+                  <div class="stars">
+                    <span v-for="n in 5" :key="n" class="star" :class="{ filled: n <= review.rating, empty: n > review.rating }">★</span>
+                  </div>
+                </div>
+                <!-- 내가 작성한 리뷰인 경우 수정/삭제 버튼 표시 -->
+                <div v-if="isMyReview(review)" class="review-actions-btns">
+                  <button @click="startEditReview(review)" class="edit-review-btn">수정</button>
+                  <button @click="deleteReview(review.reviewId)" class="delete-review-btn">삭제</button>
                 </div>
               </div>
             </div>
@@ -227,14 +275,6 @@ import axios from 'axios';
 
 const router = useRoute();
 
-// 여행지 상세 페이지로 이동하는 함수
-const navigateToDetail = (placeId) => {
-    router.push({
-    path: '/tripdetail',
-    query: { id: placeId }
-  });
-};
-
 const props = defineProps({
   placeId: {
     type: [String, Number],
@@ -250,8 +290,6 @@ const KAKAO_MAP_API_KEY = import.meta.env.VITE_KAKAO_MAP_API_KEY;
 const isLoading = ref(false);
 const error = ref('');
 const tripDetail = ref(null);
-// placeId는 이제 props에서 가져옵니다
-// const placeId = ref(route.params.id);
 
 // 찜 관련
 const isFavorited = ref(false);
@@ -277,9 +315,19 @@ const newReview = ref({
   content: ''
 });
 const reviewSubmitting = ref(false);
+const hoverRating = ref(0);
+
+// 리뷰 수정 관련
+const editingReview = ref(null);
+const editReview = ref({
+  reviewId: null,
+  rating: 0,
+  content: ''
+});
 
 // 사용자 로그인 상태
 const isLoggedIn = ref(false);
+const currentUser = ref(null);
 
 // axios 기본 설정
 axios.defaults.withCredentials = true;
@@ -328,16 +376,26 @@ const fetchFavoriteInfo = async () => {
     
     // 로그인한 경우 내가 찜했는지 확인
     if (isLoggedIn.value) {
-      // 내 찜 목록에서 확인하는 로직 추가 필요
-      // 지금은 단순화해서 false로 설정
-      isFavorited.value = false;
+      try {
+        const favoritesResponse = await axios.get(`${API_BASE_URL}/api/member/favorite`, {
+          params: { page: 0, size: 100 }
+        });
+        
+        if (favoritesResponse.data && favoritesResponse.data.content) {
+          const found = favoritesResponse.data.content.some(
+            favorite => favorite.attraction && favorite.attraction.placeId === parseInt(props.placeId)
+          );
+          isFavorited.value = found;
+        }
+      } catch (error) {
+        console.warn('찜 상태 확인 실패:', error);
+      }
     }
   } catch (err) {
     console.error('찜 정보 조회 실패:', err);
   }
 };
 
-// fetchReviews 함수 수정
 const fetchReviews = async (page = 1) => {
   try {
     reviewsLoading.value = true;
@@ -346,7 +404,7 @@ const fetchReviews = async (page = 1) => {
       `${API_BASE_URL}/api/reviews/place/${props.placeId}`,
       { 
         params: {
-          page: page - 1,  // 백엔드는 0부터 시작하는 페이지 인덱스 사용
+          page: page - 1,
           size: reviewsPerPage.value
         }
       }
@@ -363,21 +421,28 @@ const fetchReviews = async (page = 1) => {
   }
 };
 
-// 로그인 상태 체크 함수 수정
+const fetchReviewStats = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/reviews/place/${props.placeId}/stats`);
+    reviewStats.value = response.data;
+  } catch (err) {
+    console.error('리뷰 통계 조회 실패:', err);
+  }
+};
+
 const checkLoginStatus = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/api/member`);
     isLoggedIn.value = true;
+    currentUser.value = response.data;
     
     // 로그인한 경우 내가 찜했는지 확인
     try {
-      // 찜 목록에서 해당 장소가 있는지 확인
       const favoritesResponse = await axios.get(`${API_BASE_URL}/api/member/favorite`, {
         params: { page: 0, size: 100 }
       });
       
       if (favoritesResponse.data && favoritesResponse.data.content) {
-        // 현재 장소가 찜 목록에 있는지 확인
         const found = favoritesResponse.data.content.some(
           favorite => favorite.attraction && favorite.attraction.placeId === parseInt(props.placeId)
         );
@@ -391,7 +456,7 @@ const checkLoginStatus = async () => {
   }
 };
 
-// 지도 초기화
+// 지도 초기화 함수들
 const loadKakaoMapScript = () => {
   return new Promise((resolve, reject) => {
     if (!KAKAO_MAP_API_KEY) {
@@ -447,7 +512,6 @@ const initializeMap = async () => {
 
     kakaoMap.value = new window.kakao.maps.Map(mapContainer.value, mapOption);
     
-    // 마커 추가
     const markerPosition = new window.kakao.maps.LatLng(
       parseFloat(tripDetail.value.mapY), 
       parseFloat(tripDetail.value.mapX)
@@ -459,7 +523,6 @@ const initializeMap = async () => {
     
     marker.setMap(kakaoMap.value);
     
-    // 인포윈도우 추가
     const infowindow = new window.kakao.maps.InfoWindow({
       content: `<div class="map-info-window">
                   <div class="info-title">${tripDetail.value.title}</div>
@@ -482,41 +545,56 @@ const initializeMap = async () => {
 };
 
 // 이벤트 핸들러들
-async function toggleFavorite() {
+const toggleFavorite = async () => {
   if (!isLoggedIn.value) {
-    return alert('로그인이 필요합니다.');
+    alert('로그인이 필요합니다.');
+    return;
   }
-  favoriteLoading.value = true;
-
+  
   try {
+    favoriteLoading.value = true;
+    
     if (isFavorited.value) {
-      // 찜 취소
-      await axios.delete(
-        `${API_BASE_URL}/api/travel/${props.placeId}/favorite`
-      );
+      await axios.delete(`${API_BASE_URL}/api/travel/${props.placeId}/favorite`);
       isFavorited.value = false;
       favoriteCount.value = Math.max(0, favoriteCount.value - 1);
     } else {
-      // 찜 추가 (바디 없이)
-      await axios.post(
-        `${API_BASE_URL}/api/travel/${props.placeId}/favorite`
-      );
+      await axios.post(`${API_BASE_URL}/api/travel/${props.placeId}/favorite`, {
+        placeId: parseInt(props.placeId)
+      });
       isFavorited.value = true;
       favoriteCount.value += 1;
     }
   } catch (err) {
-    console.error('찜 토글 실패', err);
-    alert(err.response?.data?.message || '오류가 발생했습니다.');
+    console.error('찜 토글 실패:', err);
+    alert('오류가 발생했습니다. 다시 시도해주세요.');
   } finally {
     favoriteLoading.value = false;
   }
-}
+};
 
-
+// 별점 관련 함수들
 const setRating = (rating) => {
   newReview.value.rating = rating;
 };
 
+const setEditRating = (rating) => {
+  editReview.value.rating = rating;
+};
+
+const getRatingText = (rating) => {
+  const texts = {
+    0: '',
+    1: '별로예요',
+    2: '그저 그래요',
+    3: '보통이에요',
+    4: '좋아요',
+    5: '최고예요!'
+  };
+  return texts[rating] || '';
+};
+
+// 리뷰 관련 함수들
 const submitReview = async () => {
   if (!isLoggedIn.value) {
     alert('로그인이 필요합니다.');
@@ -531,7 +609,6 @@ const submitReview = async () => {
   try {
     reviewSubmitting.value = true;
     
-    // ReviewController 요구사항에 맞게 요청 객체 구성
     const reviewRequest = {
       placeId: parseInt(props.placeId),
       rating: newReview.value.rating,
@@ -540,12 +617,9 @@ const submitReview = async () => {
     
     await axios.post(`${API_BASE_URL}/api/reviews`, reviewRequest);
     
-    // 리뷰 목록 및 통계 다시 로드
     await fetchReviews(1);
-    // await fetchReviewStats();
-
+    await fetchReviewStats();
     
-    // 폼 초기화
     newReview.value = { rating: 0, content: '' };
     
     alert('리뷰가 등록되었습니다.');
@@ -555,6 +629,78 @@ const submitReview = async () => {
     alert('리뷰 등록 중 오류가 발생했습니다.');
   } finally {
     reviewSubmitting.value = false;
+  }
+};
+
+const isMyReview = (review) => {
+  return isLoggedIn.value && currentUser.value && review.userId === currentUser.value.userId;
+};
+
+const startEditReview = (review) => {
+  editingReview.value = review;
+  editReview.value = {
+    reviewId: review.reviewId,
+    rating: review.rating,
+    content: review.content
+  };
+};
+
+const cancelEdit = () => {
+  editingReview.value = null;
+  editReview.value = {
+    reviewId: null,
+    rating: 0,
+    content: ''
+  };
+};
+
+const updateReview = async () => {
+  if (!editReview.value.content.trim() || editReview.value.rating === 0) {
+    alert('평점과 리뷰 내용을 모두 입력해주세요.');
+    return;
+  }
+  
+  try {
+    reviewSubmitting.value = true;
+    
+    const updateRequest = {
+      rating: editReview.value.rating,
+      content: editReview.value.content.trim()
+    };
+    
+    await axios.put(`${API_BASE_URL}/api/reviews/${editReview.value.reviewId}`, updateRequest);
+    
+    await fetchReviews(currentReviewPage.value);
+    await fetchReviewStats();
+    
+    cancelEdit();
+    
+    alert('리뷰가 수정되었습니다.');
+    
+  } catch (err) {
+    console.error('리뷰 수정 실패:', err);
+    alert('리뷰 수정 중 오류가 발생했습니다.');
+  } finally {
+    reviewSubmitting.value = false;
+  }
+};
+
+const deleteReview = async (reviewId) => {
+  if (!confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
+    return;
+  }
+  
+  try {
+    await axios.delete(`${API_BASE_URL}/api/reviews/${reviewId}`);
+    
+    await fetchReviews(currentReviewPage.value);
+    await fetchReviewStats();
+    
+    alert('리뷰가 삭제되었습니다.');
+    
+  } catch (err) {
+    console.error('리뷰 삭제 실패:', err);
+    alert('리뷰 삭제 중 오류가 발생했습니다.');
   }
 };
 
@@ -593,7 +739,7 @@ onMounted(async () => {
   await fetchTripDetail();
   await fetchFavoriteInfo();
   await fetchReviews();
-//   await fetchReviewStats();
+  await fetchReviewStats();
 });
 
 // 컴포넌트 언마운트 시 정리
@@ -933,6 +1079,12 @@ onUnmounted(() => {
   color: #ffc107;
 }
 
+.star.empty {
+  color: #ddd;
+  text-stroke: 1px #ccc;
+  -webkit-text-stroke: 1px #ccc;
+}
+
 /* 리뷰 작성 */
 .review-write {
   background-color: #f8f9fa;
@@ -962,12 +1114,33 @@ onUnmounted(() => {
   font-size: 1.5rem;
   color: #ddd;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s;
+  text-stroke: 1px #ccc;
+  -webkit-text-stroke: 1px #ccc;
 }
 
-.star-input:hover,
+.star-input:hover {
+  color: #ffed4e;
+  transform: scale(1.1);
+}
+
 .star-input.active {
   color: #ffc107;
+  text-stroke: none;
+  -webkit-text-stroke: none;
+}
+
+.star-input.empty {
+  color: #ddd;
+  text-stroke: 1px #ccc;
+  -webkit-text-stroke: 1px #ccc;
+}
+
+.rating-text {
+  font-size: 0.9rem;
+  color: #9581e8;
+  font-weight: 500;
+  margin-left: 0.5rem;
 }
 
 .review-textarea {
@@ -1021,6 +1194,28 @@ onUnmounted(() => {
   transform: none;
 }
 
+.review-edit-buttons {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.cancel-edit-btn {
+  padding: 0.8rem 1.5rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.cancel-edit-btn:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+}
+
 .login-prompt {
   text-align: center;
   padding: 2rem;
@@ -1061,7 +1256,7 @@ onUnmounted(() => {
 .review-header-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 1rem;
 }
 
@@ -1092,6 +1287,50 @@ onUnmounted(() => {
 .review-date {
   font-size: 0.85rem;
   color: #666;
+}
+
+.review-rating-and-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.review-actions-btns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-review-btn, .delete-review-btn {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.edit-review-btn {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #dee2e6;
+}
+
+.edit-review-btn:hover {
+  background-color: #e9ecef;
+  transform: translateY(-1px);
+}
+
+.delete-review-btn {
+  background-color: #fff5f5;
+  color: #dc3545;
+  border: 1px solid #f5c6cb;
+}
+
+.delete-review-btn:hover {
+  background-color: #f8d7da;
+  transform: translateY(-1px);
 }
 
 .review-content p {
@@ -1204,9 +1443,24 @@ onUnmounted(() => {
     align-items: flex-start;
   }
   
+  .review-rating-and-actions {
+    align-items: flex-start;
+  }
+  
   .pagination {
     flex-wrap: wrap;
     justify-content: center;
+  }
+  
+  .review-actions {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .review-edit-buttons {
+    width: 100%;
+    justify-content: flex-end;
   }
 }
 </style>
