@@ -337,12 +337,19 @@ const fetchFavoriteInfo = async () => {
   }
 };
 
+// fetchReviews 함수 수정
 const fetchReviews = async (page = 1) => {
   try {
     reviewsLoading.value = true;
     
     const response = await axios.get(
-      `${API_BASE_URL}/api/reviews/place/${props.placeId}?page=${page - 1}&size=${reviewsPerPage.value}`
+      `${API_BASE_URL}/api/reviews/place/${props.placeId}`,
+      { 
+        params: {
+          page: page - 1,  // 백엔드는 0부터 시작하는 페이지 인덱스 사용
+          size: reviewsPerPage.value
+        }
+      }
     );
     
     reviews.value = response.data.content;
@@ -356,19 +363,29 @@ const fetchReviews = async (page = 1) => {
   }
 };
 
-const fetchReviewStats = async () => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/api/reviews/place/${props.placeId}/stats`);
-    reviewStats.value = response.data;
-  } catch (err) {
-    console.error('리뷰 통계 조회 실패:', err);
-  }
-};
-
+// 로그인 상태 체크 함수 수정
 const checkLoginStatus = async () => {
   try {
-    await axios.get(`${API_BASE_URL}/api/member`);
+    const response = await axios.get(`${API_BASE_URL}/api/member`);
     isLoggedIn.value = true;
+    
+    // 로그인한 경우 내가 찜했는지 확인
+    try {
+      // 찜 목록에서 해당 장소가 있는지 확인
+      const favoritesResponse = await axios.get(`${API_BASE_URL}/api/member/favorite`, {
+        params: { page: 0, size: 100 }
+      });
+      
+      if (favoritesResponse.data && favoritesResponse.data.content) {
+        // 현재 장소가 찜 목록에 있는지 확인
+        const found = favoritesResponse.data.content.some(
+          favorite => favorite.attraction && favorite.attraction.placeId === parseInt(props.placeId)
+        );
+        isFavorited.value = found;
+      }
+    } catch (error) {
+      console.warn('찜 상태 확인 실패:', error);
+    }
   } catch (err) {
     isLoggedIn.value = false;
   }
@@ -475,10 +492,12 @@ const toggleFavorite = async () => {
     favoriteLoading.value = true;
     
     if (isFavorited.value) {
+      // 찜 취소
       await axios.delete(`${API_BASE_URL}/api/travel/${props.placeId}/favorite`);
       isFavorited.value = false;
       favoriteCount.value = Math.max(0, favoriteCount.value - 1);
     } else {
+      // 찜 추가 - 요청 형식 수정
       await axios.post(`${API_BASE_URL}/api/travel/${props.placeId}/favorite`, {
         placeId: parseInt(props.placeId)
       });
@@ -511,15 +530,19 @@ const submitReview = async () => {
   try {
     reviewSubmitting.value = true;
     
-    await axios.post(`${API_BASE_URL}/api/reviews`, {
+    // ReviewController 요구사항에 맞게 요청 객체 구성
+    const reviewRequest = {
       placeId: parseInt(props.placeId),
       rating: newReview.value.rating,
       content: newReview.value.content.trim()
-    });
+    };
+    
+    await axios.post(`${API_BASE_URL}/api/reviews`, reviewRequest);
     
     // 리뷰 목록 및 통계 다시 로드
     await fetchReviews(1);
     await fetchReviewStats();
+
     
     // 폼 초기화
     newReview.value = { rating: 0, content: '' };

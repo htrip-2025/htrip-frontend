@@ -375,8 +375,8 @@ const drawRouteBetweenMarkers = (places) => {
     // 경로 좌표 배열 생성
     const linePath = places.map(place => {
       return new window.kakao.maps.LatLng(
-        parseFloat(place.mapY), 
-        parseFloat(place.mapX)
+        parseFloat(place.latitude), 
+        parseFloat(place.longitude)
       );
     });
 
@@ -443,15 +443,15 @@ const addMarkersToMap = (places) => {
 
     places.forEach((place, index) => {
       // mapY(위도), mapX(경도) 확인
-      if (!place.mapY || !place.mapX) {
+      if (!place.latitude || !place.longitude) {
         console.warn(`장소 "${place.title}"의 좌표 정보가 없습니다.`);
         return;
       }
 
       try {
         const position = new window.kakao.maps.LatLng(
-          parseFloat(place.mapY), 
-          parseFloat(place.mapX)
+          parseFloat(place.latitude), 
+          parseFloat(place.longitude)
         );
 
         // 마커 생성
@@ -706,7 +706,7 @@ function addPlaceToDay(place, dayIndex) {
   
   if (!isDuplicate) {
     // 좌표 정보 확인
-    if (!place.mapY || !place.mapX) {
+    if (!place.latitude || !place.longitude) {
       // 좌표 정보가 없는 경우, API를 통해 좌표 정보를 가져오기
       fetchPlaceDetails(place.placeId)
         .then(detailedPlace => {
@@ -761,13 +761,13 @@ function getSelectedPlacesByDay(dayIndex) {
 
 // 장소 선택 함수
 function selectPlace(place) {
-  if (!kakaoMap.value || !place.mapY || !place.mapX) return;
+  if (!kakaoMap.value || !place.latitude || !place.longitude) return;
   
   try {
     // 지도 중심을 선택된 장소로 이동
     const position = new window.kakao.maps.LatLng(
-      parseFloat(place.mapY), 
-      parseFloat(place.mapX)
+      parseFloat(place.latitude), 
+      parseFloat(place.longitude)
     );
     kakaoMap.value.setCenter(position);
     kakaoMap.value.setLevel(4);

@@ -73,12 +73,15 @@ const router = createRouter({
       name: 'tripmain',
       component: TripPlanMainPage,
     },
+
     {
   path: '/tripdetail',
-  name: 'tripdetail',
+  name: 'TripDetail',
   component: TripDetail,
-  props: (route) => ({ placeId: route.query.id })
+  // 쿼리나 params에서 id를 받아서 props.placeId에 집어넣는다
+  props: route => ({ placeId: route.query.id || route.params.id })
 }
+
   ],
 })
 
