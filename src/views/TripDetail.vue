@@ -482,35 +482,36 @@ const initializeMap = async () => {
 };
 
 // 이벤트 핸들러들
-const toggleFavorite = async () => {
+async function toggleFavorite() {
   if (!isLoggedIn.value) {
-    alert('로그인이 필요합니다.');
-    return;
+    return alert('로그인이 필요합니다.');
   }
-  
+  favoriteLoading.value = true;
+
   try {
-    favoriteLoading.value = true;
-    
     if (isFavorited.value) {
       // 찜 취소
-      await axios.delete(`${API_BASE_URL}/api/travel/${props.placeId}/favorite`);
+      await axios.delete(
+        `${API_BASE_URL}/api/travel/${props.placeId}/favorite`
+      );
       isFavorited.value = false;
       favoriteCount.value = Math.max(0, favoriteCount.value - 1);
     } else {
-      // 찜 추가 - 요청 형식 수정
-      await axios.post(`${API_BASE_URL}/api/travel/${props.placeId}/favorite`, {
-        placeId: parseInt(props.placeId)
-      });
+      // 찜 추가 (바디 없이)
+      await axios.post(
+        `${API_BASE_URL}/api/travel/${props.placeId}/favorite`
+      );
       isFavorited.value = true;
       favoriteCount.value += 1;
     }
   } catch (err) {
-    console.error('찜 토글 실패:', err);
-    alert('오류가 발생했습니다. 다시 시도해주세요.');
+    console.error('찜 토글 실패', err);
+    alert(err.response?.data?.message || '오류가 발생했습니다.');
   } finally {
     favoriteLoading.value = false;
   }
-};
+}
+
 
 const setRating = (rating) => {
   newReview.value.rating = rating;
@@ -541,7 +542,7 @@ const submitReview = async () => {
     
     // 리뷰 목록 및 통계 다시 로드
     await fetchReviews(1);
-    await fetchReviewStats();
+    // await fetchReviewStats();
 
     
     // 폼 초기화
@@ -592,7 +593,7 @@ onMounted(async () => {
   await fetchTripDetail();
   await fetchFavoriteInfo();
   await fetchReviews();
-  await fetchReviewStats();
+//   await fetchReviewStats();
 });
 
 // 컴포넌트 언마운트 시 정리
