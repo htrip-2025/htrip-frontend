@@ -225,7 +225,22 @@ import { ref, computed, onMounted, nextTick, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 
-const route = useRoute();
+const router = useRoute();
+
+// 여행지 상세 페이지로 이동하는 함수
+const navigateToDetail = (placeId) => {
+    router.push({
+    path: '/tripdetail',
+    query: { id: placeId }
+  });
+};
+
+const props = defineProps({
+  placeId: {
+    type: [String, Number],
+    required: true
+  }
+});
 
 // API 기본 URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -235,7 +250,8 @@ const KAKAO_MAP_API_KEY = import.meta.env.VITE_KAKAO_MAP_API_KEY;
 const isLoading = ref(false);
 const error = ref('');
 const tripDetail = ref(null);
-const placeId = ref(route.params.id);
+// placeId는 이제 props에서 가져옵니다
+// const placeId = ref(route.params.id);
 
 // 찜 관련
 const isFavorited = ref(false);
@@ -285,7 +301,7 @@ const fetchTripDetail = async () => {
     isLoading.value = true;
     error.value = '';
     
-    const response = await axios.get(`${API_BASE_URL}/api/travel/${placeId.value}`);
+    const response = await axios.get(`${API_BASE_URL}/api/travel/${props.placeId}`);
     tripDetail.value = response.data;
     
     // 지도 초기화
@@ -307,7 +323,7 @@ const fetchTripDetail = async () => {
 const fetchFavoriteInfo = async () => {
   try {
     // 찜 개수 조회
-    const countResponse = await axios.get(`${API_BASE_URL}/api/travel/${placeId.value}/favorite/count`);
+    const countResponse = await axios.get(`${API_BASE_URL}/api/travel/${props.placeId}/favorite/count`);
     favoriteCount.value = countResponse.data.count;
     
     // 로그인한 경우 내가 찜했는지 확인
@@ -326,7 +342,7 @@ const fetchReviews = async (page = 1) => {
     reviewsLoading.value = true;
     
     const response = await axios.get(
-      `${API_BASE_URL}/api/reviews/place/${placeId.value}?page=${page - 1}&size=${reviewsPerPage.value}`
+      `${API_BASE_URL}/api/reviews/place/${props.placeId}?page=${page - 1}&size=${reviewsPerPage.value}`
     );
     
     reviews.value = response.data.content;
@@ -342,7 +358,7 @@ const fetchReviews = async (page = 1) => {
 
 const fetchReviewStats = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/reviews/place/${placeId.value}/stats`);
+    const response = await axios.get(`${API_BASE_URL}/api/reviews/place/${props.placeId}/stats`);
     reviewStats.value = response.data;
   } catch (err) {
     console.error('리뷰 통계 조회 실패:', err);
@@ -459,12 +475,12 @@ const toggleFavorite = async () => {
     favoriteLoading.value = true;
     
     if (isFavorited.value) {
-      await axios.delete(`${API_BASE_URL}/api/travel/${placeId.value}/favorite`);
+      await axios.delete(`${API_BASE_URL}/api/travel/${props.placeId}/favorite`);
       isFavorited.value = false;
       favoriteCount.value = Math.max(0, favoriteCount.value - 1);
     } else {
-      await axios.post(`${API_BASE_URL}/api/travel/${placeId.value}/favorite`, {
-        placeId: parseInt(placeId.value)
+      await axios.post(`${API_BASE_URL}/api/travel/${props.placeId}/favorite`, {
+        placeId: parseInt(props.placeId)
       });
       isFavorited.value = true;
       favoriteCount.value += 1;
@@ -496,7 +512,7 @@ const submitReview = async () => {
     reviewSubmitting.value = true;
     
     await axios.post(`${API_BASE_URL}/api/reviews`, {
-      placeId: parseInt(placeId.value),
+      placeId: parseInt(props.placeId),
       rating: newReview.value.rating,
       content: newReview.value.content.trim()
     });

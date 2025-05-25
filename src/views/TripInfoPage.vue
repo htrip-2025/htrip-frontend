@@ -94,9 +94,10 @@
         <!-- 여행지 리스트 -->
         <div class="place-list" v-else>
           <div 
-            v-for="place in places" 
+            v-for="place in paginatedPlaces" 
             :key="place.placeId" 
             class="place-card"
+            @click="navigateToDetail(place.placeId)"
           >
             <div class="place-image">
               <img 
@@ -165,7 +166,10 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
+
+const router = useRouter();
 
 // API 기본 URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -204,6 +208,19 @@ const filteredSigungus = computed(() => {
   if (!selectedAreaCode.value) return [];
   return sigungus.value.filter(sigungu => sigungu.areaCode === parseInt(selectedAreaCode.value));
 });
+
+// 페이지네이션된 여행지 목록 - 이 부분이 없어서 오류가 발생했습니다
+const paginatedPlaces = computed(() => {
+  return places.value;
+});
+
+// 여행지 상세 페이지로 이동하는 함수
+const navigateToDetail = (placeId) => {
+  router.push({
+    path: '/tripdetail',
+    query: { id: placeId }
+  });
+};
 
 // API 호출 함수들
 async function fetchAreas() {
@@ -276,6 +293,7 @@ async function fetchPlaces() {
     console.error('여행지 API 호출 실패:', error.message);
     places.value = [];
     totalElements.value = 0;
+    error.value = '여행지 정보를 불러오는 중 오류가 발생했습니다.';
   } finally {
     isLoading.value = false;
   }
@@ -368,6 +386,7 @@ watch(currentPage, () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 </script>
+
 
 <style scoped>
 /* 기본 스타일 */

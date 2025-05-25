@@ -74,10 +74,11 @@ const router = createRouter({
       component: TripPlanMainPage,
     },
     {
-      path: '/tripdetail',
-      name: 'tripdetail',
-      component: TripDetail,
-    }
+  path: '/tripdetail',
+  name: 'tripdetail',
+  component: TripDetail,
+  props: (route) => ({ placeId: route.query.id })
+}
   ],
 })
 
