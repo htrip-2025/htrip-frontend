@@ -594,7 +594,6 @@ const getRatingText = (rating) => {
   return texts[rating] || '';
 };
 
-// 리뷰 관련 함수들
 const submitReview = async () => {
   if (!isLoggedIn.value) {
     alert('로그인이 필요합니다.');
@@ -615,9 +614,22 @@ const submitReview = async () => {
       content: newReview.value.content.trim()
     };
     
-    await axios.post(`${API_BASE_URL}/api/reviews`, reviewRequest);
+    const response = await axios.post(`${API_BASE_URL}/api/reviews`, reviewRequest);
     
-    await fetchReviews(1);
+    // 새로 작성한 리뷰를 즉시 리뷰 목록에 추가
+    const newReviewData = {
+      reviewId: response.data.reviewId || Date.now(), // API 응답에서 reviewId 가져오거나 임시 ID 사용
+      userId: currentUser.value.userId,
+      userName: currentUser.value.name || currentUser.value.nickname,
+      rating: newReview.value.rating,
+      content: newReview.value.content.trim(),
+      createDate: new Date().toISOString(),
+      imageUrl: null
+    };
+    
+    // 리뷰 목록 맨 앞에 새 리뷰 추가
+    reviews.value.unshift(newReviewData);
+    
     await fetchReviewStats();
     
     newReview.value = { rating: 0, content: '' };
