@@ -87,14 +87,29 @@
       </section>
 
       <!-- 지도 섹션 -->
-      <section class="map-section" v-if="tripDetail.mapX && tripDetail.mapY">
+      <section class="map-section" v-if="hasValidCoordinates">
         <h2 class="section-title">위치</h2>
         <div class="map-container" ref="mapContainer" id="trip-detail-map">
-          <div class="map-loading" v-if="mapLoading || mapError">
-            <div class="loading-spinner" v-if="mapLoading"></div>
-            <p>{{ mapError || '지도를 불러오는 중...' }}</p>
-            <button v-if="mapError" @click="initializeMap" class="retry-btn">다시 시도</button>
+          <div class="map-loading" v-if="mapLoading">
+            <div class="loading-spinner"></div>
+            <p>지도를 불러오는 중...</p>
           </div>
+          <div class="map-error" v-else-if="mapError">
+            <p>{{ mapError }}</p>
+            <button @click="initializeMap" class="retry-btn">다시 시도</button>
+          </div>
+          <div v-else-if="!mapLoaded" class="map-placeholder">
+            <p>지도를 준비하는 중...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 위치 정보가 없는 경우 -->
+      <section v-else class="map-section">
+        <h2 class="section-title">위치</h2>
+        <div class="no-location-info">
+          <p>📍 이 여행지의 위치 정보가 없습니다</p>
+          <small>{{ tripDetail.address1 }} {{ tripDetail.address2 || '' }}</small>
         </div>
       </section>
 
@@ -302,6 +317,7 @@ const mapLoading = ref(false);
 const mapError = ref('');
 const kakaoMap = ref(null);
 const mapLoaded = ref(false);
+const kakaoLoaded = ref(false);
 
 // 리뷰 관련
 const reviews = ref([]);
@@ -333,6 +349,14 @@ const currentUser = ref(null);
 axios.defaults.withCredentials = true;
 
 // 계산된 속성
+const hasValidCoordinates = computed(() => {
+  return tripDetail.value && 
+         tripDetail.value.longitude && 
+         tripDetail.value.latitude && 
+         !isNaN(parseFloat(tripDetail.value.longitude)) && 
+         !isNaN(parseFloat(tripDetail.value.latitude));
+});
+
 const visibleReviewPages = computed(() => {
   const start = Math.max(1, currentReviewPage.value - 2);
   const end = Math.min(totalReviewPages.value, start + 4);
@@ -349,15 +373,28 @@ const fetchTripDetail = async () => {
     isLoading.value = true;
     error.value = '';
     
+    console.log('여행지 정보 요청:', props.placeId);
+    
     const response = await axios.get(`${API_BASE_URL}/api/travel/${props.placeId}`);
     tripDetail.value = response.data;
     
+    console.log('여행지 정보 응답:', tripDetail.value);
+    console.log('좌표 정보:', {
+      longitude: tripDetail.value.longitude,
+      latitude: tripDetail.value.latitude
+    });
+    
     // 지도 초기화
-    if (tripDetail.value.mapX && tripDetail.value.mapY) {
+    if (hasValidCoordinates.value) {
       await nextTick();
       setTimeout(() => {
         initializeMap();
-      }, 100);
+      }, 500);
+    } else {
+      console.warn('유효한 좌표 정보가 없습니다:', {
+        longitude: tripDetail.value.longitude,
+        latitude: tripDetail.value.latitude
+      });
     }
     
   } catch (err) {
@@ -459,13 +496,29 @@ const checkLoginStatus = async () => {
 // 지도 초기화 함수들
 const loadKakaoMapScript = () => {
   return new Promise((resolve, reject) => {
+    console.log('카카오 지도 스크립트 로드 시작');
+    
     if (!KAKAO_MAP_API_KEY) {
-      reject(new Error('카카오 지도 API 키가 설정되지 않았습니다.'));
+      const error = '카카오 지도 API 키가 설정되지 않았습니다.';
+      console.error(error);
+      reject(new Error(error));
       return;
     }
 
-    if (window.kakao && window.kakao.maps) {
+    if (window.kakao && window.kakao.maps && kakaoLoaded.value) {
+      console.log('카카오 지도 이미 로드됨');
       resolve();
+      return;
+    }
+
+    // 기존 스크립트 확인
+    const existingScript = document.querySelector('script[src*="dapi.kakao.com"]');
+    if (existingScript && window.kakao && window.kakao.maps) {
+      console.log('기존 카카오 지도 스크립트 발견');
+      window.kakao.maps.load(() => {
+        kakaoLoaded.value = true;
+        resolve();
+      });
       return;
     }
 
@@ -474,16 +527,22 @@ const loadKakaoMapScript = () => {
     script.async = true;
     
     script.onload = () => {
+      console.log('카카오 지도 스크립트 로드 완료');
       if (window.kakao && window.kakao.maps) {
         window.kakao.maps.load(() => {
+          console.log('카카오 지도 API 초기화 완료');
+          kakaoLoaded.value = true;
           resolve();
         });
       } else {
-        reject(new Error('카카오 지도 객체를 찾을 수 없습니다.'));
+        const error = '카카오 지도 객체를 찾을 수 없습니다.';
+        console.error(error);
+        reject(new Error(error));
       }
     };
     
-    script.onerror = () => {
+    script.onerror = (error) => {
+      console.error('카카오 지도 스크립트 로드 실패:', error);
       reject(new Error('카카오 지도 스크립트 로드 실패'));
     };
     
@@ -496,33 +555,62 @@ const initializeMap = async () => {
     mapLoading.value = true;
     mapError.value = '';
     
+    console.log('지도 초기화 시작');
+    console.log('좌표 정보:', {
+      longitude: tripDetail.value.longitude,
+      latitude: tripDetail.value.latitude
+    });
+    
+    // 좌표 유효성 검사
+    if (!hasValidCoordinates.value) {
+      throw new Error('유효한 좌표 정보가 없습니다.');
+    }
+    
+    // 카카오 지도 스크립트 로드
     await loadKakaoMapScript();
     
-    if (!mapContainer.value || !tripDetail.value) {
-      throw new Error('지도 컨테이너 또는 여행지 정보가 없습니다.');
+    // DOM 요소 확인
+    if (!mapContainer.value) {
+      throw new Error('지도 컨테이너를 찾을 수 없습니다.');
     }
 
+    console.log('지도 컨테이너 확인:', mapContainer.value);
+
+    // 카카오 지도 API 확인
+    if (!window.kakao || !window.kakao.maps || !window.kakao.maps.Map) {
+      throw new Error('카카오 지도 API가 준비되지 않았습니다.');
+    }
+
+    // 기존 지도 정리
+    if (kakaoMap.value) {
+      kakaoMap.value = null;
+    }
+
+    const longitude = parseFloat(tripDetail.value.longitude);
+    const latitude = parseFloat(tripDetail.value.latitude);
+    
+    console.log('지도 중심 좌표:', { latitude, longitude });
+
+    // 지도 옵션 설정
     const mapOption = {
-      center: new window.kakao.maps.LatLng(
-        parseFloat(tripDetail.value.mapY), 
-        parseFloat(tripDetail.value.mapX)
-      ),
+      center: new window.kakao.maps.LatLng(latitude, longitude),
       level: 4
     };
 
+    // 지도 생성
     kakaoMap.value = new window.kakao.maps.Map(mapContainer.value, mapOption);
+    console.log('카카오 지도 생성 완료');
     
-    const markerPosition = new window.kakao.maps.LatLng(
-      parseFloat(tripDetail.value.mapY), 
-      parseFloat(tripDetail.value.mapX)
-    );
-    
+    // 마커 생성
+    const markerPosition = new window.kakao.maps.LatLng(latitude, longitude);
     const marker = new window.kakao.maps.Marker({
       position: markerPosition
     });
     
     marker.setMap(kakaoMap.value);
+    console.log('마커 생성 완료');
     
+    // 인포윈도우 생성
     const infowindow = new window.kakao.maps.InfoWindow({
       content: `<div class="map-info-window">
                   <div class="info-title">${tripDetail.value.title}</div>
@@ -530,15 +618,18 @@ const initializeMap = async () => {
                 </div>`
     });
     
+    // 마커 클릭 이벤트
     window.kakao.maps.event.addListener(marker, 'click', () => {
       infowindow.open(kakaoMap.value, marker);
     });
     
     mapLoaded.value = true;
+    console.log('지도 초기화 완료');
     
   } catch (error) {
     console.error('지도 초기화 실패:', error);
     mapError.value = error.message || '지도를 불러오는 중 오류가 발생했습니다.';
+    mapLoaded.value = false;
   } finally {
     mapLoading.value = false;
   }
@@ -618,7 +709,7 @@ const submitReview = async () => {
     
     // 새로 작성한 리뷰를 즉시 리뷰 목록에 추가
     const newReviewData = {
-      reviewId: response.data.reviewId || Date.now(), // API 응답에서 reviewId 가져오거나 임시 ID 사용
+      reviewId: response.data.reviewId || Date.now(),
       userId: currentUser.value.userId,
       userName: currentUser.value.name || currentUser.value.nickname,
       rating: newReview.value.rating,
@@ -627,7 +718,6 @@ const submitReview = async () => {
       imageUrl: null
     };
     
-    // 리뷰 목록 맨 앞에 새 리뷰 추가
     reviews.value.unshift(newReviewData);
     
     await fetchReviewStats();
@@ -747,6 +837,9 @@ const formatDate = (dateString) => {
 
 // 컴포넌트 마운트
 onMounted(async () => {
+  console.log('TripDetail 컴포넌트 마운트 시작');
+  console.log('placeId:', props.placeId);
+  
   await checkLoginStatus();
   await fetchTripDetail();
   await fetchFavoriteInfo();
@@ -756,9 +849,11 @@ onMounted(async () => {
 
 // 컴포넌트 언마운트 시 정리
 onUnmounted(() => {
+  console.log('TripDetail 컴포넌트 언마운트');
   if (kakaoMap.value) {
     kakaoMap.value = null;
   }
+  kakaoLoaded.value = false;
 });
 </script>
 
@@ -815,7 +910,7 @@ onUnmounted(() => {
   margin-bottom: 2rem;
 }
 
-.retry-button {
+.retry-button, .retry-btn {
   margin-top: 1rem;
   padding: 0.8rem 1.5rem;
   background-color: #9581e8;
@@ -824,6 +919,10 @@ onUnmounted(() => {
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
+}
+
+.retry-button:hover, .retry-btn:hover {
+  background-color: #8470d7;
 }
 
 /* 그라데이션 원형들 */
@@ -1010,14 +1109,15 @@ onUnmounted(() => {
   overflow: hidden;
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #f5f5f5;
 }
 
 #trip-detail-map {
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
 }
 
-.map-loading {
+.map-loading, .map-error, .map-placeholder {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1033,15 +1133,21 @@ onUnmounted(() => {
   text-align: center;
 }
 
-.retry-btn {
-  margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
-  background-color: #9581e8;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
+.no-location-info {
+  text-align: center;
+  padding: 3rem;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  color: #666;
+}
+
+.no-location-info p {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.no-location-info small {
+  color: #999;
 }
 
 /* 리뷰 섹션 */
