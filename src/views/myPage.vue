@@ -756,7 +756,7 @@ const fetchDashboard = async () => {
      recentWishlists.value = data.recentFavorites.content.map(favorite => ({
        id: favorite.favoriteNo,
        title: favorite.attraction.title,
-       image: favorite.attraction.firstImageUrl || 'https://via.placeholder.com/150'
+       image: favorite.attraction.firstImageUrl || 'https://placehold.co/300x200?text=No+Image'
      }));
    }
    
@@ -767,7 +767,7 @@ const fetchDashboard = async () => {
        placeName: review.placeName,
        content: review.content,
        date: formatDate(review.createDate),
-       image: review.imageUrl || 'https://via.placeholder.com/150'
+       image: review.imageUrl || 'https://placehold.co/300x200?text=No+Image'
      }));
    }
    
@@ -807,7 +807,7 @@ const fetchWishlists = async () => {
      id: favorite.favoriteNo,
      title: favorite.attraction.title,
      location: favorite.attraction.address1 || '주소 정보 없음',
-     image: favorite.attraction.firstImageUrl || 'https://via.placeholder.com/150'
+     image: favorite.attraction.firstImageUrl || 'https://placehold.co/300x200?text=No+Image'
    }));
    
    totalPages.value.wishlists = data.totalPages;
@@ -859,7 +859,7 @@ const determineStatus = (startDate, endDate) => {
 // 리뷰 조회
 const fetchReviews = async () => {
  try {
-   let url = `/api/reviews/my?page=${currentPage.value.reviews - 1}&size=${itemsPerPage}`;
+   let url = `/api/review/my?page=${currentPage.value.reviews - 1}&size=${itemsPerPage}`;
    if (searchTerms.value.reviews) {
      url += `&keyword=${encodeURIComponent(searchTerms.value.reviews)}`;
    }
@@ -872,7 +872,7 @@ const fetchReviews = async () => {
      placeName: review.placeName,
      content: review.content,
      date: formatDate(review.createDate),
-     image: review.imageUrl || 'https://via.placeholder.com/150'
+     image: review.imageUrl || 'https://placehold.co/300x200?text=No+Image'
    }));
    
    totalPages.value.reviews = data.totalPages;
@@ -913,7 +913,7 @@ const fetchPosts = async () => {
 // 댓글 조회
 const fetchComments = async () => {
  try {
-   let url = `/api/comment/my?page=${currentPage.value.comments - 1}&size=${itemsPerPage}S`;
+   let url = `/api/comment/my?page=${currentPage.value.comments - 1}&size=${itemsPerPage}`;
    if (searchTerms.value.comments) {
      url += `&keyword=${encodeURIComponent(searchTerms.value.comments)}`;
    }

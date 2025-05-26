@@ -108,13 +108,35 @@
                 </option>
               </select>
             </div>
-
+          </div>
+          
+          <div class="filter-row">
             <div class="filter-group">
-              <label>카테고리</label>
-              <select v-model="selectedCategory" @change="onCategoryChange" class="filter-select">
-                <option value="">전체 카테고리</option>
-                <option v-for="category in categories" :key="category.code" :value="category.code">
-                  {{ category.name }}
+              <label>여행 테마</label>
+              <select v-model="selectedMainCategory" @change="onMainCategoryChange" class="filter-select">
+                <option value="">전체 테마</option>
+                <option v-for="category in categories" :key="category.category" :value="category.category">
+                  {{ category.categoryName }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label>세부 분류</label>
+              <select v-model="selectedMiddleCategory" @change="onMiddleCategoryChange" class="filter-select" :disabled="!selectedMainCategory">
+                <option value="">전체</option>
+                <option v-for="category in middleCategories" :key="category.category" :value="category.category">
+                  {{ category.categoryName }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label>상세 구분</label>
+              <select v-model="selectedSubCategory" @change="onSubCategoryChange" class="filter-select" :disabled="!selectedMiddleCategory">
+                <option value="">전체</option>
+                <option v-for="category in subCategories" :key="category.category" :value="category.category">
+                  {{ category.categoryName }}
                 </option>
               </select>
             </div>
@@ -214,14 +236,15 @@ const selectedCategory = ref('');
 const areas = ref([]);
 const sigungus = ref([]);
 
-// 카테고리 정의
-const categories = ref([
-  { code: 'A01', name: '자연' },
-  { code: 'A02', name: '인문(문화/예술/역사)' },
-  { code: 'A03', name: '레포츠' },
-  { code: 'A04', name: '쇼핑' },
-  { code: 'A05', name: '음식' }
-]);
+// 카테고리 관련 상태
+const categories = ref([]);
+const middleCategories = ref([]);
+const subCategories = ref([]);
+
+// 선택된 카테고리 상태
+const selectedMainCategory = ref('');
+const selectedMiddleCategory = ref('');
+const selectedSubCategory = ref('');
 
 // 날짜별 선택된 장소들
 const selectedPlaces = ref([]);
@@ -530,7 +553,7 @@ async function fetchAreas() {
     const response = await axios.get(`${API_BASE_URL}/api/region`);
     areas.value = response.data;
   } catch (error) {
-    console.error('지역 API 호출 실패:', error);
+    console.error('지역 API 호출 실패:', error.message);
     // 기본 지역 데이터 설정
     areas.value = [
       { areaCode: 1, name: '서울' },
@@ -549,12 +572,65 @@ async function fetchSigungus() {
         const response = await axios.get(`${API_BASE_URL}/api/region/${area.areaCode}/sigungu`);
         allSigungus.push(...response.data);
       } catch (error) {
-        console.warn(`지역 ${area.areaCode} 시군구 API 호출 실패:`, error);
+        console.warn(`지역 ${area.areaCode} 시군구 API 호출 실패:`, error.message);
       }
     }
     sigungus.value = allSigungus;
   } catch (error) {
-    console.error('시군구 API 호출 실패:', error);
+    console.error('시군구 API 호출 실패:', error.message);
+    sigungus.value = [];
+  }
+}
+
+// 카테고리 관련 API 호출
+async function fetchMainCategories() {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/filters/categories/main`);
+    categories.value = response.data;
+  } catch (error) {
+    console.error('대분류 카테고리 API 호출 실패:', error.message);
+    // 기본 카테고리 데이터 설정
+    categories.value = [
+      { category: 'A01', categoryName: '자연' },
+      { category: 'A02', categoryName: '인문(문화/예술/역사)' },
+      { category: 'A03', categoryName: '레포츠' },
+      { category: 'A04', categoryName: '쇼핑' },
+      { category: 'A05', categoryName: '음식' }
+    ];
+  }
+}
+
+async function fetchMiddleCategories(mainCategory) {
+  if (!mainCategory) {
+    middleCategories.value = [];
+    return;
+  }
+  
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/filters/categories/middle`, {
+      params: { mainCategory }
+    });
+    middleCategories.value = response.data;
+  } catch (error) {
+    console.error('중분류 카테고리 API 호출 실패:', error.message);
+    middleCategories.value = [];
+  }
+}
+
+async function fetchSubCategories(middleCategory) {
+  if (!middleCategory) {
+    subCategories.value = [];
+    return;
+  }
+  
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/filters/categories/sub`, {
+      params: { middleCategory }
+    });
+    subCategories.value = response.data;
+  } catch (error) {
+    console.error('소분류 카테고리 API 호출 실패:', error.message);
+    subCategories.value = [];
   }
 }
 
@@ -574,9 +650,21 @@ async function searchPlacesAPI() {
     if (selectedSigunguCode.value) {
       params.sigunguCode = selectedSigunguCode.value;
     }
-    if (selectedCategory.value) {
-      params.category1 = selectedCategory.value;
+    
+    // 가장 구체적인 카테고리 코드 사용
+    let categoryCode = null;
+    if (selectedSubCategory.value) {
+      categoryCode = selectedSubCategory.value;
+    } else if (selectedMiddleCategory.value) {
+      categoryCode = selectedMiddleCategory.value;
+    } else if (selectedMainCategory.value) {
+      categoryCode = selectedMainCategory.value;
     }
+    
+    if (categoryCode) {
+      params.categoryCode = categoryCode;
+    }
+    
     if (modalSearchQuery.value.trim()) {
       params.keyword = modalSearchQuery.value.trim();
     }
@@ -655,7 +743,7 @@ function selectDay(dayIndex) {
   addMarkersToMap(placesForDay);
 }
 
-// 지역 변경 이벤트
+// 이벤트 핸들러들
 function onAreaChange() {
   selectedSigunguCode.value = '';
   if (hasSearched.value) {
@@ -669,7 +757,25 @@ function onSigunguChange() {
   }
 }
 
-function onCategoryChange() {
+function onMainCategoryChange() {
+  selectedMiddleCategory.value = '';
+  selectedSubCategory.value = '';
+  fetchMiddleCategories(selectedMainCategory.value);
+  
+  if (hasSearched.value) {
+    searchPlacesAPI();
+  }
+}
+
+function onMiddleCategoryChange() {
+  selectedSubCategory.value = '';
+  fetchSubCategories(selectedMiddleCategory.value);
+  
+  if (hasSearched.value) {
+    searchPlacesAPI();
+  }
+}
+function onSubCategoryChange() {
   if (hasSearched.value) {
     searchPlacesAPI();
   }
@@ -677,8 +783,8 @@ function onCategoryChange() {
 
 // 모달에서 검색 함수
 function searchInModal() {
-  if (!modalSearchQuery.value.trim() && !selectedAreaCode.value && !selectedSigunguCode.value && !selectedCategory.value) {
-    alert('검색어를 입력하거나 지역/카테고리를 선택해주세요.');
+  if (!modalSearchQuery.value.trim() && !selectedAreaCode.value && !selectedSigunguCode.value && !selectedMainCategory.value) {
+    alert('검색어를 입력하거나 지역/테마를 선택해주세요.');
     return;
   }
   searchPlacesAPI();
@@ -692,7 +798,13 @@ function openSearchModal() {
   modalSearchQuery.value = '';
   selectedAreaCode.value = '';
   selectedSigunguCode.value = '';
-  selectedCategory.value = '';
+  selectedMainCategory.value = '';
+  selectedMiddleCategory.value = '';
+  selectedSubCategory.value = '';
+  
+  // 카테고리 중분류, 소분류 초기화
+  middleCategories.value = [];
+  subCategories.value = [];
 }
 
 // 장소 추가 모달 닫기
@@ -783,15 +895,35 @@ function handleImageError(event) {
 
 // 카테고리 이름 가져오기
 function getCategoryName(categoryCode) {
+  if (!categoryCode) return '기타';
+  
+  // 메인 카테고리 확인
+  const mainCategory = categories.value.find(c => c.category === categoryCode);
+  if (mainCategory) return mainCategory.categoryName;
+  
+  // 중분류 카테고리 확인
+  const middleCategory = middleCategories.value.find(c => c.category === categoryCode);
+  if (middleCategory) return middleCategory.categoryName;
+  
+  // 소분류 카테고리 확인
+  const subCategory = subCategories.value.find(c => c.category === categoryCode);
+  if (subCategory) return subCategory.categoryName;
+  
+  // 기본 카테고리 맵에서 확인 (fallback)
   const categoryMap = {
     'A01': '자연',
-    'A02': '인문(문화/예술/역사)', 
+    'A02': '인문(문화/예술/역사)',
     'A03': '레포츠',
     'A04': '쇼핑',
     'A05': '음식'
   };
   
-  return categoryMap[categoryCode] || '기타';
+  if (categoryCode && categoryCode.length >= 3) {
+    const mainCode = categoryCode.substring(0, 3);
+    return categoryMap[mainCode] || '기타';
+  }
+  
+  return '기타';
 }
 
 // 컴포넌트 언마운트 시 정리
@@ -818,6 +950,9 @@ onMounted(async () => {
   // 지역 데이터 로드
   await fetchAreas();
   await fetchSigungus();
+  
+  // 카테고리 데이터 로드
+  await fetchMainCategories();
   
   // 지도 초기화는 DOM이 준비된 후 실행
   await nextTick();
@@ -1474,10 +1609,7 @@ watch(selectedDay, (newDay) => {
     min-width: 200px;
   }
 }
-</style>
 
-<!-- 지도 마커 및 인포윈도우 스타일 추가 -->
-<style>
 .map-marker-number {
   width: 24px;
   height: 24px;
@@ -1511,3 +1643,4 @@ watch(selectedDay, (newDay) => {
   line-height: 1.3;
 }
 </style>
+

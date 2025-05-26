@@ -120,9 +120,6 @@
           <div class="review-stats" v-if="reviewStats.averageRating">
             <div class="rating-display">
               <span class="rating-score">{{ reviewStats.averageRating.toFixed(1) }}</span>
-              <div class="stars">
-                <span v-for="n in 5" :key="n" class="star" :class="{ filled: n <= Math.round(reviewStats.averageRating) }">★</span>
-              </div>
             </div>
           </div>
         </div>
@@ -130,21 +127,7 @@
         <!-- 리뷰 작성 -->
         <div class="review-write" v-if="isLoggedIn && !editingReview">
           <h3>리뷰 작성하기</h3>
-          <div class="rating-input">
-            <span>평점: </span>
-            <div class="star-rating">
-              <span 
-                v-for="n in 5" 
-                :key="n" 
-                class="star-input" 
-                :class="{ active: n <= newReview.rating, empty: n > newReview.rating }"
-                @click="setRating(n)"
-                @mouseover="hoverRating = n"
-                @mouseleave="hoverRating = 0"
-              >★</span>
-            </div>
-            <span class="rating-text">{{ getRatingText(newReview.rating) }}</span>
-          </div>
+
           <textarea 
             v-model="newReview.content" 
             placeholder="이곳에 대한 경험을 공유해주세요..."
@@ -167,19 +150,6 @@
         <!-- 리뷰 수정 폼 -->
         <div class="review-write" v-if="editingReview">
           <h3>리뷰 수정하기</h3>
-          <div class="rating-input">
-            <span>평점: </span>
-            <div class="star-rating">
-              <span 
-                v-for="n in 5" 
-                :key="n" 
-                class="star-input" 
-                :class="{ active: n <= editReview.rating, empty: n > editReview.rating }"
-                @click="setEditRating(n)"
-              >★</span>
-            </div>
-            <span class="rating-text">{{ getRatingText(editReview.rating) }}</span>
-          </div>
           <textarea 
             v-model="editReview.content" 
             placeholder="이곳에 대한 경험을 공유해주세요..."
@@ -231,11 +201,6 @@
                 </div>
               </div>
               <div class="review-rating-and-actions">
-                <div class="review-rating">
-                  <div class="stars">
-                    <span v-for="n in 5" :key="n" class="star" :class="{ filled: n <= review.rating, empty: n > review.rating }">★</span>
-                  </div>
-                </div>
                 <!-- 내가 작성한 리뷰인 경우 수정/삭제 버튼 표시 -->
                 <div v-if="isMyReview(review)" class="review-actions-btns">
                   <button @click="startEditReview(review)" class="edit-review-btn">수정</button>
@@ -327,17 +292,15 @@ const currentReviewPage = ref(1);
 const totalReviewPages = ref(1);
 const reviewsPerPage = ref(10);
 const newReview = ref({
-  rating: 0,
   content: ''
 });
 const reviewSubmitting = ref(false);
-const hoverRating = ref(0);
+// const hoverRating = ref(0);
 
 // 리뷰 수정 관련
 const editingReview = ref(null);
 const editReview = ref({
   reviewId: null,
-  rating: 0,
   content: ''
 });
 
@@ -438,7 +401,7 @@ const fetchReviews = async (page = 1) => {
     reviewsLoading.value = true;
     
     const response = await axios.get(
-      `${API_BASE_URL}/api/reviews/place/${props.placeId}`,
+      `${API_BASE_URL}/api/review/place/${props.placeId}`,
       { 
         params: {
           page: page - 1,
@@ -460,7 +423,7 @@ const fetchReviews = async (page = 1) => {
 
 const fetchReviewStats = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/reviews/place/${props.placeId}/stats`);
+    const response = await axios.get(`${API_BASE_URL}/api/review/place/${props.placeId}/stats`);
     reviewStats.value = response.data;
   } catch (err) {
     console.error('리뷰 통계 조회 실패:', err);
@@ -664,27 +627,6 @@ const toggleFavorite = async () => {
   }
 };
 
-// 별점 관련 함수들
-const setRating = (rating) => {
-  newReview.value.rating = rating;
-};
-
-const setEditRating = (rating) => {
-  editReview.value.rating = rating;
-};
-
-const getRatingText = (rating) => {
-  const texts = {
-    0: '',
-    1: '별로예요',
-    2: '그저 그래요',
-    3: '보통이에요',
-    4: '좋아요',
-    5: '최고예요!'
-  };
-  return texts[rating] || '';
-};
-
 const submitReview = async () => {
   if (!isLoggedIn.value) {
     alert('로그인이 필요합니다.');
@@ -692,7 +634,7 @@ const submitReview = async () => {
   }
   
   if (!newReview.value.content.trim() || newReview.value.rating === 0) {
-    alert('평점과 리뷰 내용을 모두 입력해주세요.');
+    alert('리뷰 내용을 모두 입력해주세요.');
     return;
   }
   
@@ -705,7 +647,7 @@ const submitReview = async () => {
       content: newReview.value.content.trim()
     };
     
-    const response = await axios.post(`${API_BASE_URL}/api/reviews`, reviewRequest);
+    const response = await axios.post(`${API_BASE_URL}/api/review`, reviewRequest);
     
     // 새로 작성한 리뷰를 즉시 리뷰 목록에 추가
     const newReviewData = {
@@ -742,7 +684,6 @@ const startEditReview = (review) => {
   editingReview.value = review;
   editReview.value = {
     reviewId: review.reviewId,
-    rating: review.rating,
     content: review.content
   };
 };
@@ -751,14 +692,13 @@ const cancelEdit = () => {
   editingReview.value = null;
   editReview.value = {
     reviewId: null,
-    rating: 0,
     content: ''
   };
 };
 
 const updateReview = async () => {
   if (!editReview.value.content.trim() || editReview.value.rating === 0) {
-    alert('평점과 리뷰 내용을 모두 입력해주세요.');
+    alert('리뷰 내용을 모두 입력해주세요.');
     return;
   }
   
@@ -770,7 +710,7 @@ const updateReview = async () => {
       content: editReview.value.content.trim()
     };
     
-    await axios.put(`${API_BASE_URL}/api/reviews/${editReview.value.reviewId}`, updateRequest);
+    await axios.put(`${API_BASE_URL}/api/review/${editReview.value.reviewId}`, updateRequest);
     
     await fetchReviews(currentReviewPage.value);
     await fetchReviewStats();
@@ -793,7 +733,7 @@ const deleteReview = async (reviewId) => {
   }
   
   try {
-    await axios.delete(`${API_BASE_URL}/api/reviews/${reviewId}`);
+    await axios.delete(`${API_BASE_URL}/api/review/${reviewId}`);
     
     await fetchReviews(currentReviewPage.value);
     await fetchReviewStats();
@@ -1183,26 +1123,6 @@ onUnmounted(() => {
   color: #9581e8;
 }
 
-.stars {
-  display: flex;
-  gap: 0.1rem;
-}
-
-.star {
-  font-size: 1rem;
-  color: #ddd;
-}
-
-.star.filled {
-  color: #ffc107;
-}
-
-.star.empty {
-  color: #ddd;
-  text-stroke: 1px #ccc;
-  -webkit-text-stroke: 1px #ccc;
-}
-
 /* 리뷰 작성 */
 .review-write {
   background-color: #f8f9fa;
@@ -1214,51 +1134,6 @@ onUnmounted(() => {
 .review-write h3 {
   margin-bottom: 1rem;
   color: #333;
-}
-
-.rating-input {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.star-rating {
-  display: flex;
-  gap: 0.2rem;
-}
-
-.star-input {
-  font-size: 1.5rem;
-  color: #ddd;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-stroke: 1px #ccc;
-  -webkit-text-stroke: 1px #ccc;
-}
-
-.star-input:hover {
-  color: #ffed4e;
-  transform: scale(1.1);
-}
-
-.star-input.active {
-  color: #ffc107;
-  text-stroke: none;
-  -webkit-text-stroke: none;
-}
-
-.star-input.empty {
-  color: #ddd;
-  text-stroke: 1px #ccc;
-  -webkit-text-stroke: 1px #ccc;
-}
-
-.rating-text {
-  font-size: 0.9rem;
-  color: #9581e8;
-  font-weight: 500;
-  margin-left: 0.5rem;
 }
 
 .review-textarea {
@@ -1405,13 +1280,6 @@ onUnmounted(() => {
 .review-date {
   font-size: 0.85rem;
   color: #666;
-}
-
-.review-rating-and-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
 }
 
 .review-actions-btns {
