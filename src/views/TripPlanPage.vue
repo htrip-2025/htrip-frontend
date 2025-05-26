@@ -344,7 +344,6 @@ const checkLoginStatus = async () => {
   }
 };
 
-// 여행 계획 저장
 const saveTripPlan = async () => {
   if (!canSave.value) {
     alert('여행 계획을 저장하려면 로그인이 필요하고, 제목, 날짜, 그리고 최소 하나의 장소가 필요합니다.');
@@ -359,41 +358,53 @@ const saveTripPlan = async () => {
       title: tripTitle.value.trim(),
       startDate: startDate.value,
       endDate: endDate.value,
-      isPublic: isPublic.value
+      isPublic: isPublic.value  // 백엔드에서 @JsonProperty("isPublic")로 처리됨
     };
 
     console.log('여행 계획 생성 요청:', planRequest);
     const planResponse = await axios.post(`${API_BASE_URL}/api/plan`, planRequest);
     const planId = planResponse.data.planId;
+    const planDays = planResponse.data.days || [];
     
     console.log('여행 계획 생성 완료, planId:', planId);
+    console.log('생성된 days:', planDays);
 
-    // 2. 각 날짜별로 day 생성 및 장소 추가
+    // 2. 각 날짜별로 아이템 추가
     for (let dayIndex = 0; dayIndex < selectedPlaces.value.length; dayIndex++) {
       const dayPlaces = selectedPlaces.value[dayIndex];
       
       if (dayPlaces.length === 0) continue;
 
+      // 백엔드에서 생성된 day 정보 찾기
+      const dayId = planDays[dayIndex]?.dayId;
+      
+      if (!dayId) {
+        console.error(`Day ${dayIndex + 1}의 dayId를 찾을 수 없습니다.`);
+        continue;
+      }
+
       // 장소들을 순서대로 추가
       for (let sequence = 0; sequence < dayPlaces.length; sequence++) {
         const place = dayPlaces[sequence];
         
+        // CreatePlanItemRequest 형식에 맞춤
         const itemRequest = {
-          dayId: null, // 백엔드에서 처리
+          // dayId는 URL 경로에 포함되어 있어 여기서는 생략해도 됩니다
+          // 백엔드에서 request.setDayId(dayId)로 설정됨
           placeId: place.placeId,
           sequence: sequence + 1,
-          startTime: null,
+          startTime: null,  // 시간 정보가 있다면 "HH:MM:SS" 형식으로 전송
           endTime: null,
           memo: null
         };
 
-        console.log(`Day ${dayIndex + 1}, 장소 ${sequence + 1} 추가:`, itemRequest);
+        console.log(`Day ${dayIndex + 1}(dayId: ${dayId}), 장소 ${sequence + 1} 추가:`, itemRequest);
         
         try {
-          // 임시로 dayId를 1로 설정 (백엔드에서 실제 처리)
-          await axios.post(`${API_BASE_URL}/api/plan/${planId}/day/${dayIndex + 1}/item`, itemRequest);
+          await axios.post(`${API_BASE_URL}/api/plan/${planId}/day/${dayId}/item`, itemRequest);
         } catch (itemError) {
           console.error(`장소 추가 실패 (Day ${dayIndex + 1}, 장소 ${sequence + 1}):`, itemError);
+          console.error('에러 상세:', itemError.response?.data || itemError.message);
         }
       }
     }
@@ -406,18 +417,17 @@ const saveTripPlan = async () => {
 
   } catch (error) {
     console.error('여행 계획 저장 실패:', error);
+    console.error('에러 상세:', error.response?.data || error.message);
     
     // 저장 실패
     saveSuccess.value = false;
     saveModalTitle.value = '저장 실패';
-
-
-    
     
     if (error.response?.status === 401) {
       saveModalMessage.value = '로그인이 필요합니다. 다시 로그인해주세요.';
     } else if (error.response?.status === 400) {
-      saveModalMessage.value = '입력 정보를 확인해주세요.';
+      saveModalMessage.value = '입력 정보를 확인해주세요: ' + 
+        (error.response?.data?.message || '잘못된 형식의 데이터입니다.');
     } else {
       saveModalMessage.value = '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
     }
