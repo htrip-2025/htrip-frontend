@@ -1,13 +1,5 @@
 <template>
   <div class="info-container">
-    <!-- 배경 그라데이션 원형들 -->
-    <div class="gradient-circle circle1"></div>
-    <div class="gradient-circle circle2"></div>
-    <div class="gradient-circle circle3"></div>
-    <div class="gradient-circle circle4"></div>
-    <div class="gradient-circle circle5"></div>
-    <div class="gradient-circle circle6"></div>
-    <div class="gradient-circle circle7"></div>
 
     <!-- 메인 콘텐츠 -->
     <section class="main-content">
@@ -25,65 +17,110 @@
 
       <!-- 메인 콘텐츠 -->
       <div v-if="!isLoading && !error">
-        <!-- 페이지 제목 -->
-        <div class="page-title-section">
-          <h1 class="page-title">여행 정보</h1>
-          <p class="page-subtitle">국내 여행지를 찾아보세요</p>
-        </div>
 
-        <!-- 지역 선택 필터 -->
+        <!-- 필터 섹션 -->
         <div class="filter-section">
-          <div class="filter-group">
-            <label for="area-select">지역 선택</label>
-            <select 
-              id="area-select" 
-              v-model="selectedAreaCode" 
-              @change="onAreaChange"
-              class="filter-select"
-            >
-              <option value="">전체 지역</option>
-              <option v-for="area in areas" :key="area.areaCode" :value="area.areaCode">
-                {{ area.name }}
-              </option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label for="sigungu-select">시/군/구 선택</label>
-            <select 
-              id="sigungu-select" 
-              v-model="selectedSigunguCode"
-              @change="onSigunguChange"
-              class="filter-select"
-              :disabled="!selectedAreaCode"
-            >
-              <option value="">전체 시/군/구</option>
-              <option v-for="sigungu in filteredSigungus" :key="sigungu.sigunguCode" :value="sigungu.sigunguCode">
-                {{ sigungu.name }}
-              </option>
-            </select>
-          </div>
-
-          <!-- 검색 입력 -->
-          <div class="filter-group">
-            <label for="search-input">검색</label>
-            <div class="search-input-group">
-              <input 
-                id="search-input"
-                type="text" 
-                v-model="searchKeyword" 
-                @input="onSearchInput"
-                placeholder="여행지명 검색..."
-                class="filter-select"
+          <!-- 지역 및 카테고리 필터 -->
+          <div class="filter-row">
+            <div class="filter-group">
+              <label for="area-select">지역</label>
+              <select 
+                id="area-select" 
+                v-model="selectedAreaCode" 
+                @change="onAreaChange"
+                class="filter-select-small"
               >
-              <button @click="searchPlaces" class="search-button">검색</button>
+                <option value="">전체 지역</option>
+                <option v-for="area in areas" :key="area.areaCode" :value="area.areaCode">
+                  {{ area.name }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="sigungu-select">시/군/구</label>
+              <select 
+                id="sigungu-select" 
+                v-model="selectedSigunguCode"
+                @change="onSigunguChange"
+                class="filter-select-small"
+                :disabled="!selectedAreaCode"
+              >
+                <option value="">전체</option>
+                <option v-for="sigungu in filteredSigungus" :key="sigungu.sigunguCode" :value="sigungu.sigunguCode">
+                  {{ sigungu.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="main-category-select">여행테마</label>
+              <select 
+                id="main-category-select"
+                v-model="selectedMainCategory" 
+                @change="onMainCategoryChange"
+                class="filter-select-small"
+              >
+                <option value="">전체 테마</option>
+                <option v-for="category in categories" :key="category.category" :value="category.category">
+                  {{ category.categoryName }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="middle-category-select">세부분류</label>
+              <select 
+                id="middle-category-select"
+                v-model="selectedMiddleCategory" 
+                @change="onMiddleCategoryChange"
+                class="filter-select-small"
+                :disabled="!selectedMainCategory"
+              >
+                <option value="">전체</option>
+                <option v-for="category in middleCategories" :key="category.category" :value="category.category">
+                  {{ category.categoryName }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="sub-category-select">상세구분</label>
+              <select 
+                id="sub-category-select"
+                v-model="selectedSubCategory" 
+                @change="onSubCategoryChange"
+                class="filter-select-small"
+                :disabled="!selectedMiddleCategory"
+              >
+                <option value="">전체</option>
+                <option v-for="category in subCategories" :key="category.category" :value="category.category">
+                  {{ category.categoryName }}
+                </option>
+              </select>
+            </div>
+
+            <!-- 검색 입력 -->
+            <div class="filter-group search-group">
+              <label for="search-input">검색</label>
+              <div class="search-input-group">
+                <input 
+                  id="search-input"
+                  type="text" 
+                  v-model="searchKeyword" 
+                  @input="onSearchInput"
+                  placeholder="여행지명 검색..."
+                  class="filter-select-small"
+                >
+                <button @click="searchPlaces" class="search-button">검색</button>
+              </div>
             </div>
           </div>
         </div>
         
         <!-- 검색 결과 없음 -->
         <div v-if="places.length === 0 && !isLoading" class="no-results">
-          <p v-if="selectedAreaCode || selectedSigunguCode || searchKeyword">
+          <p v-if="hasSearchConditions">
             검색 조건에 맞는 여행지가 없습니다.
           </p>
           <p v-else>
@@ -181,6 +218,14 @@ const searchKeyword = ref('');
 const isLoading = ref(false);
 const error = ref('');
 
+// 카테고리 관련 상태
+const categories = ref([]);
+const middleCategories = ref([]);
+const subCategories = ref([]);
+const selectedMainCategory = ref('');
+const selectedMiddleCategory = ref('');
+const selectedSubCategory = ref('');
+
 // 데이터
 const areas = ref([]);
 const sigungus = ref([]);
@@ -209,9 +254,17 @@ const filteredSigungus = computed(() => {
   return sigungus.value.filter(sigungu => sigungu.areaCode === parseInt(selectedAreaCode.value));
 });
 
-// 페이지네이션된 여행지 목록 - 이 부분이 없어서 오류가 발생했습니다
 const paginatedPlaces = computed(() => {
   return places.value;
+});
+
+const hasSearchConditions = computed(() => {
+  return selectedAreaCode.value || 
+         selectedSigunguCode.value || 
+         selectedMainCategory.value ||
+         selectedMiddleCategory.value ||
+         selectedSubCategory.value ||
+         searchKeyword.value.trim();
 });
 
 // 여행지 상세 페이지로 이동하는 함수
@@ -257,6 +310,58 @@ async function fetchSigungus() {
   }
 }
 
+// 카테고리 관련 API 호출
+async function fetchMainCategories() {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/filters/categories/main`);
+    categories.value = response.data;
+  } catch (error) {
+    console.error('대분류 카테고리 API 호출 실패:', error.message);
+    // 기본 카테고리 데이터 설정
+    categories.value = [
+      { category: 'A01', categoryName: '자연' },
+      { category: 'A02', categoryName: '인문(문화/예술/역사)' },
+      { category: 'A03', categoryName: '레포츠' },
+      { category: 'A04', categoryName: '쇼핑' },
+      { category: 'A05', categoryName: '음식' }
+    ];
+  }
+}
+
+async function fetchMiddleCategories(mainCategory) {
+  if (!mainCategory) {
+    middleCategories.value = [];
+    return;
+  }
+  
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/filters/categories/middle`, {
+      params: { mainCategory }
+    });
+    middleCategories.value = response.data;
+  } catch (error) {
+    console.error('중분류 카테고리 API 호출 실패:', error.message);
+    middleCategories.value = [];
+  }
+}
+
+async function fetchSubCategories(middleCategory) {
+  if (!middleCategory) {
+    subCategories.value = [];
+    return;
+  }
+  
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/filters/categories/sub`, {
+      params: { middleCategory }
+    });
+    subCategories.value = response.data;
+  } catch (error) {
+    console.error('소분류 카테고리 API 호출 실패:', error.message);
+    subCategories.value = [];
+  }
+}
+
 async function fetchPlaces() {
   try {
     isLoading.value = true;
@@ -275,6 +380,20 @@ async function fetchPlaces() {
     }
     if (searchKeyword.value.trim()) {
       params.keyword = searchKeyword.value.trim();
+    }
+
+    // 가장 구체적인 카테고리 코드 사용
+    let categoryCode = null;
+    if (selectedSubCategory.value) {
+      categoryCode = selectedSubCategory.value;
+    } else if (selectedMiddleCategory.value) {
+      categoryCode = selectedMiddleCategory.value;
+    } else if (selectedMainCategory.value) {
+      categoryCode = selectedMainCategory.value;
+    }
+    
+    if (categoryCode) {
+      params.categoryCode = categoryCode;
     }
 
     const response = await axios.get(`${API_BASE_URL}/api/travel/search`, { params });
@@ -307,6 +426,7 @@ async function fetchData() {
     
     await fetchAreas();
     await fetchSigungus();
+    await fetchMainCategories();
     await fetchPlaces();
   } catch (err) {
     console.error('초기 데이터 로드 실패:', err);
@@ -324,6 +444,26 @@ function onAreaChange() {
 }
 
 function onSigunguChange() {
+  currentPage.value = 1;
+  fetchPlaces();
+}
+
+function onMainCategoryChange() {
+  selectedMiddleCategory.value = '';
+  selectedSubCategory.value = '';
+  fetchMiddleCategories(selectedMainCategory.value);
+  currentPage.value = 1;
+  fetchPlaces();
+}
+
+function onMiddleCategoryChange() {
+  selectedSubCategory.value = '';
+  fetchSubCategories(selectedMiddleCategory.value);
+  currentPage.value = 1;
+  fetchPlaces();
+}
+
+function onSubCategoryChange() {
   currentPage.value = 1;
   fetchPlaces();
 }
@@ -353,7 +493,7 @@ function handleImageError(event) {
   event.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
 }
 
-// 헬퍼 함수들들
+// 헬퍼 함수들
 function getAreaName(areaCode) {
   const area = areas.value.find(a => a.areaCode === areaCode);
   return area ? area.name : '';
@@ -365,12 +505,28 @@ function getSigunguName(areaCode, sigunguCode) {
 }
 
 function getCategoryName(category1, category2, category3) {
+  // 카테고리 코드에 따른 이름 반환
+  if (!category1) return '기타';
+  
+  // 메인 카테고리 확인
+  const mainCategory = categories.value.find(c => c.category === category1);
+  if (mainCategory) return mainCategory.categoryName;
+  
+  // 중분류 카테고리 확인
+  const middleCategory = middleCategories.value.find(c => c.category === category2);
+  if (middleCategory) return middleCategory.categoryName;
+  
+  // 소분류 카테고리 확인
+  const subCategory = subCategories.value.find(c => c.category === category3);
+  if (subCategory) return subCategory.categoryName;
+  
+  // 기본 카테고리 맵에서 확인 (fallback)
   const categoryMap = {
     'A01': '자연',
     'A02': '인문(문화/예술/역사)',
     'A03': '레포츠',
     'A04': '쇼핑',
-    'A05': '음식',
+    'A05': '음식'
   };
   
   return categoryMap[category1] || '기타';
@@ -405,27 +561,6 @@ watch(currentPage, () => {
   overflow: hidden;
   position: relative;
   min-height: 100vh;
-}
-
-/* 페이지 제목 섹션 */
-.page-title-section {
-  text-align: center;
-  margin-bottom: 3rem;
-  margin-top: 2rem;
-  position: relative;
-  z-index: 1;
-}
-
-.page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.page-subtitle {
-  font-size: 1.1rem;
-  color: #666;
 }
 
 /* 로딩 스타일 */
@@ -476,77 +611,6 @@ watch(currentPage, () => {
 
 .retry-button:hover {
   background-color: #8470d7;
-}
-
-/* 그라데이션 원형들 */
-.gradient-circle {
-  position: absolute;
-  border-radius: 65% 35% 60% 40% / 60% 40% 60% 40%;
-  z-index: 0;
-  transform: skew(-5deg, -10deg);
-}
-
-.circle1 {
-  top: -10%;
-  left: -5%;
-  width: 45vw;
-  height: 35vw;
-  background: radial-gradient(ellipse, rgba(213, 224, 251, 0.9) 0%, rgba(213, 224, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(-15deg);
-}
-
-.circle2 {
-  bottom: -15%;
-  right: -10%;
-  width: 50vw;
-  height: 38vw;
-  background: radial-gradient(ellipse, rgba(213, 237, 251, 0.9) 0%, rgba(213, 237, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(10deg);
-}
-
-.circle3 {
-  top: 20%;
-  right: 10%;
-  width: 35vw;
-  height: 25vw;
-  background: radial-gradient(ellipse, rgba(213, 222, 251, 0.85) 0%, rgba(213, 222, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(-8deg);
-}
-
-.circle4 {
-  bottom: 30%;
-  left: 5%;
-  width: 28vw;
-  height: 22vw;
-  background: radial-gradient(ellipse, rgba(213, 232, 251, 0.9) 0%, rgba(213, 232, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(12deg);
-}
-
-.circle5 {
-  top: 45%;
-  left: 30%;
-  width: 40vw;
-  height: 28vw;
-  background: radial-gradient(ellipse, rgba(213, 224, 251, 0.85) 0%, rgba(213, 224, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(-5deg);
-}
-
-.circle6 {
-  bottom: 50%;
-  right: 30%;
-  width: 45vw;
-  height: 32vw;
-  background: radial-gradient(ellipse, rgba(213, 237, 251, 0.8) 0%, rgba(213, 237, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(15deg);
-}
-
-.circle7 {
-  bottom: 10%;
-  left: 40%;
-  width: 42vw;
-  height: 30vw;
-  background: radial-gradient(ellipse, rgba(213, 232, 251, 0.85) 0%, rgba(213, 232, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(-12deg);
 }
 
 .main-content {
@@ -823,9 +887,6 @@ watch(currentPage, () => {
     padding: 2rem 2rem;
   }
   
-  .page-title {
-    font-size: 2rem;
-  }
   
   .place-list {
     grid-template-columns: 1fr;
@@ -835,6 +896,168 @@ watch(currentPage, () => {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
+  }
+}
+
+/* 필터 섹션 - 새로운 스타일 */
+.filter-section {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 120px;
+  flex: 1;
+}
+
+.filter-group.search-group {
+  min-width: 200px;
+  flex: 1.5;
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  color: #555;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-select-small {
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  font-size: 0.9rem;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+.filter-select-small:focus {
+  border-color: #9581e8;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(149, 129, 232, 0.15);
+  transform: translateY(-1px);
+}
+
+.filter-select-small:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  color: #999;
+  border-color: #e9ecef;
+}
+
+.search-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.search-input-group input {
+  flex: 1;
+  background-image: none !important;
+  padding-right: 0.8rem !important;
+}
+
+.search-button {
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(135deg, #9581e8, #8470d7);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(149, 129, 232, 0.3);
+}
+
+.search-button:hover {
+  background: linear-gradient(135deg, #8470d7, #7359d1);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(149, 129, 232, 0.4);
+}
+
+/* 반응형 추가 스타일 */
+@media (max-width: 1200px) {
+  .filter-row {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+  
+  .filter-group {
+    min-width: 100px;
+  }
+  
+  .filter-group.search-group {
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .search-input-group {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-section {
+    padding: 1rem;
+  }
+  
+  .filter-select-small {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.7rem;
+  }
+  
+  .search-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-row {
+    gap: 0.5rem;
+  }
+  
+  .filter-select-small {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
   }
 }
 </style>

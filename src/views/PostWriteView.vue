@@ -1,14 +1,6 @@
 <template>
   <div class="travel-container">
-    <!-- 배경 그라데이션 원형들 -->
-    <div class="gradient-circle circle1"></div>
-    <div class="gradient-circle circle2"></div>
-    <div class="gradient-circle circle3"></div>
-    <div class="gradient-circle circle4"></div>
-    <div class="gradient-circle circle5"></div>
-    <div class="gradient-circle circle6"></div>
-    <div class="gradient-circle circle7"></div>
-
+    
     <!-- 글 작성 섹션 -->
     <section class="write-section">
       <div class="write-container">
@@ -16,20 +8,30 @@
           <h2>글 작성하기</h2>
           <div class="write-actions">
             <router-link to="/board" class="cancel-btn">취소</router-link>
-            <button @click="savePost" class="save-btn" :disabled="!isFormValid">등록</button>
+            <button @click="savePost" class="save-btn" :disabled="!isFormValid || isSubmitting">등록</button>
           </div>
+        </div>
+
+        <!-- 로딩 인디케이터 -->
+        <div v-if="isSubmitting" class="loading-indicator">
+          <div class="spinner"></div>
+          <p>게시글을 등록하는 중입니다...</p>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div v-if="error" class="error-message">
+          <p>{{ error }}</p>
         </div>
 
         <form @submit.prevent="savePost" class="write-form">
           <!-- 카테고리 선택 -->
           <div class="form-group">
             <label for="category">카테고리</label>
-            <select v-model="post.category" id="category" class="form-select" required>
+            <select v-model="post.categoryNo" id="category" class="form-select" required>
               <option value="">카테고리를 선택하세요</option>
-              <option value="free">자유게시판</option>
-              <option value="tips">여행 팁</option>
-              <option value="qna">질문/답변</option>
-              <option value="companion">동행 구하기</option>
+              <option v-for="category in categories" :key="category.value" :value="category.value">
+                {{ category.name }}
+              </option>
             </select>
           </div>
 
@@ -93,7 +95,7 @@
                 class="image-preview-item"
               >
                 <img :src="image.url" :alt="`미리보기 ${index + 1}`">
-                <button @click="removeImage(index)" class="remove-image-btn">×</button>
+                <button type="button" @click="removeImage(index)" class="remove-image-btn">×</button>
                 <div class="image-info">
                   <span class="image-name">{{ image.name }}</span>
                   <span class="image-size">{{ formatFileSize(image.size) }}</span>
@@ -124,7 +126,7 @@
                 class="tag-item"
               >
                 #{{ tag }}
-                <button @click="removeTag(index)" class="tag-remove-btn">×</button>
+                <button type="button" @click="removeTag(index)" class="tag-remove-btn">×</button>
               </span>
             </div>
             <div class="tag-help">최대 10개까지 추가 가능합니다.</div>
@@ -133,7 +135,7 @@
           <!-- 공지사항 설정 (관리자 권한이 있는 경우만) -->
           <div v-if="isAdmin" class="form-group">
             <label class="checkbox-label">
-              <input type="checkbox" v-model="post.isNotice" class="form-checkbox">
+              <input type="checkbox" v-model="isNotice" class="form-checkbox">
               공지사항으로 등록
             </label>
           </div>
@@ -146,20 +148,35 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 const router = useRouter();
 
+// API 기본 URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 // 사용자 권한 (실제로는 로그인 상태에서 가져와야 함)
-const isAdmin = ref(false); // 관리자 권한 여부
+const isAdmin = ref(false);
+
+// 카테고리 목록
+const categories = [
+  { value: 2, name: '자유게시판' },
+  { value: 3, name: '여행 팁' },
+  { value: 4, name: '질문/답변' },
+  { value: 5, name: '동행 구하기' },
+  { value: 1, name: '공지사항' }, // 관리자만 표시
+];
 
 // 게시글 데이터
 const post = ref({
-  category: '',
+  categoryNo: '',
   title: '',
   content: '',
-  tags: [],
-  isNotice: false
+  tags: []
 });
+
+// 공지사항 설정 (백엔드의 dto 구조 상 별도 플래그로 처리)
+const isNotice = ref(false);
 
 // 태그 입력
 const tagInput = ref('');
@@ -168,9 +185,13 @@ const tagInput = ref('');
 const uploadedImages = ref([]);
 const fileInput = ref(null);
 
+// 상태 관리
+const isSubmitting = ref(false);
+const error = ref(null);
+
 // 폼 유효성 검사
 const isFormValid = computed(() => {
-  return post.value.category && 
+  return post.value.categoryNo && 
          post.value.title.trim() && 
          post.value.content.trim();
 });
@@ -252,40 +273,90 @@ const savePost = async () => {
     return;
   }
   
+  if (isSubmitting.value) return; // 중복 제출 방지
+  
+  isSubmitting.value = true;
+  error.value = null;
+  
   try {
-    // 실제로는 서버에 전송하는 코드
+    // FormData 객체 생성
     const formData = new FormData();
-    formData.append('category', post.value.category);
-    formData.append('title', post.value.title);
-    formData.append('content', post.value.content);
-    formData.append('tags', JSON.stringify(post.value.tags));
-    formData.append('isNotice', post.value.isNotice);
+    
+    // 카테고리 번호가 1인 경우 공지사항으로 처리
+    if (post.value.categoryNo === 1 && !isAdmin.value) {
+      alert('공지사항은 관리자만 작성할 수 있습니다.');
+      isSubmitting.value = false;
+      return;
+    }
+    
+    // 게시글 데이터
+    const boardData = {
+      categoryNo: post.value.categoryNo,
+      title: post.value.title,
+      content: post.value.content,
+      tags: post.value.tags
+    };
+    
+    // JSON 데이터를 FormData에 추가
+    formData.append('board', new Blob([JSON.stringify(boardData)], {
+      type: 'application/json'
+    }));
     
     // 이미지 파일들 추가
     uploadedImages.value.forEach((image, index) => {
-      formData.append(`images[${index}]`, image.file);
+      formData.append('files', image.file);
     });
     
-    // API 호출 (현재는 시뮬레이션)
-    console.log('게시글 저장:', {
-      ...post.value,
-      images: uploadedImages.value.map(img => img.name),
-      author: '현재사용자', // 실제로는 로그인한 사용자 정보
-      createdAt: new Date().toISOString().split('T')[0]
+    // API 호출
+    const response = await axios.post(`${API_BASE_URL}/api/board`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      withCredentials: true // 쿠키 포함
     });
     
+    // 성공 시 게시글 상세 페이지로 이동
     alert('게시글이 성공적으로 등록되었습니다.');
-    router.push('/board');
+    router.push(`/board/${response.data.boardNo}`);
     
-  } catch (error) {
-    console.error('게시글 저장 실패:', error);
-    alert('게시글 등록 중 오류가 발생했습니다.');
+  } catch (err) {
+    console.error('게시글 저장 실패:', err);
+    
+    if (err.response && err.response.status === 401) {
+      error.value = '로그인이 필요합니다.';
+      // 로그인 페이지로 리다이렉트
+      setTimeout(() => {
+        router.push('/login');
+      }, 1500);
+    } else if (err.response && err.response.data && err.response.data.message) {
+      error.value = err.response.data.message;
+    } else {
+      error.value = '게시글 등록 중 오류가 발생했습니다.';
+    }
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+// 사용자 권한 확인
+const checkUserPermission = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/member`, {
+      withCredentials: true
+    });
+    
+    // 관리자 권한 확인
+    isAdmin.value = response.data.role === 'ADMIN';
+    
+  } catch (err) {
+    console.error('사용자 정보 조회 실패:', err);
+    isAdmin.value = false;
   }
 };
 
 onMounted(() => {
-  // 실제로는 로그인 상태와 권한 확인
-  // isAdmin.value = checkUserPermission();
+  // 사용자 권한 확인
+  checkUserPermission();
 });
 </script>
 
@@ -307,22 +378,6 @@ onMounted(() => {
   position: relative;
   min-height: 100vh;
 }
-
-/* 그라데이션 원형 스타일 (동일) */
-.gradient-circle {
-  position: absolute;
-  border-radius: 65% 35% 60% 40% / 60% 40% 60% 40%;
-  z-index: 0;
-  transform: skew(-5deg, -10deg);
-}
-
-.circle1 { top: -10%; left: -5%; width: 45vw; height: 35vw; background: radial-gradient(ellipse, rgba(213, 224, 251, 0.9) 0%, rgba(213, 224, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(-15deg); }
-.circle2 { bottom: -15%; right: -10%; width: 50vw; height: 38vw; background: radial-gradient(ellipse, rgba(213, 237, 251, 0.9) 0%, rgba(213, 237, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(10deg); }
-.circle3 { top: 20%; right: 10%; width: 35vw; height: 25vw; background: radial-gradient(ellipse, rgba(213, 222, 251, 0.85) 0%, rgba(213, 222, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(-8deg); }
-.circle4 { bottom: 30%; left: 5%; width: 28vw; height: 22vw; background: radial-gradient(ellipse, rgba(213, 232, 251, 0.9) 0%, rgba(213, 232, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(12deg); }
-.circle5 { top: 45%; left: 30%; width: 40vw; height: 28vw; background: radial-gradient(ellipse, rgba(213, 224, 251, 0.85) 0%, rgba(213, 224, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(-5deg); }
-.circle6 { bottom: 50%; right: 30%; width: 45vw; height: 32vw; background: radial-gradient(ellipse, rgba(213, 237, 251, 0.8) 0%, rgba(213, 237, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(15deg); }
-.circle7 { bottom: 10%; left: 40%; width: 42vw; height: 30vw; background: radial-gradient(ellipse, rgba(213, 232, 251, 0.85) 0%, rgba(213, 232, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(-12deg); }
 
 /* 글 작성 섹션 */
 .write-section {

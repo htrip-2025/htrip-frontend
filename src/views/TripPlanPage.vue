@@ -1,5 +1,32 @@
 <template>
-  <div class="trip-planner-container">
+ <div class="trip-planner-container">
+    <!-- 헤더 영역 -->
+    <div class="header-section">
+      <div class="plan-title-section">
+        <input 
+          type="text" 
+          v-model="tripTitle" 
+          placeholder="여행 계획 제목을 입력하세요"
+          class="plan-title-input"
+        />
+        <div class="plan-options">
+          <label class="public-option">
+            <input type="checkbox" v-model="isPublic" />
+            <span>공개 설정</span>
+          </label>
+          <button 
+            class="save-plan-button" 
+            @click="saveTripPlan"
+            :disabled="isSaving || !canSave"
+            :class="{ saving: isSaving }"
+          >
+            <span v-if="isSaving" class="loading-spinner-small"></span>
+            {{ isSaving ? '저장 중...' : '여행 계획 저장' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- 메인 콘텐츠 영역 -->
     <div class="main-content">
       <!-- 왼쪽 여행 계획 패널 -->
@@ -18,9 +45,6 @@
               <input type="date" v-model="endDate" @change="calculateDuration">
             </div>
           </div>
-          <div class="trip-duration">
-            <span v-if="tripDuration > 0">{{ tripDuration }}박 {{ tripDuration + 1 }}일</span>
-          </div>
         </div>
 
         <!-- 날짜 탭 -->
@@ -37,27 +61,29 @@
           </button>
         </div>
 
-        <!-- 선택된 장소 목록 -->
-        <div class="selected-places">
-          <div 
-            v-for="(place, index) in getSelectedPlacesByDay(selectedDay)" 
-            :key="place.placeId"
-            class="place-item"
-            @click="selectPlace(place)"
-          >
-            <div class="place-number">{{ index + 1 }}</div>
-            <div class="place-content">
-              <div class="place-name">{{ place.title }}</div>
-              <div class="place-category">{{ place.address1 }}</div>
-              <div class="place-distance" v-if="index > 0">{{ place.telephone || '' }}</div>
+        <!-- 선택된 장소 목록 + 고정 버튼 래퍼 -->
+        <div class="selected-places-wrapper">
+          <!-- (1) 스크롤되는 장소 목록 -->
+          <div class="selected-places">
+            <div 
+              v-for="(place, index) in getSelectedPlacesByDay(selectedDay)" 
+              :key="place.placeId"
+              class="place-item"
+              @click="selectPlace(place)"
+            >
+              <div class="place-number">{{ index + 1 }}</div>
+              <div class="place-content">
+                <div class="place-name">{{ place.title }}</div>
+                <div class="place-category">{{ place.address1 }}</div>
+                <div class="place-distance" v-if="place.telephone">{{ place.telephone }}</div>
+              </div>
+              <button @click.stop="removePlaceFromDay(selectedDay, index)" class="remove-place-btn">×</button>
             </div>
-            <button @click.stop="removePlaceFromDay(selectedDay, index)" class="remove-place-btn">×</button>
           </div>
 
-          <!-- 장소 추가 버튼 -->
+          <!-- (2) 항상 보이는 하단 고정 버튼 -->
           <div class="add-place-container">
             <button class="add-place-button" @click="openSearchModal">
-              <span class="add-place-icon">+</span>
               <span>장소 추가하기</span>
             </button>
           </div>
@@ -196,12 +222,37 @@
         </div>
       </div>
     </div>
+
+    <!-- 저장 성공/실패 알림 모달 -->
+    <div v-if="showSaveModal" class="save-modal" @click.self="closeSaveModal">
+      <div class="save-modal-content">
+        <div class="save-modal-header">
+          <h3>{{ saveModalTitle }}</h3>
+          <button class="close-button" @click="closeSaveModal">&times;</button>
+        </div>
+        <div class="save-modal-body">
+          <div v-if="saveSuccess" class="success-message">
+            <div class="success-icon">✅</div>
+            <p>{{ saveModalMessage }}</p>
+            <button class="ok-button" @click="goToMyPlans">내 계획 보기</button>
+          </div>
+          <div v-else class="error-message">
+            <div class="error-icon">❌</div>
+            <p>{{ saveModalMessage }}</p>
+            <button class="ok-button" @click="closeSaveModal">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch, nextTick, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
+
+const router = useRouter();
 
 // API 기본 URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -220,6 +271,14 @@ const isSearchModalOpen = ref(false);
 const mapContainer = ref(null);
 const isSearching = ref(false);
 const hasSearched = ref(false);
+const isPublic = ref(true);
+
+// 저장 관련 상태
+const isSaving = ref(false);
+const showSaveModal = ref(false);
+const saveSuccess = ref(false);
+const saveModalTitle = ref('');
+const saveModalMessage = ref('');
 
 // 지도 관련 상태
 const mapLoading = ref(false);
@@ -252,11 +311,132 @@ const selectedPlaces = ref([]);
 // 검색 결과
 const searchResults = ref([]);
 
+// 사용자 로그인 상태
+const isLoggedIn = ref(false);
+const currentUser = ref(null);
+
+// axios 기본 설정
+axios.defaults.withCredentials = true;
+
 // 계산된 속성
 const filteredSigungus = computed(() => {
   if (!selectedAreaCode.value) return [];
   return sigungus.value.filter(sigungu => sigungu.areaCode === parseInt(selectedAreaCode.value));
 });
+
+const canSave = computed(() => {
+  return tripTitle.value.trim() && 
+         startDate.value && 
+         endDate.value && 
+         isLoggedIn.value &&
+         selectedPlaces.value.some(dayPlaces => dayPlaces.length > 0);
+});
+
+// 로그인 상태 확인
+const checkLoginStatus = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/member`);
+    isLoggedIn.value = true;
+    currentUser.value = response.data;
+  } catch (err) {
+    isLoggedIn.value = false;
+    currentUser.value = null;
+  }
+};
+
+// 여행 계획 저장
+const saveTripPlan = async () => {
+  if (!canSave.value) {
+    alert('여행 계획을 저장하려면 로그인이 필요하고, 제목, 날짜, 그리고 최소 하나의 장소가 필요합니다.');
+    return;
+  }
+
+  try {
+    isSaving.value = true;
+
+    // 1. 여행 계획 생성
+    const planRequest = {
+      title: tripTitle.value.trim(),
+      startDate: startDate.value,
+      endDate: endDate.value,
+      isPublic: isPublic.value
+    };
+
+    console.log('여행 계획 생성 요청:', planRequest);
+    const planResponse = await axios.post(`${API_BASE_URL}/api/plan`, planRequest);
+    const planId = planResponse.data.planId;
+    
+    console.log('여행 계획 생성 완료, planId:', planId);
+
+    // 2. 각 날짜별로 day 생성 및 장소 추가
+    for (let dayIndex = 0; dayIndex < selectedPlaces.value.length; dayIndex++) {
+      const dayPlaces = selectedPlaces.value[dayIndex];
+      
+      if (dayPlaces.length === 0) continue;
+
+      // 장소들을 순서대로 추가
+      for (let sequence = 0; sequence < dayPlaces.length; sequence++) {
+        const place = dayPlaces[sequence];
+        
+        const itemRequest = {
+          dayId: null, // 백엔드에서 처리
+          placeId: place.placeId,
+          sequence: sequence + 1,
+          startTime: null,
+          endTime: null,
+          memo: null
+        };
+
+        console.log(`Day ${dayIndex + 1}, 장소 ${sequence + 1} 추가:`, itemRequest);
+        
+        try {
+          // 임시로 dayId를 1로 설정 (백엔드에서 실제 처리)
+          await axios.post(`${API_BASE_URL}/api/plan/${planId}/day/${dayIndex + 1}/item`, itemRequest);
+        } catch (itemError) {
+          console.error(`장소 추가 실패 (Day ${dayIndex + 1}, 장소 ${sequence + 1}):`, itemError);
+        }
+      }
+    }
+
+    // 저장 성공
+    saveSuccess.value = true;
+    saveModalTitle.value = '저장 완료';
+    saveModalMessage.value = '여행 계획이 성공적으로 저장되었습니다!';
+    showSaveModal.value = true;
+
+  } catch (error) {
+    console.error('여행 계획 저장 실패:', error);
+    
+    // 저장 실패
+    saveSuccess.value = false;
+    saveModalTitle.value = '저장 실패';
+
+
+    
+    
+    if (error.response?.status === 401) {
+      saveModalMessage.value = '로그인이 필요합니다. 다시 로그인해주세요.';
+    } else if (error.response?.status === 400) {
+      saveModalMessage.value = '입력 정보를 확인해주세요.';
+    } else {
+      saveModalMessage.value = '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
+    }
+    
+    showSaveModal.value = true;
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+// 저장 모달 닫기
+const closeSaveModal = () => {
+  showSaveModal.value = false;
+};
+
+// 내 계획 페이지로 이동
+const goToMyPlans = () => {
+  router.push('/tripmain');
+};
 
 // 카카오 지도 스크립트 로드
 const loadKakaoMapScript = () => {
@@ -775,6 +955,7 @@ function onMiddleCategoryChange() {
     searchPlacesAPI();
   }
 }
+
 function onSubCategoryChange() {
   if (hasSearched.value) {
     searchPlacesAPI();
@@ -822,7 +1003,7 @@ function addPlaceToDay(place, dayIndex) {
       // 좌표 정보가 없는 경우, API를 통해 좌표 정보를 가져오기
       fetchPlaceDetails(place.placeId)
         .then(detailedPlace => {
-          selectedPlaces.value[dayIndex].push({ ...detailedPlace });
+          selectedPlaces.value[dayIndex].push(detailedPlace);
           closeSearchModal();
           
           // 현재 선택된 날짜의 장소들을 지도에 업데이트
@@ -834,12 +1015,12 @@ function addPlaceToDay(place, dayIndex) {
         .catch(error => {
           console.error('장소 상세 정보 가져오기 실패:', error);
           // 실패해도 일단 추가 (좌표 없이)
-          selectedPlaces.value[dayIndex].push({ ...place });
+          selectedPlaces.value[dayIndex].push(place);
           closeSearchModal();
         });
     } else {
       // 좌표 정보가 이미 있는 경우
-      selectedPlaces.value[dayIndex].push({ ...place });
+      selectedPlaces.value[dayIndex].push(place);
       closeSearchModal();
       
       // 현재 선택된 날짜의 장소들을 지도에 업데이트
@@ -937,6 +1118,9 @@ onUnmounted(() => {
 
 // 컴포넌트 마운트 시 초기화
 onMounted(async () => {
+  // 로그인 상태 확인
+  await checkLoginStatus();
+  
   // 오늘 날짜를 기본값으로 설정
   const today = new Date();
   const tomorrow = new Date(today);
@@ -1001,18 +1185,19 @@ watch(selectedDay, (newDay) => {
 /* 왼쪽 계획 패널 */
 .plan-panel {
   width: 360px;
-  height: 100%;
+  height: 100vh; /* 고정 높이 설정 */
   background-color: #fff;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* 전체 패널 오버플로우 숨김 */
 }
 
-/* 날짜 선택 섹션 */
+/* 날짜 선택 섹션 - 고정 높이 */
 .date-selection-section {
   padding: 1rem;
   border-bottom: 1px solid #eee;
+  flex-shrink: 0; /* 축소되지 않도록 */
 }
 
 .section-title {
@@ -1055,22 +1240,17 @@ watch(selectedDay, (newDay) => {
   font-size: 1.2rem;
 }
 
-.trip-duration {
-  text-align: center;
-  padding: 0.5rem;
-  background-color: #f0f4ff;
-  border-radius: 4px;
-  color: #586bad;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-/* 날짜 탭 */
+/* 날짜 탭 - 고정 높이 */
 .date-tabs {
   display: flex;
   overflow-x: auto;
   padding: 0.5rem;
   border-bottom: 1px solid #eee;
+  flex-shrink: 0; /* 축소되지 않도록 */
+  background-color: #fff; /* 배경색 고정 */
+  position: sticky; /* 스크롤 시에도 고정 */
+  top: 0;
+  z-index: 10;
 }
 
 .date-tab {
@@ -1090,6 +1270,24 @@ watch(selectedDay, (newDay) => {
   align-items: center;
 }
 
+/* 날짜 탭 스크롤바 스타일링 */
+.date-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.date-tabs::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.date-tabs::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.date-tabs::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
 .date-tab.active {
   background-color: #f0f4ff;
   color: #586bad;
@@ -1106,11 +1304,33 @@ watch(selectedDay, (newDay) => {
   color: #586bad;
 }
 
-/* 선택된 장소 목록 */
+/* 선택된 장소 목록 - 스크롤 가능하게 */
 .selected-places {
   flex: 1;
   padding: 1rem;
+  overflow-y: auto; /* 세로 스크롤 가능 */
+  min-height: 0; /* flex item이 축소될 수 있도록 */
 }
+
+/* 스크롤바 스타일링 */
+.selected-places::-webkit-scrollbar {
+  width: 6px;
+}
+
+.selected-places::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.selected-places::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.selected-places::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
 
 .place-item {
   display: flex;
@@ -1184,9 +1404,14 @@ watch(selectedDay, (newDay) => {
   justify-content: center;
 }
 
-/* 장소 추가 버튼 */
+/* 장소 추가 버튼 컨테이너 - 하단 고정 */
 .add-place-container {
   padding: 1rem 0;
+  position: sticky;
+  bottom: 0;
+  background-color: #fff;
+  border-top: 1px solid #f0f0f0;
+  margin-top: auto;
 }
 
 .add-place-button {
@@ -1208,12 +1433,6 @@ watch(selectedDay, (newDay) => {
 .add-place-button:hover {
   background-color: #f0f0f0;
   border-color: #bbb;
-}
-
-.add-place-icon {
-  font-size: 1.2rem;
-  color: #9581e8;
-  font-weight: 600;
 }
 
 /* 오른쪽 지도 패널 */
@@ -1572,11 +1791,11 @@ watch(selectedDay, (newDay) => {
   
   .plan-panel {
     width: 100%;
-    height: 50%;
+    height: 60vh;
   }
   
   .map-panel {
-    height: 50%;
+    height: 40vh;
   }
   
   .date-inputs {
@@ -1641,6 +1860,241 @@ watch(selectedDay, (newDay) => {
   font-size: 12px;
   color: #666;
   line-height: 1.3;
+}
+
+/* 헤더 섹션 스타일 */
+.header-section {
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.plan-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.plan-title-input {
+  font-size: 1.5rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #333;
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.plan-title-input:focus {
+  outline: none;
+  background-color: #f8f9fa;
+  box-shadow: 0 0 0 2px rgba(149, 129, 232, 0.1);
+}
+
+.plan-title-input::placeholder {
+  color: #999;
+  font-weight: 400;
+}
+
+.plan-options {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.public-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.public-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #9581e8;
+}
+
+.save-plan-button {
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, #9581e8, #8470d7);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(149, 129, 232, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.save-plan-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #8470d7, #7359d1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(149, 129, 232, 0.4);
+}
+
+.save-plan-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.save-plan-button.saving {
+  background: #9581e8;
+  cursor: wait;
+}
+
+.loading-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* 저장 모달 스타일 */
+.save-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.save-modal-content {
+  width: 400px;
+  max-width: 90%;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transform: scale(0.9);
+  animation: modalAppear 0.3s ease forwards;
+}
+
+@keyframes modalAppear {
+  to {
+    transform: scale(1);
+  }
+}
+
+.save-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.save-modal-header h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.save-modal-body {
+  padding: 2rem;
+}
+
+.success-message, .error-message {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.success-icon, .error-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.success-message p, .error-message p {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.ok-button {
+  padding: 0.8rem 2rem;
+  background: linear-gradient(135deg, #9581e8, #8470d7);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.ok-button:hover {
+  background: linear-gradient(135deg, #8470d7, #7359d1);
+  transform: translateY(-2px);
+}
+
+/* 반응형 디자인 추가 */
+@media (max-width: 768px) {
+  .header-section {
+    padding: 1rem;
+  }
+  
+  .plan-title-section {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .plan-title-input {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  
+  .plan-options {
+    justify-content: space-between;
+  }
+  
+  
+  .save-modal-content {
+    width: 320px;
+  }
+  
+  .save-modal-body {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .plan-title-input {
+    font-size: 1.1rem;
+  }
+  
+  .save-plan-button {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
 }
 </style>
 

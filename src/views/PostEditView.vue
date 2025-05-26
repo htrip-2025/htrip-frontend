@@ -1,35 +1,49 @@
 <template>
   <div class="travel-container">
-    <!-- 배경 그라데이션 원형들 -->
-    <div class="gradient-circle circle1"></div>
-    <div class="gradient-circle circle2"></div>
-    <div class="gradient-circle circle3"></div>
-    <div class="gradient-circle circle4"></div>
-    <div class="gradient-circle circle5"></div>
-    <div class="gradient-circle circle6"></div>
-    <div class="gradient-circle circle7"></div>
+  
+    <!-- 로딩 인디케이터 -->
+    <div v-if="initialLoading" class="loading-indicator">
+      <div class="spinner"></div>
+      <p>게시글 정보를 불러오는 중입니다...</p>
+    </div>
+
+    <!-- 에러 메시지 -->
+    <div v-else-if="initialError" class="error-message">
+      <p>{{ initialError }}</p>
+      <router-link to="/board" class="back-to-list-btn">목록으로</router-link>
+    </div>
 
     <!-- 글 수정 섹션 -->
-    <section class="edit-section">
+    <section v-else class="edit-section">
       <div class="edit-container">
         <div class="edit-header">
           <h2>글 수정하기</h2>
           <div class="edit-actions">
             <router-link :to="`/board/${postId}`" class="cancel-btn">취소</router-link>
-            <button @click="updatePost" class="save-btn" :disabled="!isFormValid">수정 완료</button>
+            <button @click="updatePost" class="save-btn" :disabled="!isFormValid || isSubmitting">수정 완료</button>
           </div>
+        </div>
+
+        <!-- 제출 중 로딩 -->
+        <div v-if="isSubmitting" class="loading-indicator">
+          <div class="spinner"></div>
+          <p>게시글을 수정하는 중입니다...</p>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div v-if="error" class="error-message">
+          <p>{{ error }}</p>
         </div>
 
         <form @submit.prevent="updatePost" class="edit-form">
           <!-- 카테고리 선택 -->
           <div class="form-group">
             <label for="category">카테고리</label>
-            <select v-model="post.category" id="category" class="form-select" required>
+            <select v-model="post.categoryNo" id="category" class="form-select" required>
               <option value="">카테고리를 선택하세요</option>
-              <option value="free">자유게시판</option>
-              <option value="tips">여행 팁</option>
-              <option value="qna">질문/답변</option>
-              <option value="companion">동행 구하기</option>
+              <option v-for="category in categories" :key="category.value" :value="category.value">
+                {{ category.name }}
+              </option>
             </select>
           </div>
 
@@ -69,13 +83,13 @@
             <div class="existing-images-container">
               <div 
                 v-for="(image, index) in existingImages" 
-                :key="image.id"
+                :key="image.imageId"
                 class="existing-image-item"
               >
-                <img :src="image.url" :alt="`기존 이미지 ${index + 1}`">
-                <button @click="removeExistingImage(index)" class="remove-image-btn">×</button>
+                <img :src="getImageUrl(image)" :alt="`기존 이미지 ${index + 1}`">
+                <button type="button" @click="removeExistingImage(image.imageId)" class="remove-image-btn">×</button>
                 <div class="image-info">
-                  <span class="image-name">{{ image.name }}</span>
+                  <span class="image-name">{{ image.originalFileName }}</span>
                 </div>
               </div>
             </div>
@@ -111,7 +125,7 @@
                 class="image-preview-item"
               >
                 <img :src="image.url" :alt="`새 이미지 ${index + 1}`">
-                <button @click="removeNewImage(index)" class="remove-image-btn">×</button>
+                <button type="button" @click="removeNewImage(index)" class="remove-image-btn">×</button>
                 <div class="image-info">
                   <span class="image-name">{{ image.name }}</span>
                   <span class="image-size">{{ formatFileSize(image.size) }}</span>
@@ -142,18 +156,10 @@
                 class="tag-item"
               >
                 #{{ tag }}
-                <button @click="removeTag(index)" class="tag-remove-btn">×</button>
+                <button type="button" @click="removeTag(index)" class="tag-remove-btn">×</button>
               </span>
             </div>
             <div class="tag-help">최대 10개까지 추가 가능합니다.</div>
-          </div>
-
-          <!-- 공지사항 설정 (관리자 권한이 있는 경우만) -->
-          <div v-if="isAdmin" class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" v-model="post.isNotice" class="form-checkbox">
-              공지사항으로 등록
-            </label>
           </div>
         </form>
       </div>
@@ -164,36 +170,56 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import axios from 'axios';
 
 const route = useRoute();
 const router = useRouter();
 
+// API 기본 URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 // 게시글 ID
-const postId = route.params.id;
+const postId = computed(() => route.params.id);
 
 // 사용자 권한
 const isAdmin = ref(false);
+const userId = ref(null);
+
+// 카테고리 목록
+const categories = [
+  { value: 2, name: '자유게시판' },
+  { value: 3, name: '여행 팁' },
+  { value: 4, name: '질문/답변' },
+  { value: 5, name: '동행 구하기' },
+  { value: 1, name: '공지사항' }, // 관리자만 표시
+];
 
 // 게시글 데이터
 const post = ref({
-  category: '',
+  categoryNo: '',
   title: '',
   content: '',
-  tags: [],
-  isNotice: false
+  tags: []
 });
-
-// 이미지 관련
-const existingImages = ref([]);
-const newImages = ref([]);
-const fileInput = ref(null);
 
 // 태그 입력
 const tagInput = ref('');
 
+// 이미지 관련
+const existingImages = ref([]);
+const newImages = ref([]);
+const removedImageIds = ref([]);
+const fileInput = ref(null);
+
+// 상태 관리
+const initialLoading = ref(true);
+const initialError = ref(null);
+const isSubmitting = ref(false);
+const error = ref(null);
+
 // 폼 유효성 검사
 const isFormValid = computed(() => {
-  return post.value.category && 
+  return post.value.categoryNo && 
          post.value.title.trim() && 
          post.value.content.trim();
 });
@@ -203,52 +229,95 @@ const totalImageCount = computed(() => {
   return existingImages.value.length + newImages.value.length;
 });
 
-// 메서드
-const loadPostData = async () => {
+// 사용자 정보 조회
+const fetchUserInfo = async () => {
   try {
-    // 실제로는 API에서 게시글 데이터 가져오기
-    // const response = await fetch(`/api/posts/${postId}`);
-    // const data = await response.json();
+    const response = await axios.get(`${API_BASE_URL}/api/member`, {
+      withCredentials: true
+    });
     
-    // 더미 데이터로 시뮬레이션
-    const dummyPost = {
-      id: postId,
-      category: 'tips',
-      title: '제주도 여행시 꼭 방문해야 할 맛집 추천합니다!',
-      content: `안녕하세요! 제주도 3박 4일 여행을 다녀온 제주사랑입니다.
-
-이번 여행에서 발견한 정말 맛있었던 맛집들을 여러분께 소개해드리고 싶어요!
-
-🍽️ 첫 번째 맛집: 성산일출봉 근처 '해녀의 집'
-- 위치: 성산일출봉에서 도보 5분 거리
-- 추천메뉴: 성게미역국, 전복죽
-- 가격대: 1만원~2만원
-- 특징: 해녀분들이 직접 따온 신선한 해산물 사용`,
-      tags: ['제주도', '맛집', '여행', '음식', '추천'],
-      isNotice: false,
-      images: [
-        { id: 1, url: 'https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg', name: '해녀의집.jpg' },
-        { id: 2, url: 'https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg', name: '올레국수.jpg' }
-      ]
-    };
+    userId.value = response.data.userId;
+    isAdmin.value = response.data.role === 'ADMIN';
     
-    post.value = {
-      category: dummyPost.category,
-      title: dummyPost.title,
-      content: dummyPost.content,
-      tags: [...dummyPost.tags],
-      isNotice: dummyPost.isNotice
-    };
+  } catch (err) {
+    console.error('사용자 정보 조회 실패:', err);
+    userId.value = null;
+    isAdmin.value = false;
+    initialError.value = '로그인이 필요합니다.';
     
-    existingImages.value = [...dummyPost.images];
-    
-  } catch (error) {
-    console.error('게시글 로딩 실패:', error);
-    alert('게시글을 불러오는 중 오류가 발생했습니다.');
-    router.push('/board');
+    // 로그인 페이지로 리다이렉트
+    setTimeout(() => {
+      router.push('/login');
+    }, 1500);
   }
 };
 
+// 게시글 데이터 로드
+const loadPostData = async () => {
+  initialLoading.value = true;
+  initialError.value = null;
+  
+  try {
+    // 게시글 상세 정보 조회
+    console.log("Loading post data for ID:", postId.value);
+    const response = await axios.get(`${API_BASE_URL}/api/board/${postId.value}`, {
+      withCredentials: true
+    });
+    
+    console.log("Post edit data loaded:", response.data);
+    const postData = response.data;
+    
+    // 본인 게시글인지 확인
+    if (userId.value !== postData.userId && !isAdmin.value) {
+      initialError.value = '게시글 수정 권한이 없습니다.';
+      return;
+    }
+    
+    // 게시글 데이터 설정
+    post.value = {
+      categoryNo: postData.categoryNo,
+      title: postData.title,
+      content: postData.content,
+      tags: postData.tags || []
+    };
+    
+    // 이미지 데이터가 있으면 설정
+    if (postData.images && postData.images.length > 0) {
+      console.log("Post has images:", postData.images);
+      existingImages.value = [...postData.images];
+      
+      // 이미지 경로가 없는 경우 추가 API 호출로 이미지 정보 가져오기
+      if (!existingImages.value[0].imagePath && postData.boardNo) {
+        try {
+          const imagesResponse = await axios.get(`${API_BASE_URL}/api/board/${postData.boardNo}/images`, {
+            withCredentials: true
+          });
+          console.log("Additional images fetched for edit:", imagesResponse.data);
+          if (Array.isArray(imagesResponse.data) && imagesResponse.data.length > 0) {
+            existingImages.value = imagesResponse.data;
+          }
+        } catch (imgErr) {
+          console.error("Failed to fetch additional image data for edit:", imgErr);
+        }
+      }
+    }
+    
+  } catch (err) {
+    console.error('게시글 로딩 실패:', err);
+    
+    if (err.response && err.response.status === 404) {
+      initialError.value = '존재하지 않는 게시글입니다.';
+    } else if (err.response && err.response.status === 403) {
+      initialError.value = '게시글 수정 권한이 없습니다.';
+    } else {
+      initialError.value = '게시글을 불러오는데 실패했습니다.';
+    }
+  } finally {
+    initialLoading.value = false;
+  }
+};
+
+// 이미지 파일 업로드 처리
 const handleFileUpload = (event) => {
   const files = Array.from(event.target.files);
   
@@ -283,16 +352,24 @@ const handleFileUpload = (event) => {
   event.target.value = '';
 };
 
-const removeExistingImage = (index) => {
+// 기존 이미지 삭제
+const removeExistingImage = (imageId) => {
   if (confirm('기존 이미지를 삭제하시겠습니까?')) {
-    existingImages.value.splice(index, 1);
+    const index = existingImages.value.findIndex(img => img.imageId === imageId);
+    if (index > -1) {
+      // 삭제할 이미지 ID 저장
+      removedImageIds.value.push(imageId);
+      existingImages.value.splice(index, 1);
+    }
   }
 };
 
+// 새로 업로드한 이미지 삭제
 const removeNewImage = (index) => {
   newImages.value.splice(index, 1);
 };
 
+// 파일 크기 포맷팅
 const formatFileSize = (bytes) => {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
@@ -301,8 +378,9 @@ const formatFileSize = (bytes) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
+// 태그 추가
 const addTag = () => {
-  const tag = tagInput.value.trim().replace(/^#/, '');
+  const tag = tagInput.value.trim().replace(/^#/, ''); // # 제거
   
   if (!tag) return;
   
@@ -320,51 +398,156 @@ const addTag = () => {
   tagInput.value = '';
 };
 
+// 태그 삭제
 const removeTag = (index) => {
   post.value.tags.splice(index, 1);
 };
 
+// 게시글 수정
 const updatePost = async () => {
   if (!isFormValid.value) {
     alert('필수 항목을 모두 입력해주세요.');
     return;
   }
   
+  if (isSubmitting.value) return; // 중복 제출 방지
+  
+  isSubmitting.value = true;
+  error.value = null;
+  
   try {
+    // FormData 객체 생성
     const formData = new FormData();
-    formData.append('category', post.value.category);
-    formData.append('title', post.value.title);
-    formData.append('content', post.value.content);
-    formData.append('tags', JSON.stringify(post.value.tags));
-    formData.append('isNotice', post.value.isNotice);
     
-    // 기존 이미지 ID들 (삭제되지 않은 것들)
-    formData.append('existingImageIds', JSON.stringify(existingImages.value.map(img => img.id)));
+    // 카테고리 번호가 1인 경우 공지사항으로 처리
+    if (post.value.categoryNo === 1 && !isAdmin.value) {
+      alert('공지사항은 관리자만 작성할 수 있습니다.');
+      isSubmitting.value = false;
+      return;
+    }
     
-    // 새로운 이미지 파일들
-    newImages.value.forEach((image, index) => {
-      formData.append(`newImages[${index}]`, image.file);
+    // 게시글 데이터
+    const boardData = {
+      categoryNo: post.value.categoryNo,
+      title: post.value.title,
+      content: post.value.content,
+      tags: post.value.tags
+    };
+    
+    console.log("Edit data to send:", boardData);
+    
+    // JSON 데이터를 FormData에 추가
+    formData.append('board', new Blob([JSON.stringify(boardData)], {
+      type: 'application/json'
+    }));
+    
+    // 새 이미지 파일들 추가
+    if (newImages.value.length > 0) {
+      console.log("Adding new images:", newImages.value.length);
+      newImages.value.forEach((image, index) => {
+        formData.append('files', image.file);
+      });
+    }
+    
+    // FormData 내용 확인을 위한 로깅
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ': ' + (pair[1] instanceof Blob ? 'Blob/File' : pair[1]));
+    }
+    
+    // 게시글 수정 API 호출
+    const response = await axios.put(`${API_BASE_URL}/api/board/${postId.value}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      withCredentials: true
     });
     
-    // API 호출 시뮬레이션
-    console.log('게시글 수정:', {
-      ...post.value,
-      existingImages: existingImages.value.map(img => img.name),
-      newImages: newImages.value.map(img => img.name),
-      updatedAt: new Date().toISOString().split('T')[0]
-    });
+    console.log("Post update response:", response.data);
     
+    // 삭제된 이미지 처리
+    if (removedImageIds.value.length > 0) {
+      console.log("Removing images:", removedImageIds.value);
+      for (const imageId of removedImageIds.value) {
+        try {
+          await axios.delete(`${API_BASE_URL}/api/board/images/${imageId}`, {
+            withCredentials: true
+          });
+        } catch (imageErr) {
+          console.error(`이미지 ${imageId} 삭제 실패:`, imageErr);
+        }
+      }
+    }
+    
+    // 성공 시 게시글 상세 페이지로 이동
     alert('게시글이 성공적으로 수정되었습니다.');
-    router.push(`/board/${postId}`);
+    router.push(`/board/${postId.value}`);
     
-  } catch (error) {
-    console.error('게시글 수정 실패:', error);
-    alert('게시글 수정 중 오류가 발생했습니다.');
+  } catch (err) {
+    console.error('게시글 수정 실패:', err);
+    
+    if (err.response && err.response.status === 401) {
+      error.value = '로그인이 필요합니다.';
+      // 로그인 페이지로 리다이렉트
+      setTimeout(() => {
+        router.push('/login');
+      }, 1500);
+    } else if (err.response && err.response.status === 403) {
+      error.value = '게시글 수정 권한이 없습니다.';
+    } else if (err.response && err.response.data && err.response.data.message) {
+      error.value = err.response.data.message;
+    } else {
+      error.value = '게시글 수정 중 오류가 발생했습니다.';
+    }
+  } finally {
+    isSubmitting.value = false;
   }
 };
 
-onMounted(() => {
-  loadPostData();
+// 이미지 URL 가져오기
+const getImageUrl = (image) => {
+  if (!image) return '';
+  
+  // 이미지 경로 확인 및 로깅
+  console.log("Image data:", image);
+  
+  // 이미지 경로가 이미 전체 URL인 경우
+  if (image.imagePath && (image.imagePath.startsWith('http://') || image.imagePath.startsWith('https://'))) {
+    return image.imagePath;
+  }
+  
+  // 백엔드가 제공하는 이미지 경로 구조에 따라 URL 생성
+  if (image.imagePath) {
+    // uploads/ 접두사가 있는지 확인
+    if (image.imagePath.startsWith('uploads/')) {
+      return `${API_BASE_URL}/${image.imagePath}`;
+    } else {
+      return `${API_BASE_URL}/uploads/${image.imagePath}`;
+    }
+  }
+  
+  // storedFileName이 있는 경우 (대체 경로)
+  if (image.storedFileName) {
+    return `${API_BASE_URL}/uploads/board/${image.storedFileName}`;
+  }
+  
+  // 직접 URL 속성이 있는 경우 (클라이언트에서 추가한 임시 미리보기 등)
+  if (image.url) {
+    return image.url;
+  }
+  
+  // 기본 이미지 또는 에러 이미지
+  return `${API_BASE_URL}/uploads/default-image.png`;
+};
+
+// 컴포넌트 마운트 시 초기 데이터 로드
+onMounted(async () => {
+  // 사용자 정보 조회
+  await fetchUserInfo();
+  
+  // 권한이 있으면 게시글 데이터 로드
+  if (userId.value) {
+    await loadPostData();
+  }
 });
 </script>
 
@@ -386,22 +569,6 @@ onMounted(() => {
   position: relative;
   min-height: 100vh;
 }
-
-/* 그라데이션 원형 스타일 */
-.gradient-circle {
-  position: absolute;
-  border-radius: 65% 35% 60% 40% / 60% 40% 60% 40%;
-  z-index: 0;
-  transform: skew(-5deg, -10deg);
-}
-
-.circle1 { top: -10%; left: -5%; width: 45vw; height: 35vw; background: radial-gradient(ellipse, rgba(213, 224, 251, 0.9) 0%, rgba(213, 224, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(-15deg); }
-.circle2 { bottom: -15%; right: -10%; width: 50vw; height: 38vw; background: radial-gradient(ellipse, rgba(213, 237, 251, 0.9) 0%, rgba(213, 237, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(10deg); }
-.circle3 { top: 20%; right: 10%; width: 35vw; height: 25vw; background: radial-gradient(ellipse, rgba(213, 222, 251, 0.85) 0%, rgba(213, 222, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(-8deg); }
-.circle4 { bottom: 30%; left: 5%; width: 28vw; height: 22vw; background: radial-gradient(ellipse, rgba(213, 232, 251, 0.9) 0%, rgba(213, 232, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(12deg); }
-.circle5 { top: 45%; left: 30%; width: 40vw; height: 28vw; background: radial-gradient(ellipse, rgba(213, 224, 251, 0.85) 0%, rgba(213, 224, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(-5deg); }
-.circle6 { bottom: 50%; right: 30%; width: 45vw; height: 32vw; background: radial-gradient(ellipse, rgba(213, 237, 251, 0.8) 0%, rgba(213, 237, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(15deg); }
-.circle7 { bottom: 10%; left: 40%; width: 42vw; height: 30vw; background: radial-gradient(ellipse, rgba(213, 232, 251, 0.85) 0%, rgba(213, 232, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%); transform: rotate(-12deg); }
 
 /* 수정 섹션 */
 .edit-section {

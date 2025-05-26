@@ -1,18 +1,16 @@
 <template>
   <div class="travel-container">
-    <!-- 배경 그라데이션 원형들 -->
-    <div class="gradient-circle circle1"></div>
-    <div class="gradient-circle circle2"></div>
-    <div class="gradient-circle circle3"></div>
-    <div class="gradient-circle circle4"></div>
-    <div class="gradient-circle circle5"></div>
-    <div class="gradient-circle circle6"></div>
-    <div class="gradient-circle circle7"></div>
 
     <!-- 게시판 섹션 -->
     <section class="board-section">
       <!-- 커뮤니티 탭 메뉴 -->
       <div class="community-tabs">
+        <a 
+          href="#" 
+          class="community-tab-item"
+          :class="{ active: activeTab === 'all' }"
+          @click.prevent="changeTab('all')"
+        >전체글 보기</a>
         <a 
           href="#" 
           class="community-tab-item"
@@ -70,23 +68,35 @@
       <div class="sort-options">
         <span 
           class="sort-option"
-          :class="{ active: activeSort === 'latest' }"
-          @click="changeSort('latest')"
+          :class="{ active: activeSort === 'LATEST' }"
+          @click="changeSort('LATEST')"
         >최신순</span>
         <span 
           class="sort-option"
-          :class="{ active: activeSort === 'popular' }"
-          @click="changeSort('popular')"
+          :class="{ active: activeSort === 'LIKES' }"
+          @click="changeSort('LIKES')"
         >인기순</span>
         <span 
           class="sort-option"
-          :class="{ active: activeSort === 'views' }"
-          @click="changeSort('views')"
+          :class="{ active: activeSort === 'VIEWS' }"
+          @click="changeSort('VIEWS')"
         >조회순</span>
       </div>
       
+      <!-- 로딩 인디케이터 -->
+      <div v-if="loading" class="loading-indicator">
+        <div class="spinner"></div>
+        <p>데이터를 불러오는 중입니다...</p>
+      </div>
+
+      <!-- 오류 메시지 -->
+      <div v-else-if="error" class="error-message">
+        <p>{{ error }}</p>
+        <button @click="fetchBoards" class="retry-btn">다시 시도</button>
+      </div>
+      
       <!-- 게시글 테이블 -->
-      <div class="board-table">
+      <div v-else class="board-table">
         <div class="table-header">
           <div class="cell-number">번호</div>
           <div class="cell-title">제목</div>
@@ -98,62 +108,67 @@
         
         <!-- 공지사항 (항상 최상단) -->
         <router-link 
-          v-for="notice in noticePost" 
-          :key="notice.id"
-          :to="`/board/${notice.id}`"
+          v-if="latestNotice"
+          :to="`/board/${latestNotice.boardNo}`"
           class="table-row notice-row"
         >
           <div class="cell-number">공지</div>
           <div class="cell-title">
             <span class="tag notice">[공지]</span> 
-            {{ notice.title }}
+            {{ latestNotice.title }}
           </div>
-          <div class="cell-author">{{ notice.author }}</div>
-          <div class="cell-date">{{ formatDate(notice.createdAt) }}</div>
-          <div class="cell-views">{{ notice.views.toLocaleString() }}</div>
-          <div class="cell-likes">{{ notice.likes }}</div>
+          <div class="cell-author">{{ latestNotice.author }}</div>
+          <div class="cell-date">{{ formatDate(latestNotice.writeDate) }}</div>
+          <div class="cell-views">{{ latestNotice.views }}</div>
+          <div class="cell-likes">{{ latestNotice.likes }}</div>
         </router-link>
         
         <!-- 일반 게시글 -->
         <router-link 
-          v-for="post in displayedPosts" 
-          :key="post.id"
-          :to="`/board/${post.id}`"
+          v-for="post in posts" 
+          :key="post.boardNo"
+          :to="`/board/${post.boardNo}`"
           class="table-row"
         >
-          <div class="cell-number">{{ post.id }}</div>
+          <div class="cell-number">{{ post.boardNo }}</div>
           <div class="cell-title">
-            <span v-if="post.category === 'tips'" class="tag tip">[팁]</span>
-            <span v-else-if="post.category === 'qna'" class="tag qna">[Q&A]</span>
-            <span v-else-if="post.category === 'companion'" class="tag companion">[동행]</span>
+            <span v-if="post.categoryNo === 2" class="tag free">[자유]</span>
+            <span v-else-if="post.categoryNo === 3" class="tag tip">[팁]</span>
+            <span v-else-if="post.categoryNo === 4" class="tag qna">[Q&A]</span>
+            <span v-else-if="post.categoryNo === 5" class="tag companion">[동행]</span>
             <span v-if="post.hasImage" class="attachment-icon">📷</span>
-            <span v-if="post.commentCount > 0" class="comment-count">[{{ post.commentCount }}]</span>
             {{ post.title }}
+            <span v-if="post.commentCount > 0" class="comment-count">[{{ post.commentCount }}]</span>
           </div>
           <div class="cell-author">{{ post.author }}</div>
-          <div class="cell-date">{{ formatDate(post.createdAt) }}</div>
-          <div class="cell-views">{{ post.views.toLocaleString() }}</div>
+          <div class="cell-date">{{ formatDate(post.writeDate) }}</div>
+          <div class="cell-views">{{ post.views }}</div>
           <div class="cell-likes">{{ post.likes }}</div>
         </router-link>
+
+        <!-- 데이터가 없을 때 -->
+        <div v-if="posts.length === 0" class="no-data">
+          <p>게시글이 없습니다.</p>
+        </div>
       </div>
       
       <!-- 페이지네이션 -->
-      <div class="pagination">
+      <div v-if="!loading && !error && totalPages > 0" class="pagination">
         <button 
           class="page-item"
-          :disabled="currentPage === 1"
+          :disabled="currentPage === 0"
           @click="changePage(currentPage - 1)"
         >이전</button>
         <button 
-          v-for="page in totalPages"
+          v-for="page in paginationRange"
           :key="page"
           class="page-item"
           :class="{ active: currentPage === page }"
           @click="changePage(page)"
-        >{{ page }}</button>
+        >{{ page + 1 }}</button>
         <button 
           class="page-item"
-          :disabled="currentPage === totalPages"
+          :disabled="currentPage === totalPages - 1"
           @click="changePage(currentPage + 1)"
         >다음</button>
       </div>
@@ -162,239 +177,230 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import axios from 'axios';
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();
+const router = useRouter();
+
+// API 기본 URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 // 상태 관리
-const activeTab = ref('free');
-const activeSort = ref('latest');
+const activeTab = ref('all'); // 기본값은 '전체글 보기'
+const activeSort = ref('LATEST');
 const searchQuery = ref('');
 const searchType = ref('title_content');
-const currentPage = ref(1);
-const postsPerPage = 10;
+const currentPage = ref(0); // 백엔드는 0부터 시작하는 페이징
+const pageSize = ref(10);
+const totalPages = ref(0);
+const totalElements = ref(0);
 
-// 더미 게시글 데이터
-const allPosts = ref([
-  // 공지사항
-  {
-    id: 1001,
-    title: '커뮤니티 이용 규칙 안내',
-    author: '관리자',
-    category: 'notice',
-    content: '커뮤니티 이용 시 지켜야 할 규칙들을 안내드립니다.',
-    createdAt: '2025-05-05',
-    views: 2103,
-    likes: 156,
-    commentCount: 8,
-    hasImage: false,
-    isNotice: true
-  },
-  // 일반 게시글
-  {
-    id: 1024,
-    title: '제주도 여행시 꼭 방문해야 할 맛집 추천합니다!',
-    author: '제주사랑',
-    category: 'tips',
-    content: '제주도 3박 4일 여행하면서 발견한 숨은 맛집들을 소개합니다.',
-    createdAt: '2025-05-06',
-    views: 1245,
-    likes: 87,
-    commentCount: 23,
-    hasImage: true
-  },
-  {
-    id: 1023,
-    title: '서울 당일치기 코스 어떻게 생각하세요?',
-    author: '여행자123',
-    category: 'qna',
-    content: '서울 당일치기로 경복궁-북촌한옥마을-인사동 코스 계획했는데 어떤가요?',
-    createdAt: '2025-05-06',
-    views: 432,
-    likes: 15,
-    commentCount: 12,
-    hasImage: false
-  },
-  {
-    id: 1022,
-    title: '부산 해운대에서 찍은 사진 공유합니다~',
-    author: '바다사랑',
-    category: 'free',
-    content: '어제 부산 해운대에서 찍은 예쁜 사진들 공유해요!',
-    createdAt: '2025-05-05',
-    views: 876,
-    likes: 42,
-    commentCount: 18,
-    hasImage: true
-  },
-  {
-    id: 1021,
-    title: '경주 2박 3일 여행 후기 (사진 많음)',
-    author: '역사탐험가',
-    category: 'tips',
-    content: '경주 여행 코스와 팁을 자세히 정리했습니다.',
-    createdAt: '2025-05-04',
-    views: 1023,
-    likes: 73,
-    commentCount: 31,
-    hasImage: true
-  },
-  {
-    id: 1020,
-    title: '6월 강릉 여행 같이 가실 분 구해요!',
-    author: '동행러버',
-    category: 'companion',
-    content: '6월 둘째 주 강릉 1박 2일 여행 동행 구합니다.',
-    createdAt: '2025-05-04',
-    views: 654,
-    likes: 28,
-    commentCount: 9,
-    hasImage: false
-  },
-  {
-    id: 1019,
-    title: '유럽 배낭여행 준비물 체크리스트',
-    author: '배낭여행러',
-    category: 'tips',
-    content: '유럽 배낭여행 3주간 다녀온 후기와 준비물 리스트입니다.',
-    createdAt: '2025-05-03',
-    views: 1456,
-    likes: 94,
-    commentCount: 27,
-    hasImage: true
-  },
-  {
-    id: 1018,
-    title: '여행 중 와이파이 사용 방법 질문드려요',
-    author: '초보여행자',
-    category: 'qna',
-    content: '해외여행시 인터넷 사용하는 가장 경제적인 방법이 뭔가요?',
-    createdAt: '2025-05-03',
-    views: 723,
-    likes: 35,
-    commentCount: 19,
-    hasImage: false
-  },
-  {
-    id: 1017,
-    title: '일본 도쿄 벚꽃 시즌 여행기',
-    author: '벚꽃사랑',
-    category: 'free',
-    content: '4월 초 도쿄 벚꽃 여행 다녀온 후기입니다.',
-    createdAt: '2025-05-02',
-    views: 987,
-    likes: 67,
-    commentCount: 14,
-    hasImage: true
-  },
-  {
-    id: 1016,
-    title: '대만 타이베이 먹방 여행 같이 하실 분!',
-    author: '먹방러버',
-    category: 'companion',
-    content: '7월 대만 타이베이 먹방 투어 동행 구합니다.',
-    createdAt: '2025-05-02',
-    views: 543,
-    likes: 22,
-    commentCount: 6,
-    hasImage: false
-  },
-  {
-    id: 1015,
-    title: '국내 캠핑장 추천 부탁드려요',
-    author: '캠핑초보',
-    category: 'qna',
-    content: '첫 캠핑 계획 중인데 초보자에게 좋은 캠핑장 추천해주세요.',
-    createdAt: '2025-05-01',
-    views: 634,
-    likes: 41,
-    commentCount: 22,
-    hasImage: false
-  }
-]);
+// 데이터 상태
+const posts = ref([]);
+const latestNotice = ref(null);
+const loading = ref(false);
+const error = ref(null);
 
-// 필터링된 게시글
-const filteredPosts = computed(() => {
-  let posts = allPosts.value.filter(post => !post.isNotice);
+// 카테고리 번호 매핑
+const categoryMapping = {
+  'all': 0,    // 전체글 보기
+  'free': 2,   // 자유게시판
+  'tips': 3,   // 여행 팁
+  'qna': 4,    // 질문/답변
+  'companion': 5, // 동행 구하기
+  'notice': 1  // 공지사항
+};
+
+// 계산된 속성
+const paginationRange = computed(() => {
+  const totalPageCount = totalPages.value;
+  const current = currentPage.value;
+  const delta = 2; // 현재 페이지 앞뒤로 보여줄 페이지 수
   
-  // 탭별 필터링
-  if (activeTab.value !== 'free') {
-    posts = posts.filter(post => post.category === activeTab.value);
+  let start = Math.max(0, current - delta);
+  let end = Math.min(totalPageCount - 1, current + delta);
+  
+  // 표시할 페이지 수가 5개 미만인 경우 더 많은 페이지 표시
+  if (end - start < 4) {
+    if (start === 0) {
+      end = Math.min(4, totalPageCount - 1);
+    } else if (end === totalPageCount - 1) {
+      start = Math.max(0, totalPageCount - 5);
+    }
   }
   
-  // 검색 필터링
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase();
-    posts = posts.filter(post => {
-      switch (searchType.value) {
-        case 'title':
-          return post.title.toLowerCase().includes(query);
-        case 'content':
-          return post.content.toLowerCase().includes(query);
-        case 'author':
-          return post.author.toLowerCase().includes(query);
-        case 'title_content':
-        default:
-          return post.title.toLowerCase().includes(query) || 
-                 post.content.toLowerCase().includes(query);
+  // 범위 내의 페이지 번호 배열 생성
+  const range = [];
+  for (let i = start; i <= end; i++) {
+    range.push(i);
+  }
+  
+  return range;
+});
+
+// 게시글 목록 조회
+const fetchBoards = async () => {
+  loading.value = true;
+  error.value = null;
+  
+  try {
+    let url;
+    const params = {
+      page: currentPage.value,
+      size: pageSize.value,
+      sort: activeSort.value
+    };
+    
+    // 전체글 보기
+    if (activeTab.value === 'all') {
+      url = `${API_BASE_URL}/api/board`;
+    }
+    // 공지사항 탭
+    else if (activeTab.value === 'notice') {
+      url = `${API_BASE_URL}/api/board/category/${categoryMapping.notice}`;
+    }
+    // 카테고리별 조회
+    else {
+      const categoryNo = categoryMapping[activeTab.value];
+      url = `${API_BASE_URL}/api/board/category/${categoryNo}`;
+    }
+
+    const { data } = await axios.get(url, {
+      params: { page: currentPage.value, size: pageSize.value, sort: activeSort.value }
+    });
+
+    // 게시글
+    const wrapper = data.boards ?? data;
+    posts.value        = wrapper.content || [];
+    totalPages.value   = wrapper.totalPages || 0;
+    totalElements.value= wrapper.totalElements || 0;
+
+    if (activeTab.value === 'notice') {
+      latestNotice.value = null;
+    } else {
+      latestNotice.value = data.latestNotice || null;
+    }
+
+  } catch (err) {
+    console.error('게시글 목록 조회 실패:', err);
+    error.value = '게시글 목록을 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.';
+    posts.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 게시글 검색
+const searchPosts = async () => {
+  if (!searchQuery.value.trim()) {
+    fetchBoards();
+    return;
+  }
+  
+  loading.value = true;
+  error.value = null;
+  
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/board/search`, {
+      params: {
+        type: searchType.value,
+        keyword: searchQuery.value,
+        page: 0, // 검색 시 첫 페이지로 이동
+        size: pageSize.value,
+        sort: 'writeDate',
+        direction: 'desc'
       }
     });
+    
+    posts.value = response.data.content;
+    totalPages.value = response.data.totalPages;
+    totalElements.value = response.data.totalElements;
+    currentPage.value = 0; // 페이지 초기화
+    
+    // 검색 시에는 공지사항 표시 안함
+    latestNotice.value = null;
+    
+  } catch (err) {
+    console.error('게시글 검색 실패:', err);
+    error.value = '게시글 검색에 실패했습니다. 잠시 후 다시 시도해주세요.';
+    posts.value = [];
+  } finally {
+    loading.value = false;
   }
-  
-  // 정렬
-  return posts.sort((a, b) => {
-    switch (activeSort.value) {
-      case 'popular':
-        return b.likes - a.likes;
-      case 'views':
-        return b.views - a.views;
-      case 'latest':
-      default:
-        return new Date(b.createdAt) - new Date(a.createdAt);
-    }
-  });
-});
+};
 
-// 공지사항
-const noticePost = computed(() => {
-  return allPosts.value.filter(post => post.isNotice);
-});
-
-// 현재 페이지에 표시할 게시글
-const displayedPosts = computed(() => {
-  const start = (currentPage.value - 1) * postsPerPage;
-  const end = start + postsPerPage;
-  return filteredPosts.value.slice(start, end);
-});
-
-// 총 페이지 수
-const totalPages = computed(() => {
-  return Math.ceil(filteredPosts.value.length / postsPerPage);
-});
-
-// 메서드
+// 탭 변경
 const changeTab = (tab) => {
   activeTab.value = tab;
-  currentPage.value = 1;
+  currentPage.value = 0; // 페이지 초기화
+  searchQuery.value = ''; // 검색어 초기화
+  fetchBoards();
+  
+  // URL 쿼리 파라미터 업데이트
+  router.push({ query: { category: tab }});
 };
 
+// 정렬 변경
 const changeSort = (sort) => {
   activeSort.value = sort;
-  currentPage.value = 1;
+  fetchBoards();
 };
 
-const searchPosts = () => {
-  currentPage.value = 1;
-};
-
+// 페이지 변경
 const changePage = (page) => {
-  if (page >= 1 && page <= totalPages.value) {
+  if (page >= 0 && page < totalPages.value) {
     currentPage.value = page;
+    fetchBoards();
   }
 };
 
+// 날짜 포맷팅
 const formatDate = (dateString) => {
+  if (!dateString) return '';
+  
   const date = new Date(dateString);
-  return `${date.getMonth() + 1}.${date.getDate()}`;
+  const now = new Date();
+  
+  // 오늘 날짜인 경우 시간만 표시
+  if (date.toDateString() === now.toDateString()) {
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  }
+  
+  // 올해인 경우 월, 일만 표시
+  if (date.getFullYear() === now.getFullYear()) {
+    return `${date.getMonth() + 1}.${date.getDate()}`;
+  }
+  
+  // 그 외에는 연, 월, 일 표시
+  return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
 };
+
+// 쿼리 파라미터 감시
+watch(() => route.query, (newQuery) => {
+  // URL에 카테고리가 있으면 탭 변경
+  if (newQuery.category && Object.keys(categoryMapping).includes(newQuery.category)) {
+    activeTab.value = newQuery.category;
+  }
+  
+  // URL에 검색어가 있으면 검색 실행
+  if (newQuery.keyword) {
+    searchQuery.value = newQuery.keyword;
+    searchType.value = newQuery.type || 'title_content';
+    searchPosts();
+  } else {
+    fetchBoards();
+  }
+}, { immediate: true });
+
+// 컴포넌트 마운트 시 게시글 목록 조회
+onMounted(() => {
+  // URL 쿼리 파라미터가 없으면 기본 조회
+  if (!route.query.category && !route.query.keyword) {
+    fetchBoards();
+  }
+});
 </script>
 
 <style scoped>
@@ -414,77 +420,6 @@ const formatDate = (dateString) => {
   overflow: hidden;
   position: relative;
   min-height: 100vh;
-}
-
-/* 그라데이션 원형 스타일 */
-.gradient-circle {
-  position: absolute;
-  border-radius: 65% 35% 60% 40% / 60% 40% 60% 40%;
-  z-index: 0;
-  transform: skew(-5deg, -10deg);
-}
-
-.circle1 {
-  top: -10%;
-  left: -5%;
-  width: 45vw;
-  height: 35vw;
-  background: radial-gradient(ellipse, rgba(213, 224, 251, 0.9) 0%, rgba(213, 224, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(-15deg);
-}
-
-.circle2 {
-  bottom: -15%;
-  right: -10%;
-  width: 50vw;
-  height: 38vw;
-  background: radial-gradient(ellipse, rgba(213, 237, 251, 0.9) 0%, rgba(213, 237, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(10deg);
-}
-
-.circle3 {
-  top: 20%;
-  right: 10%;
-  width: 35vw;
-  height: 25vw;
-  background: radial-gradient(ellipse, rgba(213, 222, 251, 0.85) 0%, rgba(213, 222, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(-8deg);
-}
-
-.circle4 {
-  bottom: 30%;
-  left: 5%;
-  width: 28vw;
-  height: 22vw;
-  background: radial-gradient(ellipse, rgba(213, 232, 251, 0.9) 0%, rgba(213, 232, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(12deg);
-}
-
-.circle5 {
-  top: 45%;
-  left: 30%;
-  width: 40vw;
-  height: 28vw;
-  background: radial-gradient(ellipse, rgba(213, 224, 251, 0.85) 0%, rgba(213, 224, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(-5deg);
-}
-
-.circle6 {
-  bottom: 50%;
-  right: 30%;
-  width: 45vw;
-  height: 32vw;
-  background: radial-gradient(ellipse, rgba(213, 237, 251, 0.8) 0%, rgba(213, 237, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(15deg);
-}
-
-.circle7 {
-  bottom: 10%;
-  left: 40%;
-  width: 42vw;
-  height: 30vw;
-  background: radial-gradient(ellipse, rgba(213, 232, 251, 0.85) 0%, rgba(213, 232, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
-  transform: rotate(-12deg);
 }
 
 /* 게시판 섹션 스타일 */
@@ -706,6 +641,11 @@ const formatDate = (dateString) => {
 .tag.notice {
   background-color: #e0f0ff;
   color: #0080ff;
+}
+
+.tag.free {
+  background-color: #e0f2ff;
+  color: #1982c4;
 }
 
 .tag.tip {

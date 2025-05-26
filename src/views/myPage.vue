@@ -1,11 +1,6 @@
 <template>
   <div class="mypage-container">
-    <!-- 배경 그라데이션 원형들 -->
-    <div class="gradient-circle circle1"></div>
-    <div class="gradient-circle circle2"></div>
-    <div class="gradient-circle circle3"></div>
-    <div class="gradient-circle circle4"></div>
-
+  
     <!-- 마이페이지 콘텐츠 -->
     <div class="mypage-content">
       <div class="mypage-layout">
@@ -93,7 +88,7 @@
                     <button @click="activeTab = 'wishlists'" class="more-btn">더보기</button>
                   </div>
                   <div class="summary-grid">
-                    <div v-for="item in recentWishlists.slice(0, 4)" :key="item.id" class="wishlist-preview clickable" @click="viewItem('wishlist', item.id)">
+                    <div v-for="item in recentWishlists.slice(0, 4)" :key="item.id" class="wishlist-preview clickable" @click="viewItem('wishlist', item.placeId)">
                       <img :src="item.image" :alt="item.title" />
                       <div class="wishlist-title">{{ item.title }}</div>
                     </div>
@@ -111,7 +106,7 @@
                   </div>
                   <div class="summary-list">
                     <div v-for="review in allReviews.slice(0, 3)" :key="review.id" class="summary-item">
-                      <div class="item-title clickable" @click="viewItem('review', review.id)">{{ review.placeName }}</div>
+                      <div class="item-title clickable" @click="viewItem('review', review.placeId)">{{ review.placeName }}</div>
                       <div class="item-subtitle">{{ review.date }}</div>
                     </div>
                   </div>
@@ -139,7 +134,7 @@
                   </div>
                   <div class="summary-list">
                     <div v-for="comment in allComments.slice(0, 3)" :key="comment.id" class="summary-item">
-                      <div class="item-title clickable" @click="viewItem('comment', comment.id)">{{ comment.postTitle }}</div>
+                      <div class="item-title clickable" @click="viewItem('comment', comment.boardNo)">{{ comment.postTitle }}</div>
                       <div class="item-subtitle">{{ comment.date }} · 좋아요 {{ comment.likes }}개</div>
                     </div>
                   </div>
@@ -201,7 +196,7 @@
                   <button class="remove-wishlist-btn" @click="removeWishlist(item.id)">❤️</button>
                 </div>
                 <div class="wishlist-info">
-                  <h4 class="clickable" @click="viewItem('wishlist', item.id)">{{ item.title }}</h4>
+                  <h4 class="clickable" @click="viewItem('wishlist', item.placeId)">{{ item.title }}</h4>
                   <p>{{ item.location }}</p>
                 </div>
               </div>
@@ -560,7 +555,7 @@
                   </label>
                 </div>
                 <div class="comment-info">
-                  <h4 class="clickable" @click="viewItem('comment', comment.id)">{{ comment.postTitle }}</h4>
+                  <h4 class="clickable" @click="viewItem('comment', comment.boardNo)">{{ comment.postTitle }}</h4>
                   <p class="comment-text">{{ comment.content }}</p>
                   <div class="comment-meta">
                     <span>{{ comment.date }}</span>
@@ -755,6 +750,7 @@ const fetchDashboard = async () => {
    if (data.recentFavorites && data.recentFavorites.content) {
      recentWishlists.value = data.recentFavorites.content.map(favorite => ({
        id: favorite.favoriteNo,
+       placeId: favorite.placeId, 
        title: favorite.attraction.title,
        image: favorite.attraction.firstImageUrl || 'https://placehold.co/300x200?text=No+Image'
      }));
@@ -764,6 +760,7 @@ const fetchDashboard = async () => {
    if (data.recentReviews && data.recentReviews.content) {
      allReviews.value = data.recentReviews.content.map(review => ({
        id: review.reviewId,
+       placeId: review.placeId,
        placeName: review.placeName,
        content: review.content,
        date: formatDate(review.createDate),
@@ -786,6 +783,7 @@ const fetchDashboard = async () => {
    if (data.recentComments && data.recentComments.content) {
      allComments.value = data.recentComments.content.map(comment => ({
        id: comment.commentId,
+       boardNo: comment.boardNo,
        postTitle: comment.postTitle,
        content: comment.content,
        date: formatDate(comment.writeDate),
@@ -805,6 +803,7 @@ const fetchWishlists = async () => {
    
    allWishlists.value = data.content.map(favorite => ({
      id: favorite.favoriteNo,
+     placeId : favorite.placeId,
      title: favorite.attraction.title,
      location: favorite.attraction.address1 || '주소 정보 없음',
      image: favorite.attraction.firstImageUrl || 'https://placehold.co/300x200?text=No+Image'
@@ -961,11 +960,13 @@ const viewItem = (type, id) => {
      router.push(`/plan/${id}`);
      break;
    case 'wishlist':
-     router.push(`/travel/${id}`);
-     break;
+    // 찜한 여행지 상세로 (query 방식)
+    router.push({ path: '/tripdetail', query: { id } });
+    break;
    case 'review':
-     router.push(`/travel/${id}`);
-     break;
+    // 리뷰가 달린 장소 상세도 tripdetail 로
+    router.push({ path: '/tripdetail', query: { id } });
+    break;
    case 'post':
      router.push(`/board/${id}`);
      break;
@@ -1340,47 +1341,6 @@ onMounted(() => {
   position: relative;
   overflow: hidden;
   padding: 1.5rem 6rem;
-}
-
-/* 그라데이션 원형 효과 */
-.gradient-circle {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.8;
-  z-index: 0;
-}
-
-.circle1 {
-  width: 550px;
-  height: 550px;
-  top: -10%;
-  left: -10%;
-  background: radial-gradient(circle at center, #b6aceb 0%, transparent 70%);
-}
-
-.circle2 {
-  width: 500px;
-  height: 500px;
-  top: 70%;
-  left: 30%;
-  background: radial-gradient(circle at center, #7c8de3 0%, transparent 70%);
-}
-
-.circle3 {
-  width: 650px;
-  height: 650px;
-  top: 20%;
-  right: -10%;
-  background: radial-gradient(circle at center, #6bd5c5 0%, transparent 70%);
-}
-
-.circle4 {
-  width: 480px;
-  height: 480px;
-  bottom: -10%;
-  right: 10%;
-  background: radial-gradient(circle at center, #bfa9e9 0%, transparent 70%);
 }
 
 /* 마이페이지 콘텐츠 스타일 */
