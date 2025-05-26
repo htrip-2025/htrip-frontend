@@ -8,11 +8,11 @@
         <span class="logo-icon">T</span>rip
       </div>
       <div class="menu-items">
-        <router-link to="#" class="menu-link">AI 추천</router-link>
+        <router-link to="/ai" class="menu-link">AI 추천</router-link>
         <router-link to="/info" class="menu-link">여행정보</router-link>
         <router-link to="/tripmain" class="menu-link">여행계획</router-link>
         <router-link to="/board" class="menu-link">커뮤니티</router-link>
-        <a href="#" class="menu-link search-icon">🔍</a>
+        <!-- <a href="#" class="menu-link search-icon">🔍</a> -->
       </div>
       
       <!-- 로그인 상태에 따른 버튼 표시 -->
@@ -182,7 +182,7 @@ html, body {
 }
 
 .logo-icon {
-  color: #9581e8;
+  color: #47a34f;
   background-color: #ffefd5;
   padding: 2px 8px;
   border-radius: 50%;
@@ -203,11 +203,11 @@ html, body {
 }
 
 .menu-link:hover {
-  color: #9581e8;
+  color: #47a34f;
 }
 
 .menu-link.router-link-active {
-  color: #9581e8;
+  color: #47a34f;
   font-weight: 600;
 }
 
@@ -276,7 +276,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #9581e8 0%, #a2b3f8 100%);
+  background: linear-gradient(135deg, #47a34f 0%, #71ca78 100%);
   color: white;
   padding: 0.6rem 1.5rem;
   border-radius: 30px;
@@ -299,7 +299,7 @@ html, body {
   left: 0;
   width: 0%;
   height: 100%;
-  background: linear-gradient(135deg, #a2b3f8 0%, #9581e8 100%);
+  background: linear-gradient(135deg, #71ca78 0%, #47a34f 100%);
   transition: width 0.5s ease;
   z-index: -1;
   border-radius: 30px;

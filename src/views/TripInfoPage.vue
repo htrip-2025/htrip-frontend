@@ -561,6 +561,14 @@ watch(currentPage, () => {
   overflow: hidden;
   position: relative;
   min-height: 100vh;
+
+  min-height: 100vh;
+  background-image: url('https://i.pinimg.com/736x/91/72/b7/9172b7886a49d6649cb05dea79f55f53.jpg');
+  background-repeat: repeat;
+  background-size: auto;
+  background-attachment: fixed;
+
+
 }
 
 /* 로딩 스타일 */
@@ -577,7 +585,7 @@ watch(currentPage, () => {
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #9581e8;
+  border-top: 4px solid #48ac50;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -601,7 +609,7 @@ watch(currentPage, () => {
 .retry-button {
   margin-top: 1rem;
   padding: 0.8rem 1.5rem;
-  background-color: #9581e8;
+  background-color: #48ac50;
   color: white;
   border: none;
   border-radius: 5px;
@@ -610,7 +618,7 @@ watch(currentPage, () => {
 }
 
 .retry-button:hover {
-  background-color: #8470d7;
+  background-color: #71ca78;
 }
 
 .main-content {
@@ -619,20 +627,6 @@ watch(currentPage, () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 0;
-}
-
-.filter-section {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .filter-group {
@@ -659,7 +653,7 @@ watch(currentPage, () => {
 }
 
 .filter-select:focus {
-  border-color: #9581e8;
+  border-color: #48ac50;
   outline: none;
   box-shadow: 0 0 0 2px rgba(149, 129, 232, 0.2);
 }
@@ -676,7 +670,7 @@ watch(currentPage, () => {
 
 .search-button {
   padding: 0.6rem 1rem;
-  background-color: #9581e8;
+  background-color: #48ac50;
   color: white;
   border: none;
   border-radius: 6px;
@@ -686,7 +680,7 @@ watch(currentPage, () => {
 }
 
 .search-button:hover {
-  background-color: #8470d7;
+  background-color: #71ca78;
 }
 
 .no-results {
@@ -709,7 +703,7 @@ watch(currentPage, () => {
 
 .place-card {
   background-color: white;
-  border-radius: 15px;
+  /* border-radius: 15px; */
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -721,7 +715,7 @@ watch(currentPage, () => {
 }
 
 .place-image {
-  height: 200px;
+  height: 150px;
   overflow: hidden;
 }
 
@@ -757,7 +751,7 @@ watch(currentPage, () => {
 }
 
 .location-icon {
-  color: #9581e8;
+  color: black;
 }
 
 .place-address {
@@ -776,11 +770,11 @@ watch(currentPage, () => {
 }
 
 .place-phone {
-  color: #2ecc71;
+  color: black;
 }
 
 .place-category {
-  color: #9581e8;
+  color: black;
   font-weight: 500;
 }
 
@@ -811,9 +805,9 @@ watch(currentPage, () => {
 }
 
 .pagination-btn.active {
-  background-color: #9581e8;
+  background-color: #48ac50;
   color: white;
-  border-color: #9581e8;
+  border-color: #48ac50;
 }
 
 .pagination-btn:hover:not(.active):not(:disabled) {
@@ -849,7 +843,7 @@ watch(currentPage, () => {
 }
 
 .logo-icon {
-  color: #9581e8;
+  color: #48ac50;
   background-color: #ffefd5;
   padding: 2px 8px;
   border-radius: 50%;
@@ -957,7 +951,7 @@ watch(currentPage, () => {
 }
 
 .filter-select-small:focus {
-  border-color: #9581e8;
+  border-color: #48ac50;
   outline: none;
   box-shadow: 0 0 0 3px rgba(149, 129, 232, 0.15);
   transform: translateY(-1px);
@@ -984,7 +978,7 @@ watch(currentPage, () => {
 
 .search-button {
   padding: 0.6rem 1.2rem;
-  background: linear-gradient(135deg, #9581e8, #8470d7);
+  background: linear-gradient(135deg, #48ac50, #71ca78);
   color: white;
   border: none;
   border-radius: 8px;
@@ -997,7 +991,7 @@ watch(currentPage, () => {
 }
 
 .search-button:hover {
-  background: linear-gradient(135deg, #8470d7, #7359d1);
+  background: linear-gradient(135deg, #71ca78, #48ac50);
   transform: translateY(-2px);
   box-shadow: 0 5px 12px rgba(149, 129, 232, 0.4);
 }

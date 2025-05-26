@@ -94,11 +94,6 @@
       </div>
     </div>
     
-    <!-- 배경 그라데이션 원형들 -->
-    <div class="gradient-circle circle1"></div>
-    <div class="gradient-circle circle2"></div>
-    <div class="gradient-circle circle3"></div>
-    <div class="gradient-circle circle4"></div>
   </div>
 </template>
 
@@ -465,50 +460,6 @@ export default {
 .naver-icon svg {
   border-radius: 2px;
   overflow: hidden;
-}
-
-/* 그라데이션 원형 효과 */
-.gradient-circle {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.8;
-}
-
-.circle1 {
-  width: 550px;
-  height: 550px;
-  top: -10%;
-  left: -10%;
-  background: radial-gradient(circle at center, #b6aceb 0%, transparent 70%);
-  z-index: 1;
-}
-
-.circle2 {
-  width: 500px;
-  height: 500px;
-  top: 70%;
-  left: 30%;
-  background: radial-gradient(circle at center, #7c8de3 0%, transparent 70%);
-  z-index: 2;
-}
-
-.circle3 {
-  width: 650px;
-  height: 650px;
-  top: 20%;
-  right: -10%;
-  background: radial-gradient(circle at center, #6bd5c5 0%, transparent 70%);
-  z-index: 1;
-}
-
-.circle4 {
-  width: 480px;
-  height: 480px;
-  bottom: -10%;
-  right: 10%;
-  background: radial-gradient(circle at center, #bfa9e9 0%, transparent 70%);
-  z-index: 1;
 }
 
 /* 반응형 디자인 */

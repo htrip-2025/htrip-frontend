@@ -12,6 +12,7 @@ import myPage from '@/views/myPage.vue'
 import TripPlanPage from '@/views/TripPlanPage.vue'
 import TripPlanMainPage from '@/views/TripPlanMainPage.vue'
 import TripDetail from '@/views/TripDetail.vue'
+import AITripRecommendation from '@/views/AITripRecommendation.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -72,6 +73,11 @@ const router = createRouter({
       path: '/tripmain',
       name: 'tripmain',
       component: TripPlanMainPage,
+    },
+    {
+      path: '/ai',
+      name: 'ai',
+      component: AITripRecommendation,
     },
 
     {

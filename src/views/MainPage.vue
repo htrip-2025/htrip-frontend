@@ -1,6 +1,7 @@
 <template>
   <div class="travel-container">
     <!-- 헤더 -->
+     
  
     <!-- 히어로 섹션 -->
     <section class="hero-section">
@@ -15,9 +16,7 @@
         <!-- 계획 시작하기 버튼 - 왼쪽 정렬로 변경 -->
 <div class="plan-button-container">
   <router-link to="/plan" class="plan-start-button">
-    <span class="button-icon">✈️</span>
     <span class="button-text">여행 계획 시작하기</span>
-    <span class="button-arrow">→</span>
   </router-link>
 </div>
 </div>
@@ -25,22 +24,22 @@
       <div class="hero-images">
   <div class="polaroid-container">
     <div class="polaroid main-image">
-      <img src="https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg" alt="Traveler in nature">
+      <img src="https://i.pinimg.com/736x/25/d2/54/25d254a20512c16e7670653a01ac5e14.jpg" alt="Traveler in nature">
       <div class="polaroid-bottom"></div>
     </div>
     
     <div class="polaroid secondary-image">
-      <img src="https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg" alt="Scenic view">
+      <img src="https://i.pinimg.com/736x/40/7e/4c/407e4c902c66973ecc2f5a48612e7581.jpg" alt="Scenic view">
       <div class="polaroid-bottom"></div>
     </div>
     
     <div class="polaroid third-image">
-      <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Another view">
+      <img src="https://i.pinimg.com/736x/86/a3/fe/86a3fe5cb80c7b1f3496f951fcb607a4.jpg" alt="Another view">
       <div class="polaroid-bottom"></div>
     </div>
     
     <div class="polaroid fourth-image">
-      <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="More scenery">
+      <img src="https://i.pinimg.com/736x/27/d1/dc/27d1dc5282bd7df8b8fdeac347482ea3.jpg" alt="More scenery">
       <div class="polaroid-bottom"></div>
     </div>
   </div>
@@ -49,148 +48,6 @@
 
 
 
-
-
-    <!-- 목적지 섹션 -->
-    <section class="destinations-section">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">TOP DESTINATION</h2>
-          <h3 class="destination-title">Popular travel destinations ✈️</h3>
-        </div>
-        <div class="navigation-arrows">
-          <button class="arrow-btn prev">◀</button>
-          <button class="arrow-btn next">▶</button>
-        </div>
-      </div>
-      
-      <div class="destination-cards">
-        <!-- Original 4 destination cards -->
-        <div class="destination-card">
-          <div class="destination-image">
-            <img src="https://i.pinimg.com/736x/59/57/a1/5957a1fb6b4f091d0ddde2cf2200d030.jpg" alt="Kullu Manali">
-          </div>
-          <div class="destination-info">
-            <h4>Kullu Manali, Himachal Pradesh</h4>
-            <div class="destination-meta">
-              <span class="price">₹ 20,000</span>
-              <span class="duration">10 Days Trip</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <div class="destination-image">
-            <img src="https://i.pinimg.com/736x/16/8a/e2/168ae26e5c9d8c3edc22a687bc7cab56.jpg" alt="Rann Utsav">
-          </div>
-          <div class="destination-info">
-            <h4>Rann Utsav (Kutch), Gujarat</h4>
-            <div class="destination-meta">
-              <span class="price">₹ 20,000</span>
-              <span class="duration">10 Days Trip</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <div class="destination-image">
-            <img src="https://i.pinimg.com/736x/4a/34/d8/4a34d822347942c4ff07e8417426daf6.jpg" alt="Hawa Mahal">
-          </div>
-          <div class="destination-info">
-            <h4>Hawa Mahal (Jaipur), Rajasthan</h4>
-            <div class="destination-meta">
-              <span class="price">₹ 20,000</span>
-              <span class="duration">10 Days Trip</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <div class="destination-image">
-            <img src="https://i.pinimg.com/736x/7d/43/ff/7d43ff51a9f3ecedda6f12a43abdb5d8.jpg" alt="Kullu Manali">
-          </div>
-          <div class="destination-info">
-            <h4>Kullu Manali, Himachal Pradesh</h4>
-            <div class="destination-meta">
-              <span class="price">₹ 20,000</span>
-              <span class="duration">10 Days Trip</span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Additional 4 destination cards -->
-        <div class="destination-card">
-          <div class="destination-image">
-            <img src="https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg" alt="Coastal Railway">
-          </div>
-          <div class="destination-info">
-            <h4>Cinque Terre, Italy</h4>
-            <div class="destination-meta">
-              <span class="price">₹ 45,000</span>
-              <span class="duration">7 Days Trip</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <div class="destination-image">
-            <img src="https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg" alt="Lake Boating">
-          </div>
-          <div class="destination-info">
-            <h4>Lake District, England</h4>
-            <div class="destination-meta">
-              <span class="price">₹ 38,000</span>
-              <span class="duration">5 Days Trip</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <div class="destination-image">
-            <img src="https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg" alt="Mountain Trek">
-          </div>
-          <div class="destination-info">
-            <h4>Swiss Alps, Switzerland</h4>
-            <div class="destination-meta">
-              <span class="price">₹ 52,000</span>
-              <span class="duration">8 Days Trip</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="destination-card">
-          <div class="destination-image">
-            <img src="https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg" alt="Beach Resort">
-          </div>
-          <div class="destination-info">
-            <h4>Bali, Indonesia</h4>
-            <div class="destination-meta">
-              <span class="price">₹ 40,000</span>
-              <span class="duration">6 Days Trip</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 항공사 로고 섹션 -->
-    <section class="airlines-section">
-      <div class="airline-logo">
-        <span>JET AIRWAYS ✈️</span>
-      </div>
-      <div class="airline-logo">
-        <span>AirAsia</span>
-      </div>
-      <div class="airline-logo">
-        <span>✈️ SpiceJet</span>
-      </div>
-      <div class="airline-logo">
-        <span>IndiGo ✈️</span>
-      </div>
-      <div class="airline-logo">
-        <span>✈️ GoAir</span>
-      </div>
-  </section>
   </div>
 </template>
 
@@ -264,6 +121,17 @@ const scrollRight = () => {
   overflow: hidden;
   position: relative;
   min-height: 100vh;
+
+
+  min-height: 100vh;
+
+  background-image: url('https://i.pinimg.com/736x/91/72/b7/9172b7886a49d6649cb05dea79f55f53.jpg');
+  background-repeat: repeat;
+  background-size: auto;
+  background-attachment: fixed;
+  
+
+
 }
 
 /* 히어로 섹션 */
@@ -311,7 +179,7 @@ const scrollRight = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #9581e8 0%, #a2b3f8 100%); /* 연한 색상으로 변경 */
+  background: linear-gradient(135deg, #48ac50 0%, #71ca78 100%); /* 연한 색상으로 변경 */
   color: white;
   padding: 0.8rem 1.8rem; /* 패딩 줄임 */
   border-radius: 30px; /* 약간 줄임 */
@@ -465,21 +333,7 @@ const scrollRight = () => {
   z-index: 1;
 }
 
-/* 배경에 커브 선 추가 */
-/* .hero-images::before {
-  content: '';
-  position: absolute;
-  top: 30%;
-  left: 5%;
-  width: 90%;
-  height: 50%;
-  border: 2px solid #e6d7a3;
-  border-left: none;
-  border-right: none;
-  border-bottom: none;
-  border-radius: 50% 50% 0 0;
-  z-index: 0;
-} */
+
 
 /* 반응형 조정 */
 @media (max-width: 768px) {
@@ -845,11 +699,6 @@ const scrollRight = () => {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  /* 그라데이션 타원형 크기 조정 */
-  .circle1, .circle2, .circle3, .circle4, .circle5, .circle6, .circle7 {
-    width: 80vw !important;
-    height: 60vw !important;
-  }
 }
 
 @media (max-width: 768px) {
@@ -897,11 +746,6 @@ const scrollRight = () => {
     transform: none !important;
     margin-bottom: 1rem;
   }
-  
-  /* 그라데이션 타원형 크기 조정 */
-  .circle1, .circle2, .circle3, .circle4, .circle5, .circle6, .circle7 {
-    width: 110vw !important;
-    height: 80vw !important;
-  }
+
 }
 </style>

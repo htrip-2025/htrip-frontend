@@ -178,6 +178,8 @@ onMounted(() => {
   min-height: 100vh;
   background-color: #ffffff;
   padding: 0;
+
+  
 }
 
 /* AI 추천 및 계획 만들기 섹션 */
