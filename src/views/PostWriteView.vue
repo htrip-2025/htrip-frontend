@@ -379,9 +379,9 @@ onMounted(() => {
   min-height: 100vh;
 
    min-height: 100vh;
-  background-image: url('https://i.pinimg.com/736x/91/72/b7/9172b7886a49d6649cb05dea79f55f53.jpg');
+  background-image: url('https://i.pinimg.com/736x/5e/9f/07/5e9f07d84b763d9fd5becff18cc6e99e.jpg');
   background-repeat: repeat;
-  background-size: auto;
+  background-size: cover;
   background-attachment: fixed;
 
 }

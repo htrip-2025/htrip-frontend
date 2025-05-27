@@ -663,10 +663,14 @@ const allComments = ref([]);
 
 // 이미지 배열
 const images = [
- 'https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg',
- 'https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg',
- 'https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg',
- 'https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg'
+//  'https://i.pinimg.com/736x/e4/1c/12/e41c125a6efb4777d8e93c74eb870ed5.jpg',
+//  'https://i.pinimg.com/736x/61/7c/5f/617c5fdb6822357b548cf2ff25c17291.jpg',
+//  'https://i.pinimg.com/736x/dc/7a/35/dc7a35cd27dde9c34efc6844c6a80e26.jpg',
+//  'https://i.pinimg.com/736x/76/46/99/764699652914504ce8abfc463c5fa760.jpg'
+'https://i.pinimg.com/736x/22/8a/da/228adaff2bc066e8fc04218bf72e5225.jpg'
+
+
+
 ];
 
 const profileImage = ref(null);
@@ -957,7 +961,7 @@ const viewItem = (type, id) => {
  console.log(`Viewing ${type} with ID ${id}`);
  switch (type) {
    case 'plan':
-     router.push(`/plan/${id}`);
+     router.push({ path: '/plan', query: { id } });
      break;
    case 'wishlist':
     // 찜한 여행지 상세로 (query 방식)
@@ -1341,6 +1345,12 @@ onMounted(() => {
   position: relative;
   overflow: hidden;
   padding: 1.5rem 6rem;
+
+  min-height: 100vh;
+ background-image: url('https://i.pinimg.com/736x/5e/9f/07/5e9f07d84b763d9fd5becff18cc6e99e.jpg');
+ background-repeat: repeat;
+ background-size: cover;
+ background-attachment: fixed;
 }
 
 /* 마이페이지 콘텐츠 스타일 */
@@ -1445,7 +1455,7 @@ onMounted(() => {
 .stat-value {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #9581e8;
+  color: #2172ce;
 }
 
 .stat-divider {
@@ -1502,8 +1512,33 @@ onMounted(() => {
 }
 
 .nav-btn.active {
-  background-color: #9581e8;
+  background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
   color: white;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.nav-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 30px;
+}
+
+.nav-btn.active:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(33, 114, 206, 0.35);
+}
+
+.nav-btn.active:hover::before {
+  width: 100%;
 }
 
 .nav-icon {
@@ -1566,23 +1601,52 @@ onMounted(() => {
 }
 
 .delete-btn {
-  padding: 0.6rem 1.2rem;
-  background-color: #dc3545;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
   color: white;
-  border: none;
-  border-radius: 20px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 30px;
   font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(33, 114, 206, 0.25);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: none;
   cursor: pointer;
-  transition: all 0.3s;
+  z-index: 1;
+}
+
+.delete-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 30px;
 }
 
 .delete-btn:hover:not(:disabled) {
-  background-color: #c82333;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(33, 114, 206, 0.35);
+}
+
+.delete-btn:hover:not(:disabled)::before {
+  width: 100%;
 }
 
 .delete-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .select-all-container {
@@ -1622,7 +1686,7 @@ onMounted(() => {
 }
 
 .checkbox-container input:checked ~ .checkmark {
-  background-color: #9581e8;
+  background-color: #2172ce;
 }
 
 .checkmark:after {
@@ -1700,18 +1764,45 @@ onMounted(() => {
 }
 
 .more-btn {
-  background-color: #9581e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
   color: white;
-  border: none;
   padding: 0.5rem 1rem;
-  border-radius: 20px;
+  border-radius: 30px;
   font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(33, 114, 206, 0.25);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: none;
   cursor: pointer;
-  transition: all 0.3s;
+  z-index: 1;
+}
+
+.more-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 30px;
 }
 
 .more-btn:hover {
-  background-color: #8571d8;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(33, 114, 206, 0.35);
+}
+
+.more-btn:hover::before {
+  width: 100%;
 }
 
 .summary-list {
@@ -1724,7 +1815,7 @@ onMounted(() => {
   background-color: white;
   padding: 0.8rem;
   border-radius: 8px;
-  border-left: 4px solid #9581e8;
+  border-left: 4px solid #2172ce;
 }
 
 /* 홈 섹션의 아이템 높이 조정 */
@@ -1747,7 +1838,7 @@ onMounted(() => {
 }
 
 .clickable:hover {
-  color: #9581e8;
+  color: #2172ce;
   text-decoration: underline;
 }
 
@@ -1957,7 +2048,7 @@ onMounted(() => {
 
 .post-category {
   display: inline-block;
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   padding: 0.2rem 0.6rem;
   border-radius: 10px;
@@ -2016,9 +2107,34 @@ onMounted(() => {
 }
 
 .page-btn.active {
-  background-color: #9581e8;
+  background: linear-gradient(135deg, #47a34f 0%, #71ca78 100%);
   color: white;
-  border-color: #9581e8;
+  border-color: #47a34f;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.page-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #71ca78 0%, #47a34f 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 5px;
+}
+
+.page-btn.active:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(71, 163, 79, 0.35);
+}
+
+.page-btn.active:hover::before {
+  width: 100%;
 }
 
 .page-btn:disabled {

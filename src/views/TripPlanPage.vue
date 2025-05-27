@@ -9,6 +9,7 @@
           placeholder="여행 계획 제목을 입력하세요"
           class="plan-title-input"
         />
+
         <div class="plan-options">
           <label class="public-option">
             <input type="checkbox" v-model="isPublic" />
@@ -49,15 +50,15 @@
 
         <!-- 날짜 탭 -->
         <div class="date-tabs">
-          <button 
-            v-for="(day, index) in generateDays()" 
-            :key="index"
+          <button
+            v-for="(day,idx) in sortedDays"
+            :key="day.dayId"
             class="date-tab"
-            :class="{ active: selectedDay === index }"
-            @click="selectDay(index)"
+            :class="{ active: selectedDay === idx }"
+            @click="selectDay(idx)"
           >
-            day{{ index + 1 }}
-            <span class="day-date">{{ formatDayDate(index) }}</span>
+            day{{ day.dayDate }}
+            <span class="day-date">{{ formatDayDate(idx) }}</span>
           </button>
         </div>
 
@@ -66,18 +67,21 @@
           <!-- (1) 스크롤되는 장소 목록 -->
           <div class="selected-places">
             <div 
-              v-for="(place, index) in getSelectedPlacesByDay(selectedDay)" 
-              :key="place.placeId"
+              v-for="(place,i) in sortedItems(sortedDays[selectedDay])" 
+              :key="place.placeId + '_' + i"
               class="place-item"
               @click="selectPlace(place)"
             >
-              <div class="place-number">{{ index + 1 }}</div>
+              <div class="place-number">{{ i + 1 }}</div>
               <div class="place-content">
                 <div class="place-name">{{ place.title }}</div>
                 <div class="place-category">{{ place.address1 }}</div>
                 <div class="place-distance" v-if="place.telephone">{{ place.telephone }}</div>
               </div>
-              <button @click.stop="removePlaceFromDay(selectedDay, index)" class="remove-place-btn">×</button>
+              <button
+                @click.stop="removePlaceFromDay(selectedDay, i)"
+                class="remove-place-btn"
+              >×</button>
             </div>
           </div>
 
@@ -248,11 +252,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, watch, nextTick, onUnmounted, toRefs } from 'vue';
+import { useRouter,useRoute } from 'vue-router';
 import axios from 'axios';
+import Sortable from 'sortablejs';
 
 const router = useRouter();
+const route = useRoute();
 
 // API 기본 URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -274,6 +280,7 @@ const hasSearched = ref(false);
 const isPublic = ref(true);
 
 // 저장 관련 상태
+const planData = ref({ days: [] });
 const isSaving = ref(false);
 const showSaveModal = ref(false);
 const saveSuccess = ref(false);
@@ -315,6 +322,14 @@ const searchResults = ref([]);
 const isLoggedIn = ref(false);
 const currentUser = ref(null);
 
+const planId = ref(null);
+const isEditMode = ref(false);
+const userPermissions = ref({
+  canEdit: false,
+  canDelete: false,
+  userRole: null
+});
+
 // axios 기본 설정
 axios.defaults.withCredentials = true;
 
@@ -329,7 +344,7 @@ const canSave = computed(() => {
          startDate.value && 
          endDate.value && 
          isLoggedIn.value &&
-         selectedPlaces.value.some(dayPlaces => dayPlaces.length > 0);
+         planData.value.days.some(day => day.items && day.items.length > 0);
 });
 
 // 로그인 상태 확인
@@ -344,94 +359,109 @@ const checkLoginStatus = async () => {
   }
 };
 
+// saveTripPlan 함수 수정 (수정 모드 지원)
 const saveTripPlan = async () => {
   if (!canSave.value) {
     alert('여행 계획을 저장하려면 로그인이 필요하고, 제목, 날짜, 그리고 최소 하나의 장소가 필요합니다.');
     return;
   }
 
+  // 수정 권한 확인
+  if (isEditMode.value && !userPermissions.value.canEdit) {
+    alert('이 계획을 수정할 권한이 없습니다.');
+    return;
+  }
+
   try {
     isSaving.value = true;
 
-    // 1. 여행 계획 생성
-    const planRequest = {
+    // 전체 계획 데이터 준비
+    const fullPlanRequest = {
       title: tripTitle.value.trim(),
       startDate: startDate.value,
       endDate: endDate.value,
-      isPublic: isPublic.value  // 백엔드에서 @JsonProperty("isPublic")로 처리됨
+      isPublic: isPublic.value,
+      days: planData.value.days.map(day => ({
+        dayId: day.dayId.toString().startsWith('temp_') ? null : day.dayId,
+        dayDate: day.dayDate,
+        items: (day.items || []).map(item => ({
+          itemId: item.itemId || null,
+          placeId: item.placeId,
+          sequence: item.sequence,
+          startTime: item.startTime || null,
+          endTime: item.endTime || null,
+          memo: item.memo || null
+        }))
+      }))
     };
-
-    console.log('여행 계획 생성 요청:', planRequest);
-    const planResponse = await axios.post(`${API_BASE_URL}/api/plan`, planRequest);
-    const planId = planResponse.data.planId;
-    const planDays = planResponse.data.days || [];
     
-    console.log('여행 계획 생성 완료, planId:', planId);
-    console.log('생성된 days:', planDays);
-
-    // 2. 각 날짜별로 아이템 추가
-    for (let dayIndex = 0; dayIndex < selectedPlaces.value.length; dayIndex++) {
-      const dayPlaces = selectedPlaces.value[dayIndex];
+    let response;
+    
+    if (isEditMode.value) {
+      // 전체 계획 한 번에 업데이트
+      response = await axios.put(`${API_BASE_URL}/api/plan/${planId.value}/full`, fullPlanRequest);
+    } else {
+      // 새 계획 생성
+      response = await axios.post(`${API_BASE_URL}/api/plan`, {
+        title: tripTitle.value.trim(),
+        startDate: startDate.value,
+        endDate: endDate.value,
+        isPublic: isPublic.value
+      });
       
-      if (dayPlaces.length === 0) continue;
-
-      // 백엔드에서 생성된 day 정보 찾기
-      const dayId = planDays[dayIndex]?.dayId;
+      // 생성된 계획 ID 저장
+      planId.value = response.data.planId;
       
-      if (!dayId) {
-        console.error(`Day ${dayIndex + 1}의 dayId를 찾을 수 없습니다.`);
-        continue;
-      }
-
-      // 장소들을 순서대로 추가
-      for (let sequence = 0; sequence < dayPlaces.length; sequence++) {
-        const place = dayPlaces[sequence];
+      // 각 일자별 아이템 추가
+      for (const day of planData.value.days) {
+        const dayResponse = response.data.days.find(d => d.dayDate === day.dayDate);
+        if (!dayResponse) continue;
         
-        // CreatePlanItemRequest 형식에 맞춤
-        const itemRequest = {
-          // dayId는 URL 경로에 포함되어 있어 여기서는 생략해도 됩니다
-          // 백엔드에서 request.setDayId(dayId)로 설정됨
-          placeId: place.placeId,
-          sequence: sequence + 1,
-          startTime: null,  // 시간 정보가 있다면 "HH:MM:SS" 형식으로 전송
-          endTime: null,
-          memo: null
-        };
-
-        console.log(`Day ${dayIndex + 1}(dayId: ${dayId}), 장소 ${sequence + 1} 추가:`, itemRequest);
-        
-        try {
-          await axios.post(`${API_BASE_URL}/api/plan/${planId}/day/${dayId}/item`, itemRequest);
-        } catch (itemError) {
-          console.error(`장소 추가 실패 (Day ${dayIndex + 1}, 장소 ${sequence + 1}):`, itemError);
-          console.error('에러 상세:', itemError.response?.data || itemError.message);
+        // 각 아이템 추가
+        for (let i = 0; i < (day.items || []).length; i++) {
+          const place = day.items[i];
+          const itemRequest = {
+            placeId: place.placeId,
+            sequence: i + 1,
+            startTime: place.startTime || null,
+            endTime: place.endTime || null,
+            memo: place.memo || null
+          };
+          
+          try {
+            const newItemResponse = await axios.post(
+              `${API_BASE_URL}/api/plan/${planId.value}/day/${dayResponse.dayId}/item`,
+              itemRequest
+            );
+            // 새로 생성된 아이템의 ID 저장
+            place.itemId = newItemResponse.data.itemId;
+          } catch (itemError) {
+            console.error(`아이템 추가 실패 (${place.title}):`, itemError);
+          }
         }
       }
     }
 
-    // 저장 성공
+    // 저장 성공 UI
     saveSuccess.value = true;
-    saveModalTitle.value = '저장 완료';
-    saveModalMessage.value = '여행 계획이 성공적으로 저장되었습니다!';
+    saveModalTitle.value = isEditMode.value ? '수정 완료' : '저장 완료';
+    saveModalMessage.value = isEditMode.value
+      ? '여행 계획이 성공적으로 수정되었습니다!'
+      : '여행 계획이 성공적으로 저장되었습니다!';
     showSaveModal.value = true;
 
+    // 수정 모드로 전환
+    if (!isEditMode.value) {
+      isEditMode.value = true;
+      userPermissions.value.canEdit = true;
+      userPermissions.value.canDelete = true;
+    }
+
   } catch (error) {
-    console.error('여행 계획 저장 실패:', error);
-    console.error('에러 상세:', error.response?.data || error.message);
-    
-    // 저장 실패
+    console.error('저장 실패:', error);
     saveSuccess.value = false;
     saveModalTitle.value = '저장 실패';
-    
-    if (error.response?.status === 401) {
-      saveModalMessage.value = '로그인이 필요합니다. 다시 로그인해주세요.';
-    } else if (error.response?.status === 400) {
-      saveModalMessage.value = '입력 정보를 확인해주세요: ' + 
-        (error.response?.data?.message || '잘못된 형식의 데이터입니다.');
-    } else {
-      saveModalMessage.value = '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
-    }
-    
+    saveModalMessage.value = '여행 계획 저장 중 오류가 발생했습니다. 다시 시도해주세요.';
     showSaveModal.value = true;
   } finally {
     isSaving.value = false;
@@ -551,7 +581,7 @@ const initializeMap = async () => {
     console.log('✅ 카카오 지도 초기화 완료');
     
     // 현재 선택된 날짜의 장소들을 지도에 표시
-    const placesForDay = getSelectedPlacesByDay(selectedDay.value);
+    const placesForDay = getPlacesForDay(selectedDay.value);
     if (placesForDay.length > 0) {
       addMarkersToMap(placesForDay);
     }
@@ -891,6 +921,7 @@ async function fetchPlaceDetails(placeId) {
 function calculateDuration() {
   if (!startDate.value || !endDate.value) {
     tripDuration.value = 0;
+    initializePlanData();
     return;
   }
   
@@ -901,7 +932,21 @@ function calculateDuration() {
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   
   tripDuration.value = diffDays;
-  initSelectedPlaces();
+  initializePlanData();
+}
+
+// planData 초기화 함수
+function initializePlanData() {
+  const days = [];
+  for (let i = 1; i <= tripDuration.value + 1; i++) {
+    days.push({
+      dayId: `temp_${i}`,
+      dayDate: i,
+      items: []
+    });
+  }
+  planData.value.days = days;
+  selectedPlaces.value = days.map(() => []);
 }
 
 // 날짜별 선택된 장소 초기화
@@ -929,7 +974,7 @@ function selectDay(dayIndex) {
   selectedDay.value = dayIndex;
   
   // 선택된 날짜의 장소들을 지도에 표시
-  const placesForDay = getSelectedPlacesByDay(dayIndex);
+  const placesForDay = getPlacesForDay(dayIndex);
   addMarkersToMap(placesForDay);
 }
 
@@ -1005,55 +1050,112 @@ function closeSearchModal() {
 
 // 장소를 특정 날짜에 추가
 function addPlaceToDay(place, dayIndex) {
-  const isDuplicate = selectedPlaces.value[dayIndex].some(p => p.placeId === place.placeId);
-  
-  if (!isDuplicate) {
-    // 좌표 정보 확인
-    if (!place.latitude || !place.longitude) {
-      // 좌표 정보가 없는 경우, API를 통해 좌표 정보를 가져오기
-      fetchPlaceDetails(place.placeId)
-        .then(detailedPlace => {
-          selectedPlaces.value[dayIndex].push(detailedPlace);
-          closeSearchModal();
-          
-          // 현재 선택된 날짜의 장소들을 지도에 업데이트
-          if (selectedDay.value === dayIndex) {
-            const placesForDay = getSelectedPlacesByDay(dayIndex);
-            addMarkersToMap(placesForDay);
-          }
-        })
-        .catch(error => {
-          console.error('장소 상세 정보 가져오기 실패:', error);
-          // 실패해도 일단 추가 (좌표 없이)
-          selectedPlaces.value[dayIndex].push(place);
-          closeSearchModal();
-        });
-    } else {
-      // 좌표 정보가 이미 있는 경우
-      selectedPlaces.value[dayIndex].push(place);
-      closeSearchModal();
-      
-      // 현재 선택된 날짜의 장소들을 지도에 업데이트
-      if (selectedDay.value === dayIndex) {
-        const placesForDay = getSelectedPlacesByDay(dayIndex);
-        addMarkersToMap(placesForDay);
-      }
-    }
-  } else {
-    alert('이미 추가된 장소입니다.');
+  console.log('▶ addPlaceToDay 호출됨:', place, 'dayIndex=', dayIndex);
+
+  // 1) sortedDays 기준으로 해당 날짜 객체 찾기
+  const day = sortedDays.value[dayIndex];
+  if (!day) return alert('잘못된 날짜입니다.');
+
+  // 2) planData 안의 진짜 원본 day 객체 찾기
+  const origDay = planData.value.days.find(d => d.dayDate === day.dayDate);
+  if (!origDay) return;
+
+  // 3) 중복 검사
+  if (origDay.items.some(it => it.placeId === place.placeId)) {
+    return alert('이미 추가된 장소입니다.');
   }
+
+  // 4) 새 아이템 생성 (좌표 매핑까지 필요하면 여기서 detail.fetch)
+  const newItem = {
+    placeId: place.placeId,
+    title: place.title,
+    address1: place.address1,
+    telephone: place.telephone,
+    latitude: place.latitude,
+    longitude: place.longitude,
+    memo: null,
+    startTime: null,
+    endTime: null,
+    sequence: origDay.items.length + 1
+  };
+
+  // 5) planData 에만 push
+  origDay.items.push(newItem);
+
+  // 6) 모달 닫고, 마커 / 리스트 갱신
+  closeSearchModal();
+  addMarkersToMap(getPlacesForDay(dayIndex));
 }
 
-// 장소 제거
+const props = defineProps({
+  plan: {
+    type: Object,
+    required: false,
+    default: () => ({ days: [] })
+  }
+});
+
+const { plan } = toRefs(props);
+
+// dayDate 순 정렬
+const sortedDays = computed(() => {
+  const days = planData.value.days;
+  if (!Array.isArray(days)) return [];
+  return days
+    .slice()
+    .sort((a, b) => a.dayDate - b.dayDate);
+});
+
+function sortedItems(day) {
+  if (!day?.items) return [];
+  return day.items
+    .slice()
+    .sort((a, b) => a.sequence - b.sequence);
+}
+
+// 장소 제거 함수 수정
 function removePlaceFromDay(dayIndex, placeIndex) {
-  if (confirm('이 장소를 제거하시겠습니까?')) {
-    selectedPlaces.value[dayIndex].splice(placeIndex, 1);
+  console.log('▶ removePlaceFromDay 호출:', dayIndex, placeIndex);
+  
+  const day = sortedDays.value[dayIndex];
+  if (!day) {
+    console.error('해당 날짜를 찾을 수 없습니다:', dayIndex);
+    return;
+  }
+  
+  // 원본 planData에서 해당 day 찾기
+  const origDay = planData.value.days.find(d => d.dayDate === day.dayDate);
+  if (!origDay || !origDay.items) {
+    console.error('원본 day 데이터를 찾을 수 없습니다');
+    return;
+  }
+  
+  // 정렬된 순서로 삭제할 아이템 찾기
+  const sortedItemsArray = sortedItems(origDay);
+  if (placeIndex >= sortedItemsArray.length) {
+    console.error('잘못된 장소 인덱스:', placeIndex);
+    return;
+  }
+  
+  const itemToRemove = sortedItemsArray[placeIndex];
+  
+  // 원본 배열에서 해당 아이템 제거 (동일한 객체 참조로 찾기)
+  const originalIndex = origDay.items.indexOf(itemToRemove);
+  
+  if (originalIndex !== -1) {
+    origDay.items.splice(originalIndex, 1);
     
-    // 현재 선택된 날짜의 장소들을 지도에 업데이트
-    if (selectedDay.value === dayIndex) {
-      const placesForDay = getSelectedPlacesByDay(dayIndex);
-      addMarkersToMap(placesForDay);
-    }
+    // sequence 재부여
+    origDay.items.forEach((item, i) => { 
+      item.sequence = i + 1; 
+    });
+    
+    console.log('✅ 장소 삭제 완료. 남은 장소 수:', origDay.items.length);
+    
+    // 마커 갱신
+    addMarkersToMap(getPlacesForDay(dayIndex));
+  } else {
+    console.error('삭제할 아이템을 원본 배열에서 찾을 수 없습니다');
   }
 }
 
@@ -1077,6 +1179,11 @@ function selectPlace(place) {
   } catch (error) {
     console.error('장소 선택 중 오류:', error);
   }
+}
+
+function getPlacesForDay(dayIndex) {
+  const day = sortedDays.value[dayIndex];
+  return day ? sortedItems(day) : [];
 }
 
 // 이미지 에러 핸들링
@@ -1130,16 +1237,38 @@ onUnmounted(() => {
 onMounted(async () => {
   // 로그인 상태 확인
   await checkLoginStatus();
-  
-  // 오늘 날짜를 기본값으로 설정
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  
-  startDate.value = today.toISOString().split('T')[0];
-  endDate.value = tomorrow.toISOString().split('T')[0];
-  
-  calculateDuration();
+  const aiRecommendedPlan = sessionStorage.getItem('aiRecommendedPlan');
+  // URL에서 planId 파라미터 확인
+  if (aiRecommendedPlan) {
+    try {
+      const recommendedData = JSON.parse(aiRecommendedPlan);
+      console.log('AI 추천 계획 데이터 수신:', recommendedData);
+      
+      // 데이터 사용 후 즉시 삭제 (한 번만 사용)
+      sessionStorage.removeItem('aiRecommendedPlan');
+      
+      await loadRecommendedPlan(recommendedData);
+    } catch (error) {
+      console.error('AI 추천 계획 데이터 파싱 실패:', error);
+      sessionStorage.removeItem('aiRecommendedPlan');
+      // 기본 새 계획으로 fallback
+      initializeNewPlan();
+    }
+  } else if (route.query.id) {
+    planId.value = route.query.id;
+    isEditMode.value = true;
+    await loadExistingPlan(planId.value);
+  } else {
+    // 새 계획 초기화
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    userPermissions.value.canEdit = true;
+    startDate.value = today.toISOString().split('T')[0];
+    endDate.value = tomorrow.toISOString().split('T')[0];
+    
+    calculateDuration();
+  }
   
   // 지역 데이터 로드
   await fetchAreas();
@@ -1153,7 +1282,247 @@ onMounted(async () => {
   setTimeout(() => {
     initializeMap();
   }, 100);
+  
+  // 다음 코드를 추가해 sortable 기능 초기화
+  initSortable();
 });
+
+// Sortable.js 초기화 함수 추가
+const initSortable = () => {
+  // 각 날짜에 대해 sortable 적용 (selectedDay가 변경될 때마다 재적용)
+  watch(selectedDay, () => {
+    nextTick(() => {
+      const container = document.querySelector('.selected-places');
+      if (!container) return;
+      
+      // 기존 sortable 인스턴스 제거
+      if (window.currentSortable) {
+        window.currentSortable.destroy();
+      }
+      
+      // 새 sortable 인스턴스 생성 (편집 권한이 있을 때만)
+      if (userPermissions.value.canEdit) {
+        window.currentSortable = Sortable.create(container, {
+          animation: 150,
+          ghostClass: 'sortable-ghost',
+          chosenClass: 'sortable-chosen',
+          dragClass: 'sortable-drag',
+          handle: '.place-item',
+          onEnd: async evt => {
+            // 1) 화면상 순서 반영 (planData 기준)
+            const dayObj = sortedDays.value[selectedDay.value];
+            const origDay = planData.value.days.find(d => d.dayDate === dayObj.dayDate);
+            if (!origDay) return;
+
+            // oldIndex → newIndex 로 item 이동
+            const moved = origDay.items.splice(evt.oldIndex, 1)[0];
+            origDay.items.splice(evt.newIndex, 0, moved);
+
+            // 2) sequence 재부여
+            origDay.items.forEach((it, i) => {
+              it.sequence = i + 1;
+            });
+
+            // 3) 리스트·마커 다시 그리기
+            addMarkersToMap(getPlacesForDay(selectedDay.value));
+          }
+        });
+      }
+    });
+  }, {immediate: true});
+};
+
+const loadRecommendedPlan = async (recommendedData) => {
+  try {
+    console.log('추천 계획 로드 시작:', recommendedData);
+    
+    // 권한 설정 (새 계획이므로 편집 가능)
+    userPermissions.value = {
+      canEdit: true,
+      canDelete: true,
+      userRole: 'LEADER'
+    };
+    
+    // 기본 정보 설정
+    tripTitle.value = recommendedData.title;
+    startDate.value = recommendedData.startDate;
+    endDate.value = recommendedData.endDate;
+    isPublic.value = recommendedData.isPublic;
+    
+    // 기간 계산
+    calculateDuration();
+    
+    // 추천된 계획 데이터를 planData에 로드하되, 상세 정보도 함께 가져오기
+    const daysWithDetails = await Promise.all(
+      recommendedData.days.map(async day => {
+        console.log(`Day ${day.dayDate} 처리 중, 아이템 수:`, day.items?.length || 0);
+        
+        // 각 아이템에 대해 상세 정보 가져오기
+        const itemsWithDetail = await Promise.all(
+          (day.items || []).map(async (item, index) => {
+            try {
+              console.log(`아이템 ${index + 1} 처리 중 - placeId:`, item.placeId);
+              
+              // 이미 상세 정보가 있는 경우 (AI에서 제공된 경우)
+              if (item.title && item.address1 && item.latitude && item.longitude) {
+                console.log(`아이템 ${index + 1} - 이미 상세 정보 있음:`, item.title);
+                return {
+                  ...item,
+                  sequence: index + 1 // sequence 보정
+                };
+              }
+              
+              // 상세 정보가 없는 경우 API에서 가져오기
+              console.log(`아이템 ${index + 1} - API에서 상세 정보 가져오는 중...`);
+              const detail = await fetchPlaceDetails(item.placeId);
+              console.log(`아이템 ${index + 1} - API 응답:`, detail.title);
+              
+              return {
+                ...item, // 기존 정보 유지
+                title: detail.title,
+                address1: detail.address1,
+                address2: detail.address2 || '',
+                telephone: detail.telephone || '',
+                longitude: detail.longitude,
+                latitude: detail.latitude,
+                sequence: index + 1 // sequence 보정
+              };
+            } catch (error) {
+              console.error(`placeId ${item.placeId} 상세 정보 로드 실패:`, error);
+              // 실패한 경우 기본 정보라도 표시
+              return { 
+                ...item,
+                title: item.title || `장소 ${item.placeId}`,
+                address1: item.address1 || '주소 정보 없음',
+                telephone: item.telephone || '',
+                longitude: item.longitude || null,
+                latitude: item.latitude || null,
+                sequence: index + 1
+              };
+            }
+          })
+        );
+        
+        console.log(`Day ${day.dayDate} 완료 - 처리된 아이템 수:`, itemsWithDetail.length);
+        return {
+          ...day,
+          items: itemsWithDetail
+        };
+      })
+    );
+    
+    // planData에 할당
+    planData.value.days = daysWithDetails;
+    
+    // selectedPlaces는 호환성을 위해 유지
+    selectedPlaces.value = planData.value.days.map(day => [...(day.items || [])]);
+    
+    console.log('✅ 추천 계획 로드 완료. 전체 planData:', planData.value);
+    console.log('첫 번째 날 아이템들:', planData.value.days[0]?.items);
+    
+    // 첫 번째 날짜의 장소들을 지도에 표시
+    if (planData.value.days.length > 0) {
+      const firstDayPlaces = getPlacesForDay(0);
+      console.log('첫 번째 날 장소들:', firstDayPlaces);
+      if (mapLoaded.value) {
+        addMarkersToMap(firstDayPlaces);
+      }
+    }
+    
+  } catch (error) {
+    console.error('추천 계획 로드 실패:', error);
+    alert('추천 여행 계획을 불러오는 중 오류가 발생했습니다.');
+    
+    // 실패 시 기본 새 계획으로 초기화
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    startDate.value = today.toISOString().split('T')[0];
+    endDate.value = tomorrow.toISOString().split('T')[0];
+    calculateDuration();
+  }
+};
+
+// 기존 계획 불러오기 함수 수정
+const loadExistingPlan = async (id) => {
+  try {
+    const { data: plan } = await axios.get(`${API_BASE_URL}/api/plan/${id}/with-permission`);
+    
+    // 권한 정보 설정
+    userPermissions.value = {
+      canEdit: plan.canEdit === true,
+      canDelete: plan.canDelete === true,
+      userRole: plan.userRole
+    };
+    
+    // 계획 기본 정보 설정
+    tripTitle.value = plan.title || '여행 계획';
+    startDate.value = plan.startDate?.split('T')[0] || '';
+    endDate.value = plan.endDate?.split('T')[0] || '';
+    isPublic.value = plan.isPublic === true;
+    
+    calculateDuration();
+    
+    // 장소 정보 설정 - API 응답 구조 그대로 사용하되 상세 정보만 추가
+    const daysWithDetails = await Promise.all(
+      (plan.days || []).map(async day => {
+        // 각 아이템에 대해 상세 정보 가져오기
+        const itemsWithDetail = await Promise.all(
+          (day.items || []).map(async item => {
+            try {
+              const detail = await fetchPlaceDetails(item.placeId);
+              return {
+                ...item, // 기존 itemId, sequence 등 유지
+                title: detail.title,
+                address1: detail.address1,
+                telephone: detail.telephone,
+                longitude: detail.longitude,
+                latitude: detail.latitude
+                // memo, startTime, endTime은 이미 item에 있음
+              };
+            } catch (e) {
+              console.error(`placeId ${item.placeId} 로드 실패`, e);
+              return { 
+                ...item,
+                title: `알 수 없는 장소 (${item.placeId})`,
+                address1: '',
+                telephone: '',
+                longitude: null,
+                latitude: null
+              };
+            }
+          })
+        );
+        
+        return {
+          ...day, // 기존 dayId, dayDate 유지
+          items: itemsWithDetail
+        };
+      })
+    );
+    
+    // planData에 직접 할당 (기존 구조 유지)
+    planData.value.days = daysWithDetails;
+    
+    // selectedPlaces는 호환성을 위해 유지하지만 실제로는 planData를 사용
+    selectedPlaces.value = planData.value.days.map(day => [...(day.items || [])]);
+    
+    console.log('✅ 기존 계획 로드 완료:', planData.value);
+    
+  } catch (error) {
+    console.error('계획 정보 로드 실패:', error);
+    
+    if (error.response?.status === 404) {
+      alert('존재하지 않는 여행 계획입니다.');
+      router.push('/tripmain');
+    } else if (error.response?.status === 403) {
+      alert('이 계획을 볼 수 있는 권한이 없습니다.');
+      router.push('/tripmain');
+    } else {
+      alert('여행 계획을 불러오는 중 오류가 발생했습니다.');
+    }
+  }
+};
 
 // 날짜가 변경될 때마다 기간 재계산
 watch([startDate, endDate], () => {
@@ -1163,18 +1532,18 @@ watch([startDate, endDate], () => {
 // 선택된 날짜가 변경될 때 지도 업데이트
 watch(selectedDay, (newDay) => {
   if (mapLoaded.value) {
-    const placesForDay = getSelectedPlacesByDay(newDay);
+    const placesForDay = getPlacesForDay(newDay);
     addMarkersToMap(placesForDay);
   }
 });
 </script>
-
 <style scoped>
+/* 기본 스타일 */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 .trip-planner-container {
@@ -1300,7 +1669,7 @@ watch(selectedDay, (newDay) => {
 }
 .date-tab.active {
   background-color: #f0f4ff;
-  color: #586bad;
+  color: #2172ce;
   font-weight: 600;
 }
 
@@ -1311,7 +1680,7 @@ watch(selectedDay, (newDay) => {
 }
 
 .date-tab.active .day-date {
-  color: #586bad;
+  color: #2172ce;
 }
 
 /* 선택된 장소 목록 - 스크롤 가능하게 */
@@ -1364,7 +1733,7 @@ watch(selectedDay, (newDay) => {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   display: flex;
   align-items: center;
@@ -1394,7 +1763,7 @@ watch(selectedDay, (newDay) => {
 
 .place-distance {
   font-size: 0.8rem;
-  color: #586bad;
+  color: #2172ce;
 }
 
 .remove-place-btn {
@@ -1425,24 +1794,45 @@ watch(selectedDay, (newDay) => {
 }
 
 .add-place-button {
-  width: 100%;
+  width: 95%;
+  margin: 0 auto;
   padding: 0.8rem;
-  background-color: #f5f5f5;
-  border: 1px dashed #ccc;
+  background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
+  color: white;
+  border: none;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  color: #666;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.add-place-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 6px;
 }
 
 .add-place-button:hover {
-  background-color: #f0f0f0;
-  border-color: #bbb;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(33, 114, 206, 0.3);
+}
+
+.add-place-button:hover::before {
+  width: 100%;
 }
 
 /* 오른쪽 지도 패널 */
@@ -1483,16 +1873,37 @@ watch(selectedDay, (newDay) => {
 .retry-btn {
   margin-top: 1rem;
   padding: 0.6rem 1.2rem;
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.retry-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 4px;
 }
 
 .retry-btn:hover {
-  background-color: #8470d7;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(33, 114, 206, 0.3);
+}
+
+.retry-btn:hover::before {
+  width: 100%;
 }
 
 /* 검색 모달 */
@@ -1593,14 +2004,15 @@ watch(selectedDay, (newDay) => {
 
 .filter-select:focus {
   outline: none;
-  border-color: #9581e8;
-  box-shadow: 0 0 0 2px rgba(149, 129, 232, 0.1);
+  border-color: #2172ce;
+  box-shadow: 0 0 0 2px rgba(33, 114, 206, 0.1);
 }
 
 .filter-select:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
   color: #999;
+  border-color: #e9ecef;
 }
 
 /* 검색 입력 */
@@ -1622,25 +2034,46 @@ watch(selectedDay, (newDay) => {
 
 .modal-search-input:focus {
   outline: none;
-  border-color: #9581e8;
-  box-shadow: 0 0 0 2px rgba(149, 129, 232, 0.1);
+  border-color: #2172ce;
+  box-shadow: 0 0 0 2px rgba(33, 114, 206, 0.1);
 }
 
 .modal-search-button {
   padding: 0.8rem 1.5rem;
-  background-color: #9581e8;
+  background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
   color: white;
   border: none;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
   white-space: nowrap;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.modal-search-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 6px;
 }
 
 .modal-search-button:hover:not(:disabled) {
-  background-color: #8470d7;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(33, 114, 206, 0.3);
+}
+
+.modal-search-button:hover::before {
+  width: 100%;
 }
 
 .modal-search-button:disabled {
@@ -1673,7 +2106,7 @@ watch(selectedDay, (newDay) => {
   width: 40px;
   height: 40px;
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #9581e8;
+  border-top: 3px solid #2172ce;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -1722,7 +2155,7 @@ watch(selectedDay, (newDay) => {
   background-color: #f8f9fa;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: #9581e8;
+  border-color: #2172ce;
 }
 
 .modal-result-image {
@@ -1783,7 +2216,7 @@ watch(selectedDay, (newDay) => {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   display: flex;
   align-items: center;
@@ -1842,7 +2275,7 @@ watch(selectedDay, (newDay) => {
 .map-marker-number {
   width: 24px;
   height: 24px;
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -1884,8 +2317,9 @@ watch(selectedDay, (newDay) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
+  max-width: 1550px;
   margin: 0 auto;
+  gap: 20px; 
 }
 
 .plan-title-input {
@@ -1903,7 +2337,7 @@ watch(selectedDay, (newDay) => {
 .plan-title-input:focus {
   outline: none;
   background-color: #f8f9fa;
-  box-shadow: 0 0 0 2px rgba(149, 129, 232, 0.1);
+  box-shadow: 0 0 0 2px rgba(33, 114, 206, 0.1);
 }
 
 .plan-title-input::placeholder {
@@ -1915,6 +2349,7 @@ watch(selectedDay, (newDay) => {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+
 }
 
 .public-option {
@@ -1929,12 +2364,12 @@ watch(selectedDay, (newDay) => {
 .public-option input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  accent-color: #9581e8;
+  accent-color: #2172ce;
 }
 
 .save-plan-button {
   padding: 0.8rem 1.5rem;
-  background: linear-gradient(135deg, #9581e8, #8470d7);
+  background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -1942,17 +2377,36 @@ watch(selectedDay, (newDay) => {
   font-size: 1rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(149, 129, 232, 0.3);
+  box-shadow: 0 4px 12px rgba(33, 114, 206, 0.3);
   display: flex;
   align-items: center;
   gap: 0.5rem;
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.save-plan-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 8px;
 }
 
 .save-plan-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #8470d7, #7359d1);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(149, 129, 232, 0.4);
+  box-shadow: 0 6px 16px rgba(33, 114, 206, 0.4);
+}
+
+.save-plan-button:hover::before {
+  width: 100%;
 }
 
 .save-plan-button:disabled {
@@ -1963,7 +2417,7 @@ watch(selectedDay, (newDay) => {
 }
 
 .save-plan-button.saving {
-  background: #9581e8;
+  background: #2172ce;
   cursor: wait;
 }
 
@@ -2049,7 +2503,7 @@ watch(selectedDay, (newDay) => {
 
 .ok-button {
   padding: 0.8rem 2rem;
-  background: linear-gradient(135deg, #9581e8, #8470d7);
+  background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -2057,11 +2511,31 @@ watch(selectedDay, (newDay) => {
   font-size: 1rem;
   font-weight: 600;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.ok-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 8px;
 }
 
 .ok-button:hover {
-  background: linear-gradient(135deg, #8470d7, #7359d1);
   transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(33, 114, 206, 0.3);
+}
+
+.ok-button:hover::before {
+  width: 100%;
 }
 
 /* 반응형 디자인 추가 */
@@ -2085,7 +2559,6 @@ watch(selectedDay, (newDay) => {
     justify-content: space-between;
   }
   
-  
   .save-modal-content {
     width: 320px;
   }
@@ -2104,7 +2577,5 @@ watch(selectedDay, (newDay) => {
     padding: 0.7rem 1.2rem;
     font-size: 0.9rem;
   }
-
 }
 </style>
-

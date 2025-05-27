@@ -711,9 +711,9 @@ onMounted(async() =>{
   min-height: 100vh;
 
   min-height: 100vh;
-  background-image: url('https://i.pinimg.com/736x/91/72/b7/9172b7886a49d6649cb05dea79f55f53.jpg');
+  background-image: url('https://i.pinimg.com/736x/5e/9f/07/5e9f07d84b763d9fd5becff18cc6e99e.jpg');
   background-repeat: repeat;
-  background-size: auto;
+  background-size: cover;
   background-attachment: fixed;
 
 
@@ -746,14 +746,14 @@ onMounted(async() =>{
 }
 
 .back-btn {
-  color: #9581e8;
+  color: #2172ce;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
 }
 
 .back-btn:hover {
-  color: #8571d8;
+  color: #2172ce;
 }
 
 .post-actions {
@@ -841,7 +841,7 @@ onMounted(async() =>{
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   display: flex;
   align-items: center;
@@ -879,7 +879,7 @@ onMounted(async() =>{
 
 .post-tag {
   background-color: #f0f4ff;
-  color: #9581e8;
+  color: #2172ce;
   padding: 0.3rem 0.6rem;
   border-radius: 15px;
   font-size: 0.8rem;
@@ -945,8 +945,8 @@ onMounted(async() =>{
 }
 
 .like-btn:hover {
-  border-color: #9581e8;
-  color: #9581e8;
+  border-color: #2172ce;
+  color: #2172ce;
   transform: translateY(-2px);
 }
 
@@ -987,7 +987,7 @@ onMounted(async() =>{
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   display: flex;
   align-items: center;
@@ -1014,7 +1014,7 @@ onMounted(async() =>{
 
 .comment-textarea:focus {
   outline: none;
-  border-color: #9581e8;
+  border-color: #2172ce;
   box-shadow: 0 0 0 2px rgba(149, 129, 232, 0.1);
 }
 
@@ -1031,7 +1031,7 @@ onMounted(async() =>{
 
 .comment-submit-btn {
   padding: 0.6rem 1.2rem;
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   border: none;
   border-radius: 5px;
@@ -1041,7 +1041,7 @@ onMounted(async() =>{
 }
 
 .comment-submit-btn:hover:not(:disabled) {
-  background-color: #8571d8;
+  background-color: #2c88f1;
   transform: translateY(-1px);
 }
 
@@ -1069,7 +1069,7 @@ onMounted(async() =>{
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   display: flex;
   align-items: center;

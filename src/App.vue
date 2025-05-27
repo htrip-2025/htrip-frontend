@@ -10,9 +10,8 @@
       <div class="menu-items">
         <router-link to="/ai" class="menu-link">AI 추천</router-link>
         <router-link to="/info" class="menu-link">여행정보</router-link>
-        <router-link to="/tripmain" class="menu-link">여행계획</router-link>
+        <router-link to="/plan" class="menu-link">여행계획</router-link>
         <router-link to="/board" class="menu-link">커뮤니티</router-link>
-        <!-- <a href="#" class="menu-link search-icon">🔍</a> -->
       </div>
       
       <!-- 로그인 상태에 따른 버튼 표시 -->
@@ -178,12 +177,12 @@ html, body {
 }
 
 .logo:hover {
-  color: #9581e8;
+  color: #2172ce;
 }
 
 .logo-icon {
-  color: #47a34f;
-  background-color: #ffefd5;
+  color: #2172ce;
+  background-color: #dfe0e1;
   padding: 2px 8px;
   border-radius: 50%;
   margin-right: 2px;
@@ -195,24 +194,21 @@ html, body {
 }
 
 .menu-link {
-  text-decoration: none;
-  color: #666;
-  font-size: 1.1rem;
-  transition: color 0.3s;
-  position: relative;
+ text-decoration: none;
+ color: #666;
+ font-size: 1.1rem;
+ transition: color 0.3s;
+ position: relative;
 }
 
 .menu-link:hover {
-  color: #47a34f;
+ color: #2172ce;
+   background-color: white;
 }
 
 .menu-link.router-link-active {
-  color: #47a34f;
-  font-weight: 600;
-}
-
-.search-icon {
-  font-size: 1.2rem;
+ color: #2172ce;
+ font-weight: 600;
 }
 
 /* 인증 섹션 */
@@ -251,20 +247,40 @@ html, body {
 }
 
 .logout-btn {
-  padding: 0.5rem 1rem;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
+ padding: 0.5rem 1rem;
+ background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
+ color: white;
+ border: none;
+ border-radius: 20px;
+ font-size: 0.9rem;
+ font-weight: 500;
+ cursor: pointer;
+ transition: all 0.3s ease;
+ position: relative;
+ overflow: hidden;
+ z-index: 1;
+}
+
+.logout-btn::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 0%;
+ height: 100%;
+ background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+ transition: width 0.5s ease;
+ z-index: -1;
+ border-radius: 20px;
 }
 
 .logout-btn:hover {
-  background-color: #c82333;
-  transform: translateY(-1px);
+ transform: translateY(-3px);
+ box-shadow: 0 10px 25px rgba(33, 114, 206, 0.35);
+}
+
+.logout-btn:hover::before {
+ width: 100%;
 }
 
 .login-section {
@@ -276,7 +292,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #47a34f 0%, #71ca78 100%);
+  background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
   color: white;
   padding: 0.6rem 1.5rem;
   border-radius: 30px;
@@ -299,7 +315,7 @@ html, body {
   left: 0;
   width: 0%;
   height: 100%;
-  background: linear-gradient(135deg, #71ca78 0%, #47a34f 100%);
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
   transition: width 0.5s ease;
   z-index: -1;
   border-radius: 30px;

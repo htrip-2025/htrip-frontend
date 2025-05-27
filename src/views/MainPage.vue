@@ -1,13 +1,14 @@
 <template>
   <div class="travel-container">
     <!-- 헤더 -->
-     
  
     <!-- 히어로 섹션 -->
     <section class="hero-section">
       <div class="hero-content">
+        <br>
         <p class="hero-subtitle">The vacation you deserve is closer than you think </p>
         <h1 class="hero-title">
+            <br>
             <br>
           Since I was born <br>
           I traveled to Korea<br>
@@ -48,6 +49,21 @@
 
 
 
+
+
+    <!-- 목적지 섹션 -->
+    <section class="destinations-section">
+      <div class="section-header">
+       
+        <div class="navigation-arrows">
+          <!-- <button class="arrow-btn prev">◀</button>
+          <button class="arrow-btn next">▶</button> -->
+        </div>
+      </div>
+     
+    </section>
+
+
   </div>
 </template>
 
@@ -67,12 +83,16 @@ onMounted(() => {
   const prevButton = document.querySelector('.arrow-btn.prev');
   const nextButton = document.querySelector('.arrow-btn.next');
   destinationCards.value = document.querySelector('.destination-cards');
+
   
-  // 이전 버튼 클릭 이벤트
-  prevButton.addEventListener('click', scrollLeft);
+  // 요소가 존재할 때만 이벤트 리스너 추가
+  if (prevButton) {
+    prevButton.addEventListener('click', scrollLeft);
+  }
   
-  // 다음 버튼 클릭 이벤트
-  nextButton.addEventListener('click', scrollRight);
+  if (nextButton) {
+    nextButton.addEventListener('click', scrollRight);
+  }
 });
 
 // 왼쪽으로 스크롤하는 함수
@@ -123,14 +143,12 @@ const scrollRight = () => {
   min-height: 100vh;
 
 
+
   min-height: 100vh;
-
-  background-image: url('https://i.pinimg.com/736x/91/72/b7/9172b7886a49d6649cb05dea79f55f53.jpg');
+  background-image: url('https://i.pinimg.com/736x/5e/9f/07/5e9f07d84b763d9fd5becff18cc6e99e.jpg');
   background-repeat: repeat;
-  background-size: auto;
+  background-size: cover;
   background-attachment: fixed;
-  
-
 
 }
 
@@ -179,7 +197,7 @@ const scrollRight = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #48ac50 0%, #71ca78 100%); /* 연한 색상으로 변경 */
+  background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%); /* 연한 색상으로 변경 */
   color: white;
   padding: 0.8rem 1.8rem; /* 패딩 줄임 */
   border-radius: 30px; /* 약간 줄임 */
@@ -204,7 +222,7 @@ const scrollRight = () => {
   left: 0;
   width: 0%;
   height: 100%;
-  background: linear-gradient(135deg, #a2b3f8 0%, #9581e8 100%); /* 연한 색상으로 변경 */
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%); /* 연한 색상으로 변경 */
   transition: width 0.5s ease;
   z-index: -1;
   border-radius: 30px;
@@ -333,7 +351,21 @@ const scrollRight = () => {
   z-index: 1;
 }
 
-
+/* 배경에 커브 선 추가 */
+/* .hero-images::before {
+  content: '';
+  position: absolute;
+  top: 30%;
+  left: 5%;
+  width: 90%;
+  height: 50%;
+  border: 2px solid #e6d7a3;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 50% 50% 0 0;
+  z-index: 0;
+} */
 
 /* 반응형 조정 */
 @media (max-width: 768px) {
@@ -371,154 +403,7 @@ const scrollRight = () => {
 }
 
 
-/* 목적지 섹션 */
-.destinations-section {
-  margin-bottom: 5rem;
-  position: relative;
-  z-index: 1;
-}
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 2rem;
-}
-
-.destination-title {
-  font-size: 1.8rem;
-  color: #333;
-}
-
-.navigation-arrows {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.arrow-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: white;
-  border: 2px solid #ddd;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  transition: all 0.3s;
-}
-
-.arrow-btn:hover {
-  background-color: #9581e8;
-  color: white;
-  border-color: #9581e8;
-  transform: scale(1.1);
-}
-
-.arrow-btn:active {
-  transform: scale(0.95);
-}
-
-.destination-cards {
-  display: flex;
-  gap: 1.5rem;
-  overflow-x: auto;
-  padding: 0.5rem;
-  scrollbar-width: none; /* Firefox */
-  scroll-behavior: smooth; /* 부드러운 스크롤 효과 */
-  -webkit-overflow-scrolling: touch; /* iOS에서 부드러운 스크롤 */
-  scroll-snap-type: x mandatory; /* 스크롤 스냅 */
-}
-
-.destination-cards::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
-
-.destination-card {
-  min-width: 250px;
-  background-color: white;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  scroll-snap-align: start; /* 스크롤 스냅 지점 */
-  transition: transform 0.3s ease;
-}
-
-.destination-image {
-  height: 180px;
-  overflow: hidden;
-}
-
-.destination-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.destination-card:hover .destination-image img {
-  transform: scale(1.05);
-}
-
-.destination-info {
-  padding: 1rem;
-}
-
-.destination-info h4 {
-  font-size: 1rem;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.destination-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-}
-
-.price {
-  color: #9581e8;
-  font-weight: 600;
-}
-
-.duration {
-  color: #666;
-}
-
-/* 항공사 로고 섹션 */
-.airlines-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem 0;
-  margin-bottom: 5rem;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  position: relative;
-  z-index: 1;
-}
-
-.airline-logo {
-  color: #999;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-/* 휴가 계획 섹션 */
-.vacation-planning {
-  display: flex;
-  gap: 4rem;
-  margin-bottom: 5rem;
-  position: relative;
-  z-index: 1;
-}
-
-.planning-images {
-  flex: 1;
-  position: relative;
-  height: 400px;
-}
 
 .main-planning-image {
   position: relative;    /* 절대 위치가 아니라 문서 흐름 안에서 */
@@ -699,6 +584,11 @@ const scrollRight = () => {
     grid-template-columns: repeat(2, 1fr);
   }
   
+  /* 그라데이션 타원형 크기 조정 */
+  .circle1, .circle2, .circle3, .circle4, .circle5, .circle6, .circle7 {
+    width: 80vw !important;
+    height: 60vw !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -746,6 +636,11 @@ const scrollRight = () => {
     transform: none !important;
     margin-bottom: 1rem;
   }
-
+  
+  /* 그라데이션 타원형 크기 조정 */
+  .circle1, .circle2, .circle3, .circle4, .circle5, .circle6, .circle7 {
+    width: 110vw !important;
+    height: 80vw !important;
+  }
 }
 </style>

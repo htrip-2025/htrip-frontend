@@ -1,11 +1,6 @@
 <template>
   <div class="container">
-    <!-- 배경 그라데이션 원형들 -->
-    <div class="gradient-circle circle1"></div>
-    <div class="gradient-circle circle2"></div>
-    <div class="gradient-circle circle3"></div>
-    <div class="gradient-circle circle4"></div>
-    <div class="gradient-circle circle5"></div>
+    
     <p class="page-subtitle">여행 계획을 위한 키워드를 선택해주세요</p>
 
     <!-- 조건 선택 폼 (처음 화면) -->
@@ -367,7 +362,7 @@ export default {
       try {
         // 병렬로 모든 관광지 정보 요청
         const fetchPromises = placeIds.map(placeId => 
-          fetch(`${import.meta.env.VITE_API_URL || ''}/api/attraction/${placeId}`, {
+          fetch(`${import.meta.env.VITE_API_URL || ''}/api/travel/${placeId}`, {
             credentials: 'include' // 쿠키 포함
           }).then(response => {
             if (!response.ok) {
@@ -538,89 +533,60 @@ export default {
     },
     
     // 내 여행 경로에서 편집
-    editInMyPlan() {
-      if (!this.recommendation) return;
-      
-      try {
-        // 추천 여행 계획을 새 여행 계획으로 저장하는 API 호출
-        const requestData = {
-          title: `${this.getAreaName()} ${this.getDurationText()} 여행`,
-          startDate: new Date().toISOString().split('T')[0], // 오늘 날짜를 기본값으로
-          endDate: new Date(new Date().getTime() + (this.formData.durationDays - 1) * 86400000).toISOString().split('T')[0],
-          isPublic: true
-        };
-        
-        // API 호출
-        fetch(`${import.meta.env.VITE_API_URL || ''}/api/plan`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestData),
-          credentials: 'include' // 쿠키 포함
+editInMyPlan() {
+  if (!this.recommendation) return;
+  
+  try {
+    // 추천 데이터를 전달할 형태로 변환
+    const tripPlanData = {
+      title: `${this.getAreaName()} ${this.getDurationText()} 여행`,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(new Date().getTime() + (this.formData.durationDays - 1) * 86400000).toISOString().split('T')[0],
+      isPublic: true,
+      days: this.recommendation.days.map(day => ({
+        dayId: `temp_${day.dayDate}`,
+        dayDate: day.dayDate,
+        items: day.items.map((item, index) => {
+          const attraction = this.attractionsCache[item.placeId];
+          return {
+            placeId: item.placeId,
+            title: attraction?.title || `장소 ${item.placeId}`,
+            address1: attraction?.address1 || '',
+            telephone: attraction?.telephone || '',
+            latitude: attraction?.latitude || null,
+            longitude: attraction?.longitude || null,
+            memo: item.memo || null,
+            startTime: null,
+            endTime: null,
+            sequence: index + 1
+          };
         })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('여행 계획 생성 실패');
-          }
-          return response.json();
-        })
-        .then(planData => {
-          console.log('생성된 여행 계획:', planData);
-          
-          // 추천된 여행 일정 아이템들을 새 계획에 추가
-          const addItemPromises = [];
-          
-          this.recommendation.days.forEach(day => {
-            const dayId = planData.days.find(d => d.dayDate === day.dayDate)?.dayId;
-            if (!dayId) return;
-            
-            day.items.forEach(item => {
-              const itemRequest = {
-                dayId: dayId,
-                placeId: item.placeId,
-                sequence: item.sequence,
-                startTime: null, // 실제로는 적절한 시간 설정 필요
-                endTime: null,
-                memo: item.memo
-              };
-              
-              // 아이템 추가 API 호출
-              const promise = fetch(`${import.meta.env.VITE_API_URL || ''}/api/plan/${planData.planId}/day/${dayId}/item`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(itemRequest),
-                credentials: 'include'
-              });
-              
-              addItemPromises.push(promise);
-            });
-          });
-          
-          // 모든 아이템 추가가 완료되면 편집 페이지로 이동
-          Promise.all(addItemPromises)
-            .then(() => {
-              // 여행 계획 편집 페이지로 이동
-              this.$router.push(`/plan?id=${planData.planId}`);
-            })
-            .catch(error => {
-              console.error('일정 아이템 추가 실패:', error);
-              // 오류가 있어도 편집 페이지로 이동
-              this.$router.push(`/plan?id=${planData.planId}`);
-            });
-        })
-        .catch(error => {
-          console.error('여행 계획 저장 실패:', error);
-          alert('여행 계획을 저장하는 중 오류가 발생했습니다.');
-        });
-        
-      } catch (error) {
-        console.error('내 여행 경로로 편집 실패:', error);
-        alert('여행 계획을 저장하는 중 오류가 발생했습니다.');
+      })),
+      metadata: {
+        source: 'ai-recommendation',
+        recommendationId: this.recommendation.id,
+        originalFormData: { ...this.formData }
       }
-    },
+    };
+
+    // 방법 1: sessionStorage 사용 (가장 간단)
+    sessionStorage.setItem('aiRecommendedPlan', JSON.stringify(tripPlanData));
+    this.$router.push('/plan');
+
+    // 방법 2: 라우터 params로 전달 (백업)
+    // this.$router.push({
+    //   path: '/plan',
+    //   query: { 
+    //     source: 'ai-recommendation',
+    //     planData: encodeURIComponent(JSON.stringify(tripPlanData))
+    //   }
+    // });
+
+  } catch (error) {
+    console.error('여행 계획으로 이동 실패:', error);
+    alert('여행 계획 페이지로 이동하는 중 오류가 발생했습니다.');
+  }
+},
     
     // 지역 이미지 가져오기
     getAreaImage() {
@@ -658,10 +624,18 @@ export default {
     
     // 장소 카테고리 가져오기
     getPlaceCategory(placeId) {
-      if (this.attractionsCache[placeId]) {
-        return this.attractionsCache[placeId].category1 || '관광명소';
-      }
-      return '관광명소';
+        const ctId = this.attractionsCache[placeId]?.contentTypeId;
+        switch (ctId) {
+        case 12: return '관광지';
+        case 14: return '문화시설';
+        case 15: return '행사/공연/축제';
+        case 25: return '여행코스';
+        case 28: return '레포츠';
+        case 32: return '숙박';
+        case 38: return '쇼핑';
+        case 39: return '음식점';
+        default: return '관광명소';
+        }
     }
   },
   created() {
@@ -699,7 +673,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 /* 기본 스타일 */
 .container {
@@ -707,56 +680,15 @@ export default {
   margin: 0 auto;
   padding: 2rem;
   position: relative;
-  min-height: 100vh;
-  background-color: #ffffff;
-}
+  /* background-color: #ffffff; */
 
-/* 배경 그라데이션 원형 */
-.gradient-circle {
-  position: absolute;
-  border-radius: 65% 35% 60% 40% / 60% 40% 60% 40%;
-  z-index: -1;
-  opacity: 0.7;
-}
+ width: 100%;
+ min-height: 100vh;
+ background-image: url('https://i.pinimg.com/736x/5e/9f/07/5e9f07d84b763d9fd5becff18cc6e99e.jpg');
+ background-repeat: repeat;
+ background-size: cover;
+ background-attachment: fixed;
 
-.circle1 {
-  top: -10%;
-  left: -5%;
-  width: 45vw;
-  height: 35vw;
-  background: radial-gradient(ellipse, rgba(213, 224, 251, 0.9) 0%, rgba(213, 224, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
-}
-
-.circle2 {
-  bottom: -15%;
-  right: -10%;
-  width: 50vw;
-  height: 38vw;
-  background: radial-gradient(ellipse, rgba(213, 237, 251, 0.9) 0%, rgba(213, 237, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
-}
-
-.circle3 {
-  top: 20%;
-  right: 10%;
-  width: 35vw;
-  height: 25vw;
-  background: radial-gradient(ellipse, rgba(213, 222, 251, 0.85) 0%, rgba(213, 222, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
-}
-
-.circle4 {
-  bottom: 30%;
-  left: 5%;
-  width: 28vw;
-  height: 22vw;
-  background: radial-gradient(ellipse, rgba(213, 232, 251, 0.9) 0%, rgba(213, 232, 251, 0.5) 40%, rgba(255, 255, 255, 0) 70%);
-}
-
-.circle5 {
-  top: 45%;
-  left: 30%;
-  width: 40vw;
-  height: 28vw;
-  background: radial-gradient(ellipse, rgba(213, 224, 251, 0.85) 0%, rgba(213, 224, 251, 0.4) 40%, rgba(255, 255, 255, 0) 70%);
 }
 
 /* 페이지 제목 */
@@ -823,10 +755,10 @@ export default {
 }
 
 .option-button.active {
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
-  border-color: #9581e8;
-  box-shadow: 0 5px 15px rgba(149, 129, 232, 0.3);
+  border-color: #2172ce;
+  box-shadow: 0 5px 15px rgba(33, 114, 206, 0.3);
 }
 
 .submit-button {
@@ -835,7 +767,7 @@ export default {
   max-width: 400px;
   margin: 3rem auto 1rem;
   padding: 1.2rem;
-  background: linear-gradient(135deg, #9581e8 0%, #a2b3f8 100%);
+  background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -843,12 +775,32 @@ export default {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 5px 20px rgba(149, 129, 232, 0.4);
+  box-shadow: 0 5px 20px rgba(33, 114, 206, 0.4);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 10px;
 }
 
 .submit-button:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(149, 129, 232, 0.5);
+  box-shadow: 0 8px 25px rgba(33, 114, 206, 0.5);
+}
+
+.submit-button:hover::before {
+  width: 100%;
 }
 
 .submit-button:disabled {
@@ -880,7 +832,7 @@ export default {
   height: 70px;
   margin: 0 auto 2rem;
   border: 6px solid #f3f3f3;
-  border-top: 6px solid #9581e8;
+  border-top: 6px solid #2172ce;
   border-radius: 50%;
   animation: spin 1.5s linear infinite;
 }
@@ -914,7 +866,7 @@ export default {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #9581e8 0%, #a2b3f8 100%);
+  background: linear-gradient(90deg, #2172ce 0%, #2c88f1 100%);
   border-radius: 5px;
   transition: width 0.5s ease;
 }
@@ -963,7 +915,7 @@ export default {
 
 .result-subtitle {
   font-size: 1.3rem;
-  color: #9581e8;
+  color: #2172ce;
   margin-bottom: 0.5rem;
 }
 
@@ -996,7 +948,7 @@ export default {
   width: 50px;
   height: 50px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #9581e8;
+  border-top: 4px solid #2172ce;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -1022,7 +974,7 @@ export default {
 }
 
 .day-tab.active {
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
 }
 
@@ -1056,7 +1008,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   border-radius: 50%;
   font-weight: 600;
@@ -1075,7 +1027,7 @@ export default {
 
 .place-category {
   font-size: 0.9rem;
-  color: #9581e8;
+  color: #2172ce;
   margin-bottom: 0.5rem;
 }
 
@@ -1114,8 +1066,8 @@ export default {
 
 .change-btn {
   background-color: #f5f7fb;
-  color: #9581e8;
-  border: 1px solid #9581e8;
+  color: #2172ce;
+  border: 1px solid #2172ce;
 }
 
 .change-btn:hover {
@@ -1123,15 +1075,34 @@ export default {
 }
 
 .edit-btn {
-  background-color: #9581e8;
+  background-color: #2172ce;
   color: white;
   border: none;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.edit-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+  transition: width 0.5s ease;
+  z-index: -1;
+  border-radius: 8px;
 }
 
 .edit-btn:hover {
-  background-color: #8571d8;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(149, 129, 232, 0.3);
+  box-shadow: 0 5px 15px rgba(33, 114, 206, 0.3);
+}
+
+.edit-btn:hover::before {
+  width: 100%;
 }
 
 /* 에러 메시지 */

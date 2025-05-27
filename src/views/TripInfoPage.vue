@@ -189,15 +189,7 @@
       </div>
     </section>
     
-    <!-- 푸터 -->
-    <footer class="footer">
-      <div class="footer-content">
-        <div class="footer-logo">
-          <span class="logo-icon">T</span>rip
-        </div>
-        <p class="copyright">© 2025 Trip. All rights reserved.</p>
-      </div>
-    </footer>
+  
   </div>
 </template>
 
@@ -563,10 +555,11 @@ watch(currentPage, () => {
   min-height: 100vh;
 
   min-height: 100vh;
-  background-image: url('https://i.pinimg.com/736x/91/72/b7/9172b7886a49d6649cb05dea79f55f53.jpg');
+  background-image: url('https://i.pinimg.com/736x/5e/9f/07/5e9f07d84b763d9fd5becff18cc6e99e.jpg');
   background-repeat: repeat;
-  background-size: auto;
+  background-size: cover;
   background-attachment: fixed;
+  
 
 
 }
@@ -585,7 +578,7 @@ watch(currentPage, () => {
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #48ac50;
+  border-top: 4px solid #2172ce;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -606,19 +599,44 @@ watch(currentPage, () => {
   margin-bottom: 2rem;
 }
 
+/* 재시도 버튼 */
 .retry-button {
-  margin-top: 1rem;
-  padding: 0.8rem 1.5rem;
-  background-color: #48ac50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
+ margin-top: 1rem;
+ padding: 0.8rem 1.5rem;
+ background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
+ color: white;
+ border: none;
+ border-radius: 5px;
+ cursor: pointer;
+ font-size: 1rem;
+ transition: all 0.3s ease;
+ box-shadow: 0 3px 8px rgba(33, 114, 206, 0.3);
+ position: relative;
+ overflow: hidden;
+ z-index: 1;
+}
+
+.retry-button::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 0%;
+ height: 100%;
+ background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+ transition: width 0.5s ease;
+ z-index: -1;
+ border-radius: 5px;
 }
 
 .retry-button:hover {
-  background-color: #71ca78;
+ background: linear-gradient(135deg, #2c88f1, #2172ce);
+ transform: translateY(-3px);
+ box-shadow: 0 5px 12px rgba(33, 114, 206, 0.4);
+}
+
+.retry-button:hover::before {
+ width: 100%;
 }
 
 .main-content {
@@ -653,7 +671,7 @@ watch(currentPage, () => {
 }
 
 .filter-select:focus {
-  border-color: #48ac50;
+  border-color: #2172ce;
   outline: none;
   box-shadow: 0 0 0 2px rgba(149, 129, 232, 0.2);
 }
@@ -668,19 +686,52 @@ watch(currentPage, () => {
   gap: 0.5rem;
 }
 
+/* 검색 버튼 */
 .search-button {
-  padding: 0.6rem 1rem;
-  background-color: #48ac50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  white-space: nowrap;
+ padding: 0.6rem 1.2rem;
+ background: linear-gradient(135deg, #2172ce, #2c88f1);
+ color: white;
+ border: none;
+ border-radius: 8px;
+ cursor: pointer;
+ font-size: 0.9rem;
+ font-weight: 600;
+ white-space: nowrap;
+ transition: all 0.3s ease;
+ box-shadow: 0 3px 8px rgba(33, 114, 206, 0.3);
+ position: relative;
+ overflow: hidden;
+ z-index: 1;
 }
 
-.search-button:hover {
-  background-color: #71ca78;
+.search-button::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 0%;
+ height: 100%;
+ background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+ transition: width 0.5s ease;
+ z-index: -1;
+ border-radius: 8px;
+}
+
+.search-button:hover:not(:disabled) {
+ background: linear-gradient(135deg, #2c88f1, #2172ce);
+ transform: translateY(-2px);
+ box-shadow: 0 5px 12px rgba(33, 114, 206, 0.4);
+}
+
+.search-button:hover::before {
+ width: 100%;
+}
+
+.search-button:disabled {
+ background: #ccc;
+ cursor: not-allowed;
+ transform: none;
+ box-shadow: none;
 }
 
 .no-results {
@@ -785,29 +836,53 @@ watch(currentPage, () => {
   margin-bottom: 3rem;
 }
 
+/* 페이지네이션 버튼 */
 .pagination-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: white;
-  border: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
+ width: 40px;
+ height: 40px;
+ border-radius: 50%;
+ background-color: white;
+ border: 1px solid #ddd;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ cursor: pointer;
+ transition: all 0.3s ease;
+ font-size: 0.9rem;
+ color: #666;
+ position: relative;
+ overflow: hidden;
+ z-index: 1;
+}
+
+.pagination-btn::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 0%;
+ height: 100%;
+ background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+ transition: width 0.5s ease;
+ z-index: -1;
+ border-radius: 50%;
 }
 
 .prev, .next {
-  width: auto;
-  padding: 0 1rem;
-  border-radius: 20px;
+ width: auto;
+ padding: 0 1rem;
+ border-radius: 20px;
+}
+
+.prev::before, .next::before {
+ border-radius: 20px;
 }
 
 .pagination-btn.active {
-  background-color: #48ac50;
-  color: white;
-  border-color: #48ac50;
+ background: linear-gradient(135deg, #2172ce, #2c88f1);
+ color: white;
+ border-color: #2172ce;
+ box-shadow: 0 3px 8px rgba(33, 114, 206, 0.3);
 }
 
 .pagination-btn:hover:not(.active):not(:disabled) {
@@ -819,41 +894,6 @@ watch(currentPage, () => {
   cursor: not-allowed;
 }
 
-.footer {
-  background-color: #f8f9fa;
-  padding: 2rem 0;
-  margin-top: 3rem;
-  border-top: 1px solid #eee;
-  position: relative;
-  z-index: 1;
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.footer-logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #333;
-}
-
-.logo-icon {
-  color: #48ac50;
-  background-color: #ffefd5;
-  padding: 2px 8px;
-  border-radius: 50%;
-  margin-right: 2px;
-}
-
-.copyright {
-  color: #999;
-  font-size: 0.9rem;
-}
 
 /* 반응형 디자인 */
 @media (max-width: 1024px) {
@@ -951,7 +991,7 @@ watch(currentPage, () => {
 }
 
 .filter-select-small:focus {
-  border-color: #48ac50;
+  border-color: #2172ce;
   outline: none;
   box-shadow: 0 0 0 3px rgba(149, 129, 232, 0.15);
   transform: translateY(-1px);
@@ -978,7 +1018,7 @@ watch(currentPage, () => {
 
 .search-button {
   padding: 0.6rem 1.2rem;
-  background: linear-gradient(135deg, #48ac50, #71ca78);
+  background: linear-gradient(135deg, #2172ce, #2c88f1);
   color: white;
   border: none;
   border-radius: 8px;
@@ -991,7 +1031,7 @@ watch(currentPage, () => {
 }
 
 .search-button:hover {
-  background: linear-gradient(135deg, #71ca78, #48ac50);
+  background: linear-gradient(135deg, #2c88f1, #2172ce);
   transform: translateY(-2px);
   box-shadow: 0 5px 12px rgba(149, 129, 232, 0.4);
 }

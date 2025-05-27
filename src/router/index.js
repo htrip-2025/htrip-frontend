@@ -13,6 +13,8 @@ import TripPlanPage from '@/views/TripPlanPage.vue'
 import TripPlanMainPage from '@/views/TripPlanMainPage.vue'
 import TripDetail from '@/views/TripDetail.vue'
 import AITripRecommendation from '@/views/AITripRecommendation.vue'
+import MainPage from '../views/MainPage.vue'
+import TripInfoPage from '../views/TripInfoPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,12 +22,12 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: main_page,
+      component: MainPage,
     },
     {
       path: '/info',
       name: 'info',
-      component: trip_info_page,
+      component: TripInfoPage,
     },
     {
       path: '/plan',

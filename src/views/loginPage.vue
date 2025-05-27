@@ -1,61 +1,64 @@
 <template>
   <div class="login-container">
-    <!-- 왼쪽 콘텐츠 영역은 그대로 유지 -->
-    <div class="content-section">
-      <div class="branding">
-        <div class="logo-area">
-          <span class="logo-icon">T</span>rip
+    <!-- 왼쪽 배경 이미지 영역 -->
+    <div class="background-section">
+      <div class="overlay">
+        <div class="branding">
+          <div class="logo-area">
+            <span class="logo-icon">T</span>rip
+          </div>
+          <h1 class="slogan">
+            Move Fast.<br>
+            Break Nothing.
+            
+          </h1>
         </div>
-        <h1 class="slogan">
-          Move Fast.<br>
-          Break Nothing.
-        </h1>
-      </div>
-      
-      <div class="features">
-        <div class="feature-item">
-          <div class="feature-icon">
-            <div class="icon-lines">
-              <span></span>
+        
+        <div class="features">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <div class="icon-lines">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div class="feature-text">
+              <h3>Remove Bottlenecks</h3>
+              <p>Release testing and approvals are the most common bottleneck for tech, but you can now remove that bottleneck with Trip.</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon dashboard-icon">
               <span></span>
               <span></span>
             </div>
-          </div>
-          <div class="feature-text">
-            <h3>Remove Bottlenecks</h3>
-            <p>Release testing and approvals are the most common bottleneck for tech, but you can now remove that bottleneck with Trip.</p>
+            <div class="feature-text">
+              <h3>Access Risk Analysis</h3>
+              <p>We use machine learning and static analysis to assess risk, summarise code changes, and automate and delegate release management tasks. Integrate with a couple of clicks.</p>
+            </div>
           </div>
         </div>
         
-        <div class="feature-item">
-          <div class="feature-icon dashboard-icon">
-            <span></span>
-            <span></span>
-          </div>
-          <div class="feature-text">
-            <h3>Access Risk Analysis</h3>
-            <p>We use machine learning and static analysis to assess risk, summarise code changes, and automate and delegate release management tasks. Integrate with a couple of clicks.</p>
-          </div>
+        <div class="brand-footer">
+          <div class="logo-text">Trip</div>
         </div>
-      </div>
-      
-      <div class="brand-footer">
-        <div class="logo-text">Trip</div>
       </div>
     </div>
 
-    <!-- 오른쪽 로그인 폼 영역 수정 -->
+    <!-- 오른쪽 로그인 폼 영역 -->
     <div class="login-form-section">
       <div class="form-container">
-        <h2 class="form-title">Create an account.</h2>
-        <p class="form-subtitle">Already have an account? <a href="#" class="signin-link">Sign in</a></p>
-        
+        <h2 class="form-title">Login</h2>
+        <!-- <p class="form-subtitle">Already have an account? <a href="#" class="signin-link">Sign in</a></p>
+         -->
         <!-- 알림 메시지 -->
         <div v-if="message" class="alert" :class="{'alert-success': isSuccess, 'alert-error': !isSuccess}">
           {{ message }}
         </div>
         
-        <!-- 기존 폼 대신 소셜 로그인 버튼만 표시 -->
+        <!-- 소셜 로그인 버튼들 -->
         <div class="social-login-buttons">
           <!-- Google 로그인 버튼 -->
           <a href="#" class="social-login-btn google-btn" @click.prevent="handleGoogleLogin">
@@ -80,7 +83,7 @@
             <span>Kakao로 시작하기</span>
           </a>
           
-          <!-- Naver 로그인 버튼 - 아직 구현하지 않음 -->
+          <!-- Naver 로그인 버튼 -->
           <a href="#" class="social-login-btn naver-btn" @click.prevent="handleNaverLogin">
             <div class="social-icon naver-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -194,7 +197,6 @@ export default {
 </script>
 
 <style scoped>
-/* 기존 스타일 유지 */
 * {
   margin: 0;
   padding: 0;
@@ -206,18 +208,30 @@ export default {
   display: flex;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(120deg, #e0f7fa, #e8eaf6, #ede7f6);
   position: relative;
   overflow: hidden;
 }
 
-/* 왼쪽 콘텐츠 영역 스타일 유지 */
-.content-section {
+/* 왼쪽 배경 이미지 영역 */
+.background-section {
   flex: 1;
-  padding: 4rem;
+  background-image: url('https://i.pinimg.com/736x/c2/ef/69/c2ef693e49bed87f90e7f0b8b909ff23.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.overlay {
+  background: rgba(0, 0, 0, 0.4);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4rem;
   z-index: 10;
 }
 
@@ -228,7 +242,7 @@ export default {
 .logo-area {
   font-size: 2rem;
   font-weight: 700;
-  color: #333;
+  color: white;
   margin-bottom: 2rem;
 }
 
@@ -243,9 +257,10 @@ export default {
 .slogan {
   font-size: 3.5rem;
   font-weight: 800;
-  color: #40316E;
+  color: white;
   line-height: 1.2;
   margin-bottom: 3rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .features {
@@ -263,12 +278,13 @@ export default {
 .feature-icon {
   width: 50px;
   height: 50px;
-  background: rgba(149, 129, 232, 0.1);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 5px;
+  backdrop-filter: blur(10px);
 }
 
 .icon-lines {
@@ -282,7 +298,7 @@ export default {
   display: block;
   width: 4px;
   height: 20px;
-  background-color: #9581e8;
+  background-color: white;
   border-radius: 2px;
 }
 
@@ -306,7 +322,7 @@ export default {
   display: block;
   width: 25px;
   height: 6px;
-  background-color: #9581e8;
+  background-color: white;
   border-radius: 3px;
 }
 
@@ -316,15 +332,17 @@ export default {
 
 .feature-text h3 {
   font-size: 1.3rem;
-  color: #40316E;
+  color: white;
   margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .feature-text p {
   font-size: 0.95rem;
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.6;
   max-width: 400px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .brand-footer {
@@ -334,7 +352,8 @@ export default {
 .logo-text {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #9581e8;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* 오른쪽 로그인 폼 영역 */
@@ -343,7 +362,11 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #f8f9fa;
   z-index: 10;
+  background-image: url('https://i.pinimg.com/736x/a9/21/72/a92172a74650d9d2cd6a446dc69275b7.jpg');
+
+
 }
 
 .form-container {
@@ -352,7 +375,8 @@ export default {
   background-color: white;
   border-radius: 15px;
   padding: 3rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin: 2rem;
 }
 
 .form-title {
@@ -360,6 +384,8 @@ export default {
   font-weight: 700;
   color: #333;
   margin-bottom: 0.5rem;
+  
+
 }
 
 .form-subtitle {
@@ -393,7 +419,7 @@ export default {
   color: #EA4335;
 }
 
-/* 소셜 로그인 버튼 스타일 추가 */
+/* 소셜 로그인 버튼 스타일 */
 .social-login-buttons {
   display: flex;
   flex-direction: column;
@@ -434,6 +460,7 @@ export default {
 
 .google-btn:hover {
   background-color: #f8f8f8;
+  transform: translateY(-2px);
 }
 
 /* Kakao 버튼 스타일 */
@@ -444,6 +471,7 @@ export default {
 
 .kakao-btn:hover {
   background-color: #FDD800;
+  transform: translateY(-2px);
 }
 
 /* Naver 버튼 스타일 */
@@ -454,6 +482,7 @@ export default {
 
 .naver-btn:hover {
   background-color: #02B14A;
+  transform: translateY(-2px);
 }
 
 /* 네이버 아이콘 특별 스타일 */
@@ -468,12 +497,20 @@ export default {
     flex-direction: column;
   }
   
-  .content-section {
+  .background-section {
+    min-height: 40vh;
+  }
+  
+  .overlay {
     padding: 2rem;
   }
   
+  .slogan {
+    font-size: 2.5rem;
+  }
+  
   .form-container {
-    margin: 2rem;
+    margin: 1rem;
     max-width: none;
   }
 }
@@ -483,21 +520,37 @@ export default {
     flex-direction: column;
   }
   
-  .content-section {
-    padding: 2rem 1.5rem;
+  .background-section {
+    min-height: 35vh;
+  }
+  
+  .overlay {
+    padding: 1.5rem;
   }
   
   .slogan {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
   
   .features {
     gap: 1.5rem;
   }
   
+  .feature-text h3 {
+    font-size: 1.1rem;
+  }
+  
+  .feature-text p {
+    font-size: 0.9rem;
+  }
+  
   .form-container {
     padding: 2rem;
-    margin: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .form-title {
+    font-size: 1.5rem;
   }
 }
 </style>
