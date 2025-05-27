@@ -3,31 +3,36 @@
 <template>
   <div id="app">
     <!-- 특정 페이지가 아닐 때만 헤더 표시 -->
-    <header v-if="!shouldHideHeader" class="header">
-      <div class="logo" @click="goToHome">
-        <span class="logo-icon">T</span>rip
-      </div>
-      <div class="menu-items">
-        <router-link to="/ai" class="menu-link">AI 추천</router-link>
-        <router-link to="/info" class="menu-link">여행정보</router-link>
-        <router-link to="/plan" class="menu-link">여행계획</router-link>
-        <router-link to="/board" class="menu-link">커뮤니티</router-link>
-      </div>
-      
-      <!-- 로그인 상태에 따른 버튼 표시 -->
-      <div class="auth-section">
-        <div v-if="isLoggedIn" class="user-info">
-          <span class="username">{{ userName }}님</span>
-          <router-link to="/mypage" class="mypage-btn">마이페이지</router-link>
-          <button @click="logout" class="logout-btn">로그아웃</button>
-        </div>
-        <div v-else class="login-section">
-          <router-link to="/login" class="login-button">
-            <span class="button-text">로그인</span>
-          </router-link>
-        </div>
-      </div>
-    </header>
+   <!-- 헤더 부분만 수정 -->
+<header v-if="!shouldHideHeader" class="header">
+  <div class="logo" @click="goToHome">
+    <span class="logo-icon">T</span>ripmind
+  </div>
+  
+  <!-- 메뉴 항목들을 중앙에 고정 배치 -->
+  <div class="header-center">
+    <div class="menu-items">
+      <router-link to="/ai" class="menu-link" id="fontsize">AI 추천</router-link>
+      <router-link to="/info" class="menu-link" id="fontsize">여행정보</router-link>
+      <router-link to="/plan" class="menu-link" id="fontsize">여행계획</router-link>
+      <router-link to="/board" class="menu-link" id="fontsize">커뮤니티</router-link>
+    </div>
+  </div>
+  
+  <!-- 로그인 상태에 따른 버튼 표시 -->
+  <div class="auth-section">
+    <div v-if="isLoggedIn" class="user-info">
+      <span class="username">{{ userName }}님</span>
+      <router-link to="/mypage" class="mypage-btn">마이페이지</router-link>
+      <button @click="logout" class="logout-btn">로그아웃</button>
+    </div>
+    <div v-else class="login-section">
+      <router-link to="/login" class="login-button">
+        <span class="button-text">로그인</span>
+      </router-link>
+    </div>
+  </div>
+</header>
     
     <!-- 페이지 콘텐츠 -->
     <main :class="{ 'with-header': !shouldHideHeader, 'no-header': shouldHideHeader }">
@@ -157,7 +162,6 @@ html, body {
 /* 헤더 스타일 */
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 1rem 6rem;
   background-color: #ffffff;
@@ -168,13 +172,25 @@ html, body {
   box-sizing: border-box;
 }
 
+/* 헤더 중앙 영역 - 절대 중앙 배치 */
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+}
+
 .logo {
   font-size: 2rem;
   font-weight: 700;
   color: #333;
   cursor: pointer;
   transition: color 0.3s ease;
+  width: 200px; /* 로고 영역 고정 너비 */
+   font-family: 'LeeSeoyun';
 }
+
 
 .logo:hover {
   color: #2172ce;
@@ -188,9 +204,20 @@ html, body {
   margin-right: 2px;
 }
 
+#fontsize{
+  font-size: 20px;
+}
+
 .menu-items {
   display: flex;
   gap: 2rem;
+ font-family: 'LeeSeoyun';
+}
+@font-face {
+    font-family: 'LeeSeoyun';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2202-2@1.0/LeeSeoyun.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
 }
 
 .menu-link {
@@ -211,10 +238,13 @@ html, body {
  font-weight: 600;
 }
 
-/* 인증 섹션 */
+/* 인증 섹션 - 오른쪽 고정 */
 .auth-section {
   display: flex;
   align-items: center;
+  margin-left: auto;
+  width: 300px; /* 고정 너비로 일정한 공간 확보 */
+  justify-content: flex-end;
 }
 
 .user-info {
@@ -239,6 +269,7 @@ html, body {
   font-weight: 500;
   transition: all 0.3s ease;
   border: 1px solid #e9ecef;
+   font-family: 'LeeSeoyun';
 }
 
 .mypage-btn:hover {
@@ -259,6 +290,7 @@ html, body {
  position: relative;
  overflow: hidden;
  z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .logout-btn::before {
@@ -306,6 +338,7 @@ html, body {
   border: none;
   cursor: pointer;
   z-index: 1;
+   font-family: 'LeeSeoyun';
 }
 
 .login-button::before {

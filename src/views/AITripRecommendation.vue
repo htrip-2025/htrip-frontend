@@ -111,7 +111,7 @@
     <!-- 결과 화면 -->
     <div v-if="step === 'result'" class="result-container">
       <div class="result-header">
-        <img :src="getAreaImage()" alt="지역 이미지" class="area-image">
+        <img src="https://i.pinimg.com/736x/22/8a/da/228adaff2bc066e8fc04218bf72e5225.jpg" alt="지역 이미지" class="area-image">
         <div class="result-title-container">
           <h2 class="result-title">{{ getAreaName() }}, {{ getDurationText() }}</h2>
           <h3 class="result-subtitle">추천일정입니다.</h3>
@@ -432,22 +432,28 @@ export default {
     
     // 지도 초기화
     initializeMap() {
-      if (!this.$refs.mapContainer || !this.recommendation) return;
-      
-      if (window.kakao && window.kakao.maps) {
+    if (!this.$refs.mapContainer || !this.recommendation) return;
+
+    // 1) 로드 후 renderMap() 실행
+    const loadAndRender = () => {
+      // maps 내부 모듈이 완전히 준비되는 시점
+      window.kakao.maps.load(() => {
         this.renderMap();
-      } else {
-        // 카카오맵 API 로드
-        const script = document.createElement('script');
-        script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_API_KEY}&autoload=false`;
-        script.onload = () => {
-          window.kakao.maps.load(() => {
-            this.renderMap();
-          });
-        };
-        document.head.appendChild(script);
-      }
-    },
+      });
+    };
+
+    // 2) SDK 스크립트가 전혀 없다면 삽입  
+    if (!window.kakao || !window.kakao.maps) {
+      const script = document.createElement('script');
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_API_KEY}&autoload=false`;
+      script.onload = loadAndRender;
+      document.head.appendChild(script);
+
+    // 3) SDK는 이미 로드되어 있지만, loadAndRender()가 한 번도 실행되지 않았다면
+    } else {
+      loadAndRender();
+    }
+  },
     
     // 지도 렌더링
     renderMap() {
@@ -599,7 +605,7 @@ editInMyPlan() {
         39: 'https://images.unsplash.com/photo-1547093349-65cdba98369a'     // 제주
       };
       
-      return images[this.formData.areaCode] || 'https://images.unsplash.com/photo-1517154421773-0529f29ea451'; // 기본 이미지
+      return images[this.formData.areaCode] || 'https://i.pinimg.com/736x/22/8a/da/228adaff2bc066e8fc04218bf72e5225.jpg'; // 기본 이미지
     },
     
     // 지역명 가져오기
@@ -676,19 +682,40 @@ editInMyPlan() {
 <style scoped>
 /* 기본 스타일 */
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100vw;
+  min-height: 100vh;
   padding: 2rem;
-  position: relative;
-  /* background-color: #ffffff; */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  
+  /* 배경 이미지 설정 */
+  background-image: url('https://i.pinimg.com/736x/5e/9f/07/5e9f07d84b763d9fd5becff18cc6e99e.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
 
- width: 100%;
- min-height: 100vh;
- background-image: url('https://i.pinimg.com/736x/5e/9f/07/5e9f07d84b763d9fd5becff18cc6e99e.jpg');
- background-repeat: repeat;
- background-size: cover;
- background-attachment: fixed;
+/* 스크롤바 숨기기 (선택사항) */
+.container::-webkit-scrollbar {
+  width: 8px;
+}
 
+.container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 /* 페이지 제목 */
@@ -699,25 +726,33 @@ editInMyPlan() {
   margin-bottom: 0.5rem;
   position: relative;
   z-index: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+   font-family: 'LeeSeoyun';
 }
 
 .page-subtitle {
   font-size: 1.2rem;
   text-align: center;
-  color: #666;
+  color: #333;
   margin-bottom: 2rem;
   position: relative;
   z-index: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+   font-family: 'LeeSeoyun';
 }
 
 /* 폼 스타일 */
 .recommendation-form {
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 2rem;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .form-section {
@@ -728,6 +763,9 @@ editInMyPlan() {
   font-size: 1.3rem;
   color: #444;
   margin-bottom: 1rem;
+  font-weight: 600;
+   font-family: 'LeeSeoyun';
+
 }
 
 .button-grid {
@@ -738,7 +776,7 @@ editInMyPlan() {
 
 .option-button {
   padding: 1rem;
-  background-color: #f5f7fb;
+  background-color: rgba(245, 247, 251, 0.9);
   border: 1px solid #e0e4ec;
   border-radius: 10px;
   cursor: pointer;
@@ -746,12 +784,14 @@ editInMyPlan() {
   font-size: 1rem;
   color: #555;
   text-align: center;
+  backdrop-filter: blur(5px);
+   font-family: 'LeeSeoyun';
 }
 
 .option-button:hover {
-  background-color: #eaeffd;
+  background-color: rgba(234, 239, 253, 0.9);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .option-button.active {
@@ -779,6 +819,7 @@ editInMyPlan() {
   position: relative;
   overflow: hidden;
   z-index: 1;
+   font-family: 'LeeSeoyun';
 }
 
 .submit-button::before {
@@ -815,14 +856,17 @@ editInMyPlan() {
   justify-content: center;
   align-items: center;
   min-height: 70vh;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .loading-box {
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
   border-radius: 15px;
   padding: 3rem;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
   max-width: 500px;
   width: 100%;
 }
@@ -831,7 +875,7 @@ editInMyPlan() {
   width: 70px;
   height: 70px;
   margin: 0 auto 2rem;
-  border: 6px solid #f3f3f3;
+  border: 6px solid rgba(243, 243, 243, 0.8);
   border-top: 6px solid #2172ce;
   border-radius: 50%;
   animation: spin 1.5s linear infinite;
@@ -846,6 +890,8 @@ editInMyPlan() {
   font-size: 1.8rem;
   color: #333;
   margin-bottom: 1rem;
+  font-weight: 600;
+   font-family: 'LeeSeoyun';
 }
 
 .loading-message {
@@ -858,7 +904,7 @@ editInMyPlan() {
 .progress-bar {
   width: 100%;
   height: 10px;
-  background-color: #f0f0f0;
+  background-color: rgba(240, 240, 240, 0.8);
   border-radius: 5px;
   overflow: hidden;
   margin-bottom: 0.5rem;
@@ -874,23 +920,29 @@ editInMyPlan() {
 .progress-text {
   font-size: 1rem;
   color: #666;
+  font-weight: 500;
+   font-family: 'LeeSeoyun';
 }
 
 /* 결과 화면 스타일 */
 .result-container {
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .result-header {
   display: flex;
   align-items: center;
   padding: 2rem;
-  background-color: #f8f9fa;
+  background-color: rgba(248, 249, 250, 0.9);
+  backdrop-filter: blur(5px);
 }
 
 .area-image {
@@ -901,6 +953,7 @@ editInMyPlan() {
   margin-right: 2rem;
   border: 4px solid white;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  
 }
 
 .result-title-container {
@@ -911,23 +964,29 @@ editInMyPlan() {
   font-size: 2rem;
   color: #333;
   margin-bottom: 0.5rem;
+  font-weight: 700;
+   font-family: 'LeeSeoyun';
 }
 
 .result-subtitle {
   font-size: 1.3rem;
   color: #2172ce;
   margin-bottom: 0.5rem;
+  font-weight: 600;
+   font-family: 'LeeSeoyun';
+
 }
 
 .result-description {
   font-size: 1rem;
   color: #666;
+   font-family: 'LeeSeoyun';
 }
 
 .map-container {
   width: 100%;
   height: 400px;
-  background-color: #f0f4ff;
+  background-color: rgba(240, 244, 255, 0.9);
   position: relative;
 }
 
@@ -941,65 +1000,86 @@ editInMyPlan() {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: rgba(240, 244, 255, 0.8);
+  background-color: rgba(240, 244, 255, 0.9);
+  backdrop-filter: blur(5px);
 }
 
 .map-spinner {
   width: 50px;
   height: 50px;
-  border: 4px solid #f3f3f3;
+  border: 4px solid rgba(243, 243, 243, 0.8);
   border-top: 4px solid #2172ce;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
+   font-family: 'LeeSeoyun';
 }
 
 .day-tabs {
   display: flex;
   padding: 1rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(238, 238, 238, 0.8);
   overflow-x: auto;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+   font-family: 'LeeSeoyun';
 }
 
 .day-tab {
   padding: 0.8rem 1.5rem;
   margin-right: 0.5rem;
-  background-color: #f5f7fb;
+  background-color: rgba(245, 247, 251, 0.9);
   border: none;
   border-radius: 25px;
   cursor: pointer;
   font-size: 0.9rem;
   color: #555;
   white-space: nowrap;
+  transition: all 0.3s;
+  backdrop-filter: blur(5px);
+   font-family: 'LeeSeoyun';
 }
 
 .day-tab.active {
   background-color: #2172ce;
   color: white;
+  box-shadow: 0 3px 10px rgba(33, 114, 206, 0.3);
+}
+
+.day-tab:hover:not(.active) {
+  background-color: rgba(234, 239, 253, 0.9);
 }
 
 .places-list {
   padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+   font-family: 'LeeSeoyun';
 }
 
 .day-places {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+   font-family: 'LeeSeoyun';
 }
 
 .place-item {
   display: flex;
   gap: 1rem;
   padding: 1.5rem;
-  background-color: #f8f9fa;
+  background-color: rgba(248, 249, 250, 0.9);
   border-radius: 10px;
   transition: all 0.3s;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+   font-family: 'LeeSeoyun';
 }
 
 .place-item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.95);
 }
 
 .place-number {
@@ -1013,28 +1093,36 @@ editInMyPlan() {
   border-radius: 50%;
   font-weight: 600;
   flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(33, 114, 206, 0.3);
+   font-family: 'LeeSeoyun';
 }
 
 .place-info {
   flex: 1;
+   font-family: 'LeeSeoyun';
 }
 
 .place-name {
   font-size: 1.2rem;
   color: #333;
   margin-bottom: 0.5rem;
+  font-weight: 600;
+   font-family: 'LeeSeoyun';
 }
 
 .place-category {
   font-size: 0.9rem;
   color: #2172ce;
   margin-bottom: 0.5rem;
+  font-weight: 500;
+   font-family: 'LeeSeoyun';
 }
 
 .place-memo {
   font-size: 0.95rem;
   color: #666;
   line-height: 1.5;
+   font-family: 'LeeSeoyun';
 }
 
 .action-buttons {
@@ -1042,7 +1130,11 @@ editInMyPlan() {
   justify-content: center;
   gap: 1rem;
   padding: 2rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid rgba(238, 238, 238, 0.8);
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+   font-family: 'LeeSeoyun';
+    font-family: 'LeeSeoyun';
 }
 
 .action-btn {
@@ -1052,26 +1144,32 @@ editInMyPlan() {
   font-size: 1rem;
   font-weight: 500;
   transition: all 0.3s;
+  backdrop-filter: blur(5px);
+   font-family: 'LeeSeoyun';
+    font-family: 'LeeSeoyun';
 }
 
 .retry-btn {
-  background-color: #f0f0f0;
+  background-color: rgba(240, 240, 240, 0.9);
   color: #666;
-  border: none;
+  border: 1px solid rgba(224, 224, 224, 0.8);
+   font-family: 'LeeSeoyun';
 }
 
 .retry-btn:hover {
-  background-color: #e0e0e0;
+  background-color: rgba(224, 224, 224, 0.9);
+  transform: translateY(-2px);
 }
 
 .change-btn {
-  background-color: #f5f7fb;
+  background-color: rgba(245, 247, 251, 0.9);
   color: #2172ce;
-  border: 1px solid #2172ce;
+  border: 1px solid rgba(33, 114, 206, 0.8);
 }
 
 .change-btn:hover {
-  background-color: #eaeffd;
+  background-color: rgba(234, 239, 253, 0.9);
+  transform: translateY(-2px);
 }
 
 .edit-btn {
@@ -1081,6 +1179,7 @@ editInMyPlan() {
   position: relative;
   overflow: hidden;
   z-index: 1;
+  box-shadow: 0 3px 10px rgba(33, 114, 206, 0.3);
 }
 
 .edit-btn::before {
@@ -1098,7 +1197,7 @@ editInMyPlan() {
 
 .edit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(33, 114, 206, 0.3);
+  box-shadow: 0 8px 20px rgba(33, 114, 206, 0.4);
 }
 
 .edit-btn:hover::before {
@@ -1107,12 +1206,16 @@ editInMyPlan() {
 
 /* 에러 메시지 */
 .error-message {
-  background-color: #fff5f5;
+  background-color: rgba(255, 245, 245, 0.95);
   color: #e53e3e;
   padding: 1rem;
   border-radius: 10px;
-  margin: 2rem 0;
+  margin: 2rem auto;
   text-align: center;
+  max-width: 600px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(229, 62, 62, 0.3);
+   font-family: 'LeeSeoyun';
 }
 
 .error-message button {
@@ -1123,9 +1226,22 @@ editInMyPlan() {
   border-radius: 5px;
   margin-top: 1rem;
   cursor: pointer;
+  transition: all 0.3s;
+   font-family: 'LeeSeoyun';
+}
+
+.error-message button:hover {
+  background-color: #d32f2f;
+  transform: translateY(-1px);
 }
 
 /* 반응형 디자인 */
+@media (max-width: 1200px) {
+  .container {
+    padding: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -1151,6 +1267,37 @@ editInMyPlan() {
   
   .action-btn {
     width: 100%;
+  }
+  
+  .day-tabs {
+    justify-content: flex-start;
+  }
+  
+  .place-item {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .recommendation-form,
+  .loading-box,
+  .result-container {
+    margin: 0;
+    border-radius: 10px;
+  }
+  
+  .button-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.8rem;
+  }
+  
+  .option-button {
+    padding: 0.8rem 0.5rem;
+    font-size: 0.9rem;
   }
 }
 </style>

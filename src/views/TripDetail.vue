@@ -55,7 +55,7 @@
             <div class="trip-meta">
               <div class="meta-item">
                 <span class="meta-icon">📍</span>
-                <span>{{ tripDetail.address1 }} {{ tripDetail.address2 || '' }}</span>
+                <span class="font">{{ tripDetail.address1 }} {{ tripDetail.address2 || '' }}</span>
               </div>
               
               <div v-if="tripDetail.telephone" class="meta-item">
@@ -65,7 +65,7 @@
               
               <div class="meta-item">
                 <span class="meta-icon">❤️</span>
-                <span>{{ favoriteCount }}명이 찜했어요</span>
+                <span class=" font">{{ favoriteCount }}명이 찜했어요</span>
               </div>
             </div>
 
@@ -171,7 +171,7 @@
         <!-- 리뷰 목록 -->
         <div class="review-list">
           <div v-if="reviews.length === 0 && !reviewsLoading" class="no-reviews">
-            <p>아직 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요!</p>
+            <p class="font">아직 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요!</p>
           </div>
           
           <div v-if="reviewsLoading" class="loading">
@@ -654,7 +654,15 @@ const submitReview = async () => {
     
     reviews.value.unshift(newReviewData);
     
+    // 리뷰 통계 업데이트
     await fetchReviewStats();
+    
+    // 리뷰 카운트 직접 증가
+    if (reviewStats.value.totalCount !== undefined) {
+      reviewStats.value.totalCount += 1;
+    } else {
+      reviewStats.value.totalCount = 1;
+    }
     
     newReview.value = { rating: 0, content: '' };
     
@@ -665,6 +673,30 @@ const submitReview = async () => {
     alert('리뷰 등록 중 오류가 발생했습니다.');
   } finally {
     reviewSubmitting.value = false;
+  }
+};
+
+const deleteReview = async (reviewId) => {
+  if (!confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
+    return;
+  }
+  
+  try {
+    await axios.delete(`${API_BASE_URL}/api/review/${reviewId}`);
+    
+    await fetchReviews(currentReviewPage.value);
+    await fetchReviewStats();
+    
+    // 리뷰 카운트 직접 감소
+    if (reviewStats.value.totalCount !== undefined && reviewStats.value.totalCount > 0) {
+      reviewStats.value.totalCount -= 1;
+    }
+    
+    alert('리뷰가 삭제되었습니다.');
+    
+  } catch (err) {
+    console.error('리뷰 삭제 실패:', err);
+    alert('리뷰 삭제 중 오류가 발생했습니다.');
   }
 };
 
@@ -719,24 +751,7 @@ const updateReview = async () => {
   }
 };
 
-const deleteReview = async (reviewId) => {
-  if (!confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
-    return;
-  }
-  
-  try {
-    await axios.delete(`${API_BASE_URL}/api/review/${reviewId}`);
-    
-    await fetchReviews(currentReviewPage.value);
-    await fetchReviewStats();
-    
-    alert('리뷰가 삭제되었습니다.');
-    
-  } catch (err) {
-    console.error('리뷰 삭제 실패:', err);
-    alert('리뷰 삭제 중 오류가 발생했습니다.');
-  }
-};
+
 
 const changeReviewPage = (page) => {
   if (page >= 1 && page <= totalReviewPages.value) {
@@ -846,6 +861,7 @@ onUnmounted(() => {
  background-color: rgba(231, 76, 60, 0.1);
  border-radius: 10px;
  margin-bottom: 2rem;
+  font-family: 'LeeSeoyun';
 }
 
 .retry-button {
@@ -862,6 +878,7 @@ onUnmounted(() => {
  position: relative;
  overflow: hidden;
  z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .retry-button::before {
@@ -887,11 +904,15 @@ onUnmounted(() => {
  width: 100%;
 }
 
+.font{
+     font-family: 'LeeSeoyun';
+}
 .main-content {
  position: relative;
  z-index: 1;
  max-width: 1200px;
  margin: 0 auto;
+  font-family: 'LeeSeoyun';
 }
 
 /* 여행지 헤더 */
@@ -901,6 +922,7 @@ onUnmounted(() => {
  border-radius: 15px;
  padding: 2rem;
  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  font-family: 'LeeSeoyun';
 }
 
 .header-content {
@@ -908,6 +930,7 @@ onUnmounted(() => {
  grid-template-columns: 1fr 1fr;
  gap: 2rem;
  align-items: start;
+  font-family: 'LeeSeoyun';
 }
 
 .image-section {
@@ -946,6 +969,7 @@ onUnmounted(() => {
  font-size: 1.5rem;
  transition: all 0.3s ease;
  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: 'LeeSeoyun';
 }
 
 .favorite-button:hover {
@@ -972,10 +996,12 @@ onUnmounted(() => {
 
 .info-section {
  padding: 1rem 0;
+  font-family: 'LeeSeoyun';
 }
 
 .trip-category {
  margin-bottom: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .category-badge {
@@ -985,6 +1011,7 @@ onUnmounted(() => {
  border-radius: 15px;
  font-size: 0.85rem;
  font-weight: 500;
+  font-family: 'LeeSeoyun';
 }
 
 .trip-title {
@@ -993,6 +1020,7 @@ onUnmounted(() => {
  color: #333;
  margin-bottom: 1.5rem;
  line-height: 1.3;
+  font-family: 'LeeSeoyun';
 }
 
 .trip-meta {
@@ -1000,6 +1028,7 @@ onUnmounted(() => {
  flex-direction: column;
  gap: 0.8rem;
  margin-bottom: 2rem;
+  font-family: 'LeeSeoyun';
 }
 
 .meta-item {
@@ -1008,10 +1037,12 @@ onUnmounted(() => {
  gap: 0.5rem;
  font-size: 1rem;
  color: #555;
+  font-family: 'LeeSeoyun';
 }
 
 .meta-icon {
  font-size: 1.1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .trip-description {
@@ -1019,17 +1050,20 @@ onUnmounted(() => {
  padding: 1.5rem;
  border-radius: 10px;
  border-left: 4px solid #2172ce;
+  font-family: 'LeeSeoyun';
 }
 
-.trip-description h3 {
+.trip-description h2 {
  font-size: 1.2rem;
  color: #333;
  margin-bottom: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .trip-description p {
  line-height: 1.7;
  color: #555;
+  font-family: 'LeeSeoyun';
 }
 
 /* 지도 섹션 */
@@ -1046,6 +1080,7 @@ onUnmounted(() => {
  font-weight: 700;
  color: #333;
  margin-bottom: 1.5rem;
+  font-family: 'LeeSeoyun';
 }
 
 .map-container {
@@ -1101,6 +1136,7 @@ onUnmounted(() => {
  border-radius: 15px;
  padding: 2rem;
  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  font-family: 'LeeSeoyun';
 }
 
 .review-header {
@@ -1108,24 +1144,28 @@ onUnmounted(() => {
  justify-content: space-between;
  align-items: center;
  margin-bottom: 2rem;
+  font-family: 'LeeSeoyun';
 }
 
 .review-stats {
  display: flex;
  align-items: center;
  gap: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .rating-display {
  display: flex;
  align-items: center;
  gap: 0.5rem;
+  font-family: 'LeeSeoyun';
 }
 
 .rating-score {
  font-size: 1.5rem;
  font-weight: 700;
  color: #2172ce;
+  font-family: 'LeeSeoyun';
 }
 
 /* 리뷰 작성 */
@@ -1134,11 +1174,13 @@ onUnmounted(() => {
  padding: 1.5rem;
  border-radius: 10px;
  margin-bottom: 2rem;
+  font-family: 'LeeSeoyun';
 }
 
-.review-write h3 {
+.review-write h2 {
  margin-bottom: 1rem;
  color: #333;
+  font-family: 'LeeSeoyun';
 }
 
 .review-textarea {
@@ -1150,23 +1192,27 @@ onUnmounted(() => {
  font-size: 0.95rem;
  resize: vertical;
  margin-bottom: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .review-textarea:focus {
  outline: none;
  border-color: #2172ce;
  box-shadow: 0 0 0 2px rgba(33, 114, 206, 0.1);
+ 
 }
 
 .review-actions {
  display: flex;
  justify-content: space-between;
  align-items: center;
+  font-family: 'LeeSeoyun';
 }
 
 .char-count {
  font-size: 0.85rem;
  color: #666;
+  font-family: 'LeeSeoyun';
 }
 
 .submit-review-btn {
@@ -1183,6 +1229,7 @@ onUnmounted(() => {
  position: relative;
  overflow: hidden;
  z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .submit-review-btn::before {
@@ -1218,6 +1265,7 @@ onUnmounted(() => {
 .review-edit-buttons {
  display: flex;
  gap: 0.8rem;
+  font-family: 'LeeSeoyun';
 }
 
 .cancel-edit-btn {
@@ -1230,11 +1278,13 @@ onUnmounted(() => {
  font-size: 0.95rem;
  font-weight: 500;
  transition: all 0.3s;
+  font-family: 'LeeSeoyun';
 }
 
 .cancel-edit-btn:hover {
  background-color: #5a6268;
  transform: translateY(-2px);
+ 
 }
 
 .login-prompt {
@@ -1243,12 +1293,14 @@ onUnmounted(() => {
  background-color: #f8f9fa;
  border-radius: 10px;
  margin-bottom: 2rem;
+  font-family: 'LeeSeoyun';
 }
 
 .login-prompt a {
  color: #2172ce;
  text-decoration: none;
  font-weight: 600;
+  font-family: 'LeeSeoyun';
 }
 
 /* 리뷰 목록 */
@@ -1256,6 +1308,7 @@ onUnmounted(() => {
  display: flex;
  flex-direction: column;
  gap: 1.5rem;
+  font-family: 'LeeSeoyun';
 }
 
 .no-reviews {
@@ -1264,7 +1317,9 @@ onUnmounted(() => {
  color: #666;
  background-color: #f8f9fa;
  border-radius: 10px;
+  font-family: 'LeeSeoyun';
 }
+
 
 .review-item {
  background-color: white;
@@ -1272,6 +1327,7 @@ onUnmounted(() => {
  border-radius: 10px;
  padding: 1.5rem;
  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  font-family: 'LeeSeoyun';
 }
 
 .review-header-item {
@@ -1279,12 +1335,14 @@ onUnmounted(() => {
  justify-content: space-between;
  align-items: flex-start;
  margin-bottom: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .reviewer-info {
  display: flex;
  align-items: center;
  gap: 0.8rem;
+  font-family: 'LeeSeoyun';
 }
 
 .reviewer-avatar {
@@ -1298,21 +1356,25 @@ onUnmounted(() => {
  justify-content: center;
  font-weight: 600;
  font-size: 1.1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .reviewer-name {
  font-weight: 600;
  color: #333;
+  font-family: 'LeeSeoyun';
 }
 
 .review-date {
  font-size: 0.85rem;
  color: #666;
+  font-family: 'LeeSeoyun';
 }
 
 .review-actions-btns {
  display: flex;
  gap: 0.5rem;
+  font-family: 'LeeSeoyun';
 }
 
 .edit-review-btn, .delete-review-btn {
@@ -1323,12 +1385,14 @@ onUnmounted(() => {
  font-size: 0.8rem;
  font-weight: 500;
  transition: all 0.3s;
+  font-family: 'LeeSeoyun';
 }
 
 .edit-review-btn {
  background-color: #f8f9fa;
  color: #495057;
  border: 1px solid #dee2e6;
+  font-family: 'LeeSeoyun';
 }
 
 .edit-review-btn:hover {
@@ -1340,17 +1404,20 @@ onUnmounted(() => {
  background-color: #fff5f5;
  color: #dc3545;
  border: 1px solid #f5c6cb;
+  font-family: 'LeeSeoyun';
 }
 
 .delete-review-btn:hover {
  background-color: #f8d7da;
  transform: translateY(-1px);
+  font-family: 'LeeSeoyun';
 }
 
 .review-content p {
  line-height: 1.6;
  color: #555;
  margin-bottom: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .review-image {
@@ -1370,6 +1437,7 @@ onUnmounted(() => {
  justify-content: center;
  gap: 0.5rem;
  margin-top: 2rem;
+  font-family: 'LeeSeoyun';
 }
 
 .pagination-btn {
@@ -1385,6 +1453,7 @@ onUnmounted(() => {
  transition: all 0.3s ease;
  font-size: 0.9rem;
  color: #666;
+  font-family: 'LeeSeoyun';
 }
 
 .prev, .next {
@@ -1491,11 +1560,13 @@ onUnmounted(() => {
  color: #333;
  margin-bottom: 4px;
  font-size: 14px;
+  font-family: 'LeeSeoyun';
 }
 
 .info-address {
  font-size: 12px;
  color: #666;
  line-height: 1.3;
+  font-family: 'LeeSeoyun';
 }
 </style>

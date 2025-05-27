@@ -5,45 +5,19 @@
       <div class="overlay">
         <div class="branding">
           <div class="logo-area">
-            <span class="logo-icon">T</span>rip
+            <span class="logo-icon">T</span>ripmind
           </div>
           <h1 class="slogan">
-            Move Fast.<br>
-            Break Nothing.
-            
+            <br>
+            <br>
+            <br>
+            당신의 다음 여행,<br>
+            &ensp; &ensp;&ensp;이곳에서 시작됩니다.
+          
           </h1>
         </div>
         
-        <div class="features">
-          <div class="feature-item">
-            <div class="feature-icon">
-              <div class="icon-lines">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </div>
-            <div class="feature-text">
-              <h3>Remove Bottlenecks</h3>
-              <p>Release testing and approvals are the most common bottleneck for tech, but you can now remove that bottleneck with Trip.</p>
-            </div>
-          </div>
-          
-          <div class="feature-item">
-            <div class="feature-icon dashboard-icon">
-              <span></span>
-              <span></span>
-            </div>
-            <div class="feature-text">
-              <h3>Access Risk Analysis</h3>
-              <p>We use machine learning and static analysis to assess risk, summarise code changes, and automate and delegate release management tasks. Integrate with a couple of clicks.</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="brand-footer">
-          <div class="logo-text">Trip</div>
-        </div>
+       
       </div>
     </div>
 
@@ -202,6 +176,7 @@ export default {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+   font-family: 'LeeSeoyun';
 }
 
 .login-container {
@@ -244,11 +219,12 @@ export default {
   font-weight: 700;
   color: white;
   margin-bottom: 2rem;
+   font-family: 'LeeSeoyun';
 }
 
 .logo-icon {
-  color: #9581e8;
-  background-color: #ffefd5;
+  color: #2172ce;
+  background-color: #dfe0e1;
   padding: 2px 8px;
   border-radius: 50%;
   margin-right: 2px;
@@ -261,6 +237,7 @@ export default {
   line-height: 1.2;
   margin-bottom: 3rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+   font-family: 'LeeSeoyun';
 }
 
 .features {
@@ -384,8 +361,15 @@ export default {
   font-weight: 700;
   color: #333;
   margin-bottom: 0.5rem;
-  
+  text-align: center;
+  font-family: 'MoveSans-Bold';
 
+}
+@font-face {
+    font-family: 'MoveSans-Bold';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2405-2@1.0/MoveSans-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
 }
 
 .form-subtitle {

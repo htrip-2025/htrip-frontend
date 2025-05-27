@@ -1335,6 +1335,7 @@ onMounted(() => {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+   font-family: 'LeeSeoyun';
 }
 
 /* 마이페이지 컨테이너 */

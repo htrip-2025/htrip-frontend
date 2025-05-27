@@ -31,7 +31,7 @@
                 class="filter-select-small"
               >
                 <option value="">전체 지역</option>
-                <option v-for="area in areas" :key="area.areaCode" :value="area.areaCode">
+                <option class="font" v-for="area in areas" :key="area.areaCode" :value="area.areaCode">
                   {{ area.name }}
                 </option>
               </select>
@@ -47,7 +47,7 @@
                 :disabled="!selectedAreaCode"
               >
                 <option value="">전체</option>
-                <option v-for="sigungu in filteredSigungus" :key="sigungu.sigunguCode" :value="sigungu.sigunguCode">
+                <option class="font"v-for="sigungu in filteredSigungus" :key="sigungu.sigunguCode" :value="sigungu.sigunguCode">
                   {{ sigungu.name }}
                 </option>
               </select>
@@ -62,7 +62,7 @@
                 class="filter-select-small"
               >
                 <option value="">전체 테마</option>
-                <option v-for="category in categories" :key="category.category" :value="category.category">
+                <option class="font" v-for="category in categories" :key="category.category" :value="category.category">
                   {{ category.categoryName }}
                 </option>
               </select>
@@ -78,7 +78,7 @@
                 :disabled="!selectedMainCategory"
               >
                 <option value="">전체</option>
-                <option v-for="category in middleCategories" :key="category.category" :value="category.category">
+                <option class="font" v-for="category in middleCategories" :key="category.category" :value="category.category">
                   {{ category.categoryName }}
                 </option>
               </select>
@@ -94,7 +94,7 @@
                 :disabled="!selectedMiddleCategory"
               >
                 <option value="">전체</option>
-                <option v-for="category in subCategories" :key="category.category" :value="category.category">
+                <option class="font" v-for="category in subCategories" :key="category.category" :value="category.category">
                   {{ category.categoryName }}
                 </option>
               </select>
@@ -120,10 +120,10 @@
         
         <!-- 검색 결과 없음 -->
         <div v-if="places.length === 0 && !isLoading" class="no-results">
-          <p v-if="hasSearchConditions">
+          <p  class="font" v-if="hasSearchConditions">
             검색 조건에 맞는 여행지가 없습니다.
           </p>
-          <p v-else>
+          <p class="font" v-else>
             등록된 여행지가 없습니다.
           </p>
         </div>
@@ -597,6 +597,11 @@ watch(currentPage, () => {
   background-color: rgba(231, 76, 60, 0.1);
   border-radius: 10px;
   margin-bottom: 2rem;
+   font-family: 'LeeSeoyun';
+}
+
+.font{
+   font-family: 'LeeSeoyun';
 }
 
 /* 재시도 버튼 */
@@ -614,6 +619,7 @@ watch(currentPage, () => {
  position: relative;
  overflow: hidden;
  z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .retry-button::before {
@@ -645,6 +651,7 @@ watch(currentPage, () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 0;
+   font-family: 'LeeSeoyun';
 }
 
 .filter-group {
@@ -652,12 +659,14 @@ watch(currentPage, () => {
   flex-direction: column;
   gap: 0.3rem;
   min-width: 140px;
+   font-family: 'LeeSeoyun';
 }
 
 .filter-group label {
   font-size: 0.9rem;
   color: #666;
   font-weight: 500;
+   font-family: 'LeeSeoyun';
 }
 
 .filter-select {
@@ -668,6 +677,7 @@ watch(currentPage, () => {
   background-color: white;
   cursor: pointer;
   transition: border-color 0.3s, box-shadow 0.3s;
+   font-family: 'LeeSeoyun';
 }
 
 .filter-select:focus {
@@ -684,6 +694,7 @@ watch(currentPage, () => {
 .search-input-group {
   display: flex;
   gap: 0.5rem;
+   font-family: 'LeeSeoyun';
 }
 
 /* 검색 버튼 */
@@ -702,6 +713,7 @@ watch(currentPage, () => {
  position: relative;
  overflow: hidden;
  z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .search-button::before {
@@ -743,6 +755,7 @@ watch(currentPage, () => {
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   margin-bottom: 3rem;
+   font-family: 'LeeSeoyun';
 }
 
 .place-list {
@@ -750,6 +763,7 @@ watch(currentPage, () => {
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-bottom: 3rem;
+   font-family: 'LeeSeoyun';
 }
 
 .place-card {
@@ -758,6 +772,7 @@ watch(currentPage, () => {
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+   font-family: 'LeeSeoyun';
 }
 
 .place-card:hover {
@@ -783,6 +798,7 @@ watch(currentPage, () => {
 
 .place-info {
   padding: 1rem;
+   font-family: 'LeeSeoyun';
 }
 
 .place-name {
@@ -790,6 +806,7 @@ watch(currentPage, () => {
   font-weight: 600;
   color: #333;
   margin-bottom: 0.3rem;
+   font-family: 'LeeSeoyun';
 }
 
 .place-location {
@@ -799,10 +816,12 @@ watch(currentPage, () => {
   color: #666;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
+   font-family: 'LeeSeoyun';
 }
 
 .location-icon {
   color: black;
+   font-family: 'LeeSeoyun';
 }
 
 .place-address {
@@ -810,7 +829,9 @@ watch(currentPage, () => {
   font-size: 0.85rem;
   line-height: 1.4;
   margin-bottom: 0.8rem;
+   font-family: 'LeeSeoyun';
 }
+
 
 .place-meta {
   display: flex;
@@ -818,15 +839,19 @@ watch(currentPage, () => {
   gap: 0.3rem;
   font-size: 0.8rem;
   color: #666;
+   font-family: 'LeeSeoyun';
 }
 
 .place-phone {
   color: black;
+   font-family: 'LeeSeoyun';
 }
+
 
 .place-category {
   color: black;
   font-weight: 500;
+   font-family: 'LeeSeoyun';
 }
 
 .pagination {
@@ -834,6 +859,7 @@ watch(currentPage, () => {
   justify-content: center;
   gap: 0.5rem;
   margin-bottom: 3rem;
+   font-family: 'LeeSeoyun';
 }
 
 /* 페이지네이션 버튼 */
@@ -853,6 +879,7 @@ watch(currentPage, () => {
  position: relative;
  overflow: hidden;
  z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .pagination-btn::before {
@@ -942,6 +969,7 @@ watch(currentPage, () => {
   margin-bottom: 2rem;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+   font-family: 'LeeSeoyun';
 }
 
 .filter-row {
@@ -950,6 +978,7 @@ watch(currentPage, () => {
   align-items: end;
   flex-wrap: wrap;
   justify-content: space-between;
+   font-family: 'LeeSeoyun';
 }
 
 .filter-group {
@@ -958,11 +987,13 @@ watch(currentPage, () => {
   gap: 0.4rem;
   min-width: 120px;
   flex: 1;
+   font-family: 'LeeSeoyun';
 }
 
 .filter-group.search-group {
   min-width: 200px;
   flex: 1.5;
+   font-family: 'LeeSeoyun';
 }
 
 .filter-group label {
@@ -971,6 +1002,7 @@ watch(currentPage, () => {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+   font-family: 'LeeSeoyun';
 }
 
 .filter-select-small {
@@ -988,6 +1020,7 @@ watch(currentPage, () => {
   background-position: right 0.7rem center;
   background-size: 1em;
   padding-right: 2.5rem;
+   font-family: 'LeeSeoyun';
 }
 
 .filter-select-small:focus {
@@ -1008,12 +1041,14 @@ watch(currentPage, () => {
   display: flex;
   gap: 0.5rem;
   align-items: stretch;
+   font-family: 'LeeSeoyun';
 }
 
 .search-input-group input {
   flex: 1;
   background-image: none !important;
   padding-right: 0.8rem !important;
+   font-family: 'LeeSeoyun';
 }
 
 .search-button {
@@ -1028,6 +1063,7 @@ watch(currentPage, () => {
   white-space: nowrap;
   transition: all 0.3s ease;
   box-shadow: 0 3px 8px rgba(149, 129, 232, 0.3);
+   font-family: 'LeeSeoyun';
 }
 
 .search-button:hover {

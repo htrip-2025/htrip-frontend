@@ -363,365 +363,452 @@ onMounted(() => {
 <style scoped>
 /* 기본 스타일은 게시판과 동일하게 유지 */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+ font-family: 'LeeSeoyun';
 }
 
 .travel-container {
-  width: 100%;
-  margin: 0 auto;
-  padding: 2rem 6rem;
-  background-color: #ffffff;
-  overflow: hidden;
-  position: relative;
-  min-height: 100vh;
+ width: 100%;
+ margin: 0 auto;
+ padding: 2rem 6rem;
+ background-color: #ffffff;
+ overflow: hidden;
+ position: relative;
+ min-height: 100vh;
 
-   min-height: 100vh;
-  background-image: url('https://i.pinimg.com/736x/5e/9f/07/5e9f07d84b763d9fd5becff18cc6e99e.jpg');
-  background-repeat: repeat;
-  background-size: cover;
-  background-attachment: fixed;
+  min-height: 100vh;
+ background-image: url('https://i.pinimg.com/736x/5e/9f/07/5e9f07d84b763d9fd5becff18cc6e99e.jpg');
+ background-repeat: repeat;
+ background-size: cover;
+ background-attachment: fixed;
 
 }
 
 /* 글 작성 섹션 */
 .write-section {
-  position: relative;
-  z-index: 1;
-  margin-top: 1rem;
+ position: relative;
+ z-index: 1;
+ margin-top: 1rem;
+ font-family: 'LeeSeoyun';
 }
 
 .write-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  background-color: white;
-  border-radius: 15px;
-  padding: 2rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+ max-width: 1000px;
+ margin: 0 auto;
+ background-color: white;
+ border-radius: 15px;
+ padding: 2rem;
+ box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+ font-family: 'LeeSeoyun';
 }
 
 .write-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 2rem;
+ padding-bottom: 1rem;
+ border-bottom: 1px solid #eee;
 }
 
 .write-header h2 {
-  font-size: 1.8rem;
-  color: #333;
+ font-size: 1.8rem;
+ color: #333;
 }
 
 .write-actions {
-  display: flex;
-  gap: 1rem;
+ display: flex;
+ gap: 1rem;
 }
 
 .cancel-btn, .save-btn {
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.3s;
-  border: none;
+ padding: 0.8rem 1.5rem;
+ border-radius: 8px;
+ font-size: 0.9rem;
+ font-weight: 500;
+ text-decoration: none;
+ cursor: pointer;
+ transition: all 0.3s ease;
+ border: none;
+ position: relative;
+ overflow: hidden;
+ z-index: 1;
 }
 
 .cancel-btn {
-  background-color: #f0f0f0;
-  color: #666;
+ background-color: #f0f0f0;
+ color: #666;
 }
 
 .cancel-btn:hover {
-  background-color: #e0e0e0;
+ background-color: #e0e0e0;
 }
 
 .save-btn {
-  background-color: #9581e8;
-  color: white;
+ background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
+ color: white;
+ box-shadow: 0 8px 20px rgba(33, 114, 206, 0.25);
+}
+
+.save-btn::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 0%;
+ height: 100%;
+ background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+ transition: width 0.5s ease;
+ z-index: -1;
+ border-radius: 8px;
 }
 
 .save-btn:hover:not(:disabled) {
-  background-color: #8571d8;
-  transform: translateY(-2px);
+ transform: translateY(-3px);
+ box-shadow: 0 10px 25px rgba(33, 114, 206, 0.35);
+}
+
+.save-btn:hover::before {
+ width: 100%;
 }
 
 .save-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+ background: #ccc;
+ cursor: not-allowed;
+ transform: none;
+ box-shadow: none;
 }
 
 /* 폼 스타일 */
 .write-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+ display: flex;
+ flex-direction: column;
+ gap: 1.5rem;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
+ display: flex;
+ flex-direction: column;
 }
 
 .form-group label {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+ font-weight: 600;
+ color: #333;
+ margin-bottom: 0.5rem;
+ font-size: 0.9rem;
 }
 
 .form-select, .form-input, .form-textarea {
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  transition: border-color 0.3s;
+ padding: 0.8rem;
+ border: 1px solid #ddd;
+ border-radius: 8px;
+ font-size: 0.9rem;
+ transition: border-color 0.3s;
 }
 
 .form-select:focus, .form-input:focus, .form-textarea:focus {
-  outline: none;
-  border-color: #9581e8;
-  box-shadow: 0 0 0 2px rgba(149, 129, 232, 0.1);
+ outline: none;
+ border-color: #2172ce;
+ box-shadow: 0 0 0 2px rgba(33, 114, 206, 0.1);
 }
 
 .form-textarea {
-  resize: vertical;
-  min-height: 300px;
-  font-family: inherit;
+ resize: vertical;
+ min-height: 300px;
+ font-family: inherit;
 }
 
 .char-count {
-  align-self: flex-end;
-  font-size: 0.8rem;
-  color: #999;
-  margin-top: 0.3rem;
+ align-self: flex-end;
+ font-size: 0.8rem;
+ color: #999;
+ margin-top: 0.3rem;
 }
 
 /* 이미지 업로드 */
 .image-upload-area {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+ display: flex;
+ flex-direction: column;
+ gap: 0.5rem;
 }
 
 .file-input {
-  display: none;
+ display: none;
 }
 
 .file-upload-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  border: 2px dashed #ddd;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s;
-  background-color: #fafafa;
-  width: fit-content;
+ display: inline-flex;
+ align-items: center;
+ gap: 0.5rem;
+ padding: 1rem;
+ border: 2px dashed #ddd;
+ border-radius: 8px;
+ cursor: pointer;
+ transition: all 0.3s;
+ background-color: #fafafa;
+ width: fit-content;
 }
 
 .file-upload-btn:hover {
-  border-color: #9581e8;
-  background-color: #f0f4ff;
+ border-color: #2172ce;
+ background-color: #f0f4ff;
 }
 
 .upload-icon {
-  font-size: 1.2rem;
+ font-size: 1.2rem;
 }
 
 .upload-info {
-  font-size: 0.8rem;
-  color: #666;
+ font-size: 0.8rem;
+ color: #666;
 }
 
 /* 이미지 미리보기 */
 .image-preview-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+ gap: 1rem;
+ margin-top: 1rem;
 }
 
 .image-preview-item {
-  position: relative;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: white;
+ position: relative;
+ border: 1px solid #ddd;
+ border-radius: 8px;
+ overflow: hidden;
+ background-color: white;
 }
 
 .image-preview-item img {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  display: block;
+ width: 100%;
+ height: 120px;
+ object-fit: cover;
+ display: block;
 }
 
 .remove-image-btn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  line-height: 1;
+ position: absolute;
+ top: 5px;
+ right: 5px;
+ width: 25px;
+ height: 25px;
+ border-radius: 50%;
+ background-color: rgba(0, 0, 0, 0.7);
+ color: white;
+ border: none;
+ cursor: pointer;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-size: 1.2rem;
+ line-height: 1;
 }
 
 .image-info {
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+ padding: 0.5rem;
+ display: flex;
+ flex-direction: column;
+ gap: 0.2rem;
 }
 
 .image-name {
-  font-size: 0.8rem;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+ font-size: 0.8rem;
+ font-weight: 500;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
 }
 
 .image-size {
-  font-size: 0.7rem;
-  color: #666;
+ font-size: 0.7rem;
+ color: #666;
 }
 
 /* 태그 입력 */
 .tag-input-container {
-  display: flex;
-  gap: 0.5rem;
+ display: flex;
+ gap: 0.5rem;
 }
 
 .tag-input {
-  flex: 1;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 0.9rem;
+ flex: 1;
+ padding: 0.8rem;
+ border: 1px solid #ddd;
+ border-radius: 8px;
+ font-size: 0.9rem;
 }
 
 .tag-add-btn {
-  padding: 0.8rem 1rem;
-  background-color: #9581e8;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
+ padding: 0.8rem 1rem;
+ background: linear-gradient(135deg, #2172ce 0%, #2c88f1 100%);
+ color: white;
+ border: none;
+ border-radius: 8px;
+ cursor: pointer;
+ font-size: 0.9rem;
+ transition: all 0.3s ease;
+ box-shadow: 0 8px 20px rgba(33, 114, 206, 0.25);
+ position: relative;
+ overflow: hidden;
+ z-index: 1;
+}
+
+.tag-add-btn::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 0%;
+ height: 100%;
+ background: linear-gradient(135deg, #2c88f1 0%, #2172ce 100%);
+ transition: width 0.5s ease;
+ z-index: -1;
+ border-radius: 8px;
+}
+
+.tag-add-btn:hover {
+ transform: translateY(-3px);
+ box-shadow: 0 10px 25px rgba(33, 114, 206, 0.35);
+}
+
+.tag-add-btn:hover::before {
+ width: 100%;
 }
 
 .tag-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+ display: flex;
+ flex-wrap: wrap;
+ gap: 0.5rem;
+ margin-top: 0.5rem;
 }
 
 .tag-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background-color: #f0f4ff;
-  color: #9581e8;
-  padding: 0.3rem 0.6rem;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  font-weight: 500;
+ display: inline-flex;
+ align-items: center;
+ gap: 0.3rem;
+ background-color: #f0f4ff;
+ color: #2172ce;
+ padding: 0.3rem 0.6rem;
+ border-radius: 15px;
+ font-size: 0.8rem;
+ font-weight: 500;
 }
 
 .tag-remove-btn {
-  background: none;
-  border: none;
-  color: #9581e8;
-  cursor: pointer;
-  font-size: 1rem;
-  line-height: 1;
-  padding: 0;
-  margin-left: 0.2rem;
+ background: none;
+ border: none;
+ color: #2172ce;
+ cursor: pointer;
+ font-size: 1rem;
+ line-height: 1;
+ padding: 0;
+ margin-left: 0.2rem;
 }
 
 .tag-help {
-  font-size: 0.8rem;
-  color: #666;
-  margin-top: 0.3rem;
+ font-size: 0.8rem;
+ color: #666;
+ margin-top: 0.3rem;
 }
 
 /* 체크박스 */
 .checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-weight: normal;
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
+ cursor: pointer;
+ font-weight: normal;
 }
 
 .form-checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+ width: 18px;
+ height: 18px;
+ cursor: pointer;
+}
+
+/* 로딩 및 에러 스타일 */
+.loading-indicator {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+ padding: 4rem;
+ color: #666;
+}
+
+.spinner {
+ width: 40px;
+ height: 40px;
+ border: 4px solid #f3f3f3;
+ border-top: 4px solid #2172ce;
+ border-radius: 50%;
+ animation: spin 1s linear infinite;
+ margin-bottom: 1rem;
+}
+
+@keyframes spin {
+ 0% { transform: rotate(0deg); }
+ 100% { transform: rotate(360deg); }
+}
+
+.error-message {
+ text-align: center;
+ padding: 3rem;
+ color: #e74c3c;
+ background-color: rgba(231, 76, 60, 0.1);
+ border-radius: 10px;
+ margin-bottom: 2rem;
 }
 
 /* 반응형 디자인 */
 @media (max-width: 1024px) {
-  .travel-container {
-    padding: 2rem 2rem;
-  }
-  
-  .write-container {
-    padding: 1.5rem;
-  }
+ .travel-container {
+   padding: 2rem 2rem;
+ }
+ 
+ .write-container {
+   padding: 1.5rem;
+ }
 }
 
 @media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-  }
-  
-  .menu-items {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-  
-  .login-section {
-    margin-top: 0.5rem;
-  }
-  
-  .write-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-  
-  .write-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
-  
-  .tag-input-container {
-    flex-direction: column;
-  }
-  
-  .image-preview-container {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
+ .header {
+   flex-direction: column;
+   gap: 1rem;
+   padding: 1rem;
+ }
+ 
+ .menu-items {
+   width: 100%;
+   justify-content: center;
+   flex-wrap: wrap;
+   gap: 1rem;
+ }
+ 
+ .login-section {
+   margin-top: 0.5rem;
+ }
+ 
+ .write-header {
+   flex-direction: column;
+   gap: 1rem;
+   align-items: flex-start;
+ }
+ 
+ .write-actions {
+   width: 100%;
+   justify-content: flex-end;
+ }
+ 
+ .tag-input-container {
+   flex-direction: column;
+ }
+ 
+ .image-preview-container {
+   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+ }
 }
 </style>

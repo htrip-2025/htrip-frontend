@@ -409,6 +409,7 @@ onMounted(() => {
  padding: 0;
  box-sizing: border-box;
  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+ font-family: 'LeeSeoyun';
 }
 
 .travel-container {

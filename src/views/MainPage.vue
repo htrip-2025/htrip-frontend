@@ -6,12 +6,14 @@
     <section class="hero-section">
       <div class="hero-content">
         <br>
-        <p class="hero-subtitle">The vacation you deserve is closer than you think </p>
+        <!-- <p class="hero-subtitle">The vacation you deserve is closer than you think </p> -->
         <h1 class="hero-title">
             <br>
             <br>
-          Since I was born <br>
-          I traveled to Korea<br>
+            <br>
+           국내 여행, 더 스마트하게. <br>
+          AI가 당신의 여정을 디자인합니다.<br>
+         
         </h1>
 
         <!-- 계획 시작하기 버튼 - 왼쪽 정렬로 변경 -->
@@ -130,6 +132,7 @@ const scrollRight = () => {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
+    font-family: 'LeeSeoyun';
 }
 
 /* 전체 컨테이너 */
@@ -177,7 +180,7 @@ const scrollRight = () => {
 }
 
 .hero-title {
-  font-size: 3rem;
+  font-size: 40px;
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 2rem;
@@ -249,6 +252,8 @@ const scrollRight = () => {
 .button-text {
   flex: 1;
   text-align: left; /* 왼쪽 정렬로 변경 */
+   font-family: 'LeeSeoyun';
+   font-size: 20px;
 }
 
 .button-arrow {

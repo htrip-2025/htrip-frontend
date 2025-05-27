@@ -475,7 +475,7 @@ const closeSaveModal = () => {
 
 // 내 계획 페이지로 이동
 const goToMyPlans = () => {
-  router.push('/tripmain');
+  router.push('/mypage');
 };
 
 // 카카오 지도 스크립트 로드
@@ -1559,6 +1559,7 @@ watch(selectedDay, (newDay) => {
   flex: 1;
   display: flex;
   overflow: hidden;
+  font-family: 'LeeSeoyun';
 }
 
 /* 왼쪽 계획 패널 */
@@ -1570,6 +1571,7 @@ watch(selectedDay, (newDay) => {
   display: flex;
   flex-direction: column;
   overflow: hidden; /* 전체 패널 오버플로우 숨김 */
+  font-family: 'LeeSeoyun';
 }
 
 /* 날짜 선택 섹션 - 고정 높이 */
@@ -1577,6 +1579,7 @@ watch(selectedDay, (newDay) => {
   padding: 1rem;
   border-bottom: 1px solid #eee;
   flex-shrink: 0; /* 축소되지 않도록 */
+  font-family: 'LeeSeoyun';
 }
 
 .section-title {
@@ -1584,6 +1587,7 @@ watch(selectedDay, (newDay) => {
   font-weight: 600;
   color: #333;
   margin-bottom: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .date-inputs {
@@ -1591,6 +1595,7 @@ watch(selectedDay, (newDay) => {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .date-input-group {
@@ -1598,12 +1603,14 @@ watch(selectedDay, (newDay) => {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  font-family: 'LeeSeoyun';
 }
 
 .date-input-group label {
   font-size: 0.8rem;
   color: #666;
   font-weight: 500;
+  font-family: 'LeeSeoyun';
 }
 
 .date-input-group input {
@@ -1611,12 +1618,14 @@ watch(selectedDay, (newDay) => {
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 0.9rem;
+  font-family: 'LeeSeoyun';
 }
 
 .date-divider {
   color: #666;
   margin-top: 1rem;
   font-size: 1.2rem;
+  font-family: 'LeeSeoyun';
 }
 
 /* 날짜 탭 - 고정 높이 */
@@ -1630,6 +1639,7 @@ watch(selectedDay, (newDay) => {
   position: sticky; /* 스크롤 시에도 고정 */
   top: 0;
   z-index: 10;
+  font-family: 'LeeSeoyun';
 }
 
 .date-tab {
@@ -1647,21 +1657,25 @@ watch(selectedDay, (newDay) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: 'LeeSeoyun';
 }
 
 /* 날짜 탭 스크롤바 스타일링 */
 .date-tabs::-webkit-scrollbar {
   height: 4px;
+  font-family: 'LeeSeoyun';
 }
 
 .date-tabs::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 2px;
+  font-family: 'LeeSeoyun';
 }
 
 .date-tabs::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 2px;
+  font-family: 'LeeSeoyun';
 }
 
 .date-tabs::-webkit-scrollbar-thumb:hover {
@@ -1677,6 +1691,7 @@ watch(selectedDay, (newDay) => {
   font-size: 0.75rem;
   margin-top: 0.2rem;
   color: #999;
+  font-family: 'LeeSeoyun';
 }
 
 .date-tab.active .day-date {
@@ -1689,6 +1704,7 @@ watch(selectedDay, (newDay) => {
   padding: 1rem;
   overflow-y: auto; /* 세로 스크롤 가능 */
   min-height: 0; /* flex item이 축소될 수 있도록 */
+  font-family: 'LeeSeoyun';
 }
 
 /* 스크롤바 스타일링 */
@@ -1722,6 +1738,7 @@ watch(selectedDay, (newDay) => {
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  font-family: 'LeeSeoyun';
 }
 
 .place-item:hover {
@@ -1742,9 +1759,11 @@ watch(selectedDay, (newDay) => {
   font-weight: 700;
   margin-right: 0.8rem;
   flex-shrink: 0;
+  font-family: 'LeeSeoyun';
 }
 
 .place-content {
+    font-family: 'LeeSeoyun';
   flex: 1;
 }
 
@@ -1753,17 +1772,20 @@ watch(selectedDay, (newDay) => {
   font-weight: 600;
   color: #333;
   margin-bottom: 0.3rem;
+  font-family: 'LeeSeoyun';
 }
 
 .place-category {
   font-size: 0.8rem;
   color: #888;
   margin-bottom: 0.5rem;
+  font-family: 'LeeSeoyun';
 }
 
 .place-distance {
   font-size: 0.8rem;
   color: #2172ce;
+  font-family: 'LeeSeoyun';
 }
 
 .remove-place-btn {
@@ -1781,6 +1803,7 @@ watch(selectedDay, (newDay) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'LeeSeoyun';
 }
 
 /* 장소 추가 버튼 컨테이너 - 하단 고정 */
@@ -1791,6 +1814,7 @@ watch(selectedDay, (newDay) => {
   background-color: #fff;
   border-top: 1px solid #f0f0f0;
   margin-top: auto;
+  font-family: 'LeeSeoyun';
 }
 
 .add-place-button {
@@ -1811,6 +1835,7 @@ watch(selectedDay, (newDay) => {
   position: relative;
   overflow: hidden;
   z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .add-place-button::before {
@@ -1868,6 +1893,7 @@ watch(selectedDay, (newDay) => {
   padding: 2rem;
   border-radius: 8px;
   text-align: center;
+  font-family: 'LeeSeoyun';
 }
 
 .retry-btn {
@@ -1882,6 +1908,7 @@ watch(selectedDay, (newDay) => {
   position: relative;
   overflow: hidden;
   z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .retry-btn::before {
@@ -1918,6 +1945,7 @@ watch(selectedDay, (newDay) => {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  font-family: 'LeeSeoyun';
 }
 
 .modal-content {
@@ -1930,6 +1958,7 @@ watch(selectedDay, (newDay) => {
   display: flex;
   flex-direction: column;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  font-family: 'LeeSeoyun';
 }
 
 .modal-header {
@@ -1939,12 +1968,14 @@ watch(selectedDay, (newDay) => {
   padding: 1.5rem;
   border-bottom: 1px solid #eee;
   background-color: #f8f9fa;
+  font-family: 'LeeSeoyun';
 }
 
-.modal-header h3 {
+.modal-header h2 {
   font-size: 1.3rem;
   font-weight: 600;
   color: #333;
+  font-family: 'LeeSeoyun';
 }
 
 .close-button {
@@ -1960,6 +1991,7 @@ watch(selectedDay, (newDay) => {
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s;
+  font-family: 'LeeSeoyun';
 }
 
 .close-button:hover {
@@ -1971,12 +2003,14 @@ watch(selectedDay, (newDay) => {
   padding: 1.5rem;
   border-bottom: 1px solid #eee;
   background-color: #fafafa;
+  font-family: 'LeeSeoyun';
 }
 
 .filter-row {
   display: flex;
   gap: 1rem;
   margin-bottom: 0;
+  font-family: 'LeeSeoyun';
 }
 
 .filter-group {
@@ -1984,12 +2018,14 @@ watch(selectedDay, (newDay) => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  font-family: 'LeeSeoyun';
 }
 
 .filter-group label {
   font-size: 0.9rem;
   font-weight: 500;
   color: #555;
+  font-family: 'LeeSeoyun';
 }
 
 .filter-select {
@@ -2000,6 +2036,7 @@ watch(selectedDay, (newDay) => {
   background-color: white;
   cursor: pointer;
   transition: border-color 0.2s;
+  font-family: 'LeeSeoyun';
 }
 
 .filter-select:focus {
@@ -2021,6 +2058,7 @@ watch(selectedDay, (newDay) => {
   padding: 1.5rem;
   gap: 0.8rem;
   border-bottom: 1px solid #eee;
+  font-family: 'LeeSeoyun';
 }
 
 .modal-search-input {
@@ -2030,6 +2068,7 @@ watch(selectedDay, (newDay) => {
   border-radius: 6px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  font-family: 'LeeSeoyun';
 }
 
 .modal-search-input:focus {
@@ -2052,6 +2091,7 @@ watch(selectedDay, (newDay) => {
   position: relative;
   overflow: hidden;
   z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .modal-search-button::before {
@@ -2090,6 +2130,7 @@ watch(selectedDay, (newDay) => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .loading {
@@ -2174,6 +2215,7 @@ watch(selectedDay, (newDay) => {
 
 .modal-result-content {
   flex: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .modal-result-name {
@@ -2182,6 +2224,7 @@ watch(selectedDay, (newDay) => {
   color: #333;
   margin-bottom: 0.5rem;
   line-height: 1.2;
+  font-family: 'LeeSeoyun';
 }
 
 .modal-result-category {
@@ -2192,6 +2235,7 @@ watch(selectedDay, (newDay) => {
   align-items: flex-start;
   gap: 0.5rem;
   flex-wrap: wrap;
+  font-family: 'LeeSeoyun';
 }
 
 .category-badge {
@@ -2202,11 +2246,13 @@ watch(selectedDay, (newDay) => {
   font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
+  font-family: 'LeeSeoyun';
 }
 
 .modal-result-phone {
   font-size: 0.8rem;
   color: #2ecc71;
+  font-family: 'LeeSeoyun';
 }
 
 .add-place-icon {
@@ -2224,6 +2270,7 @@ watch(selectedDay, (newDay) => {
   font-size: 1.2rem;
   font-weight: 600;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: 'LeeSeoyun';
 }
 
 /* 미디어 쿼리 */
@@ -2285,11 +2332,13 @@ watch(selectedDay, (newDay) => {
   font-weight: bold;
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: 'LeeSeoyun';
 }
 
 .map-info-window {
   padding: 8px 12px;
   max-width: 200px;
+  font-family: 'LeeSeoyun';
 }
 
 .info-title {
@@ -2297,12 +2346,14 @@ watch(selectedDay, (newDay) => {
   color: #333;
   margin-bottom: 4px;
   font-size: 14px;
+  font-family: 'LeeSeoyun';
 }
 
 .info-address {
   font-size: 12px;
   color: #666;
   line-height: 1.3;
+  font-family: 'LeeSeoyun';
 }
 
 /* 헤더 섹션 스타일 */
@@ -2311,6 +2362,7 @@ watch(selectedDay, (newDay) => {
   border-bottom: 1px solid #eee;
   padding: 1rem 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-family: 'LeeSeoyun';
 }
 
 .plan-title-section {
@@ -2320,6 +2372,7 @@ watch(selectedDay, (newDay) => {
   max-width: 1550px;
   margin: 0 auto;
   gap: 20px; 
+  font-family: 'LeeSeoyun';
 }
 
 .plan-title-input {
@@ -2332,6 +2385,7 @@ watch(selectedDay, (newDay) => {
   padding: 0.5rem 1rem;
   border-radius: 8px;
   transition: all 0.3s ease;
+  font-family: 'LeeSeoyun';
 }
 
 .plan-title-input:focus {
@@ -2349,7 +2403,7 @@ watch(selectedDay, (newDay) => {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-
+font-family: 'LeeSeoyun';
 }
 
 .public-option {
@@ -2359,12 +2413,14 @@ watch(selectedDay, (newDay) => {
   cursor: pointer;
   font-size: 0.95rem;
   color: #666;
+  font-family: 'LeeSeoyun';
 }
 
 .public-option input[type="checkbox"] {
   width: 18px;
   height: 18px;
   accent-color: #2172ce;
+  
 }
 
 .save-plan-button {
@@ -2385,6 +2441,7 @@ watch(selectedDay, (newDay) => {
   position: relative;
   overflow: hidden;
   z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .save-plan-button::before {
@@ -2398,6 +2455,7 @@ watch(selectedDay, (newDay) => {
   transition: width 0.5s ease;
   z-index: -1;
   border-radius: 8px;
+
 }
 
 .save-plan-button:hover:not(:disabled) {
@@ -2428,6 +2486,7 @@ watch(selectedDay, (newDay) => {
   border-top: 2px solid white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  font-family: 'LeeSeoyun';
 }
 
 /* 저장 모달 스타일 */
@@ -2443,6 +2502,7 @@ watch(selectedDay, (newDay) => {
   justify-content: center;
   z-index: 2000;
   backdrop-filter: blur(4px);
+  font-family: 'LeeSeoyun';
 }
 
 .save-modal-content {
@@ -2454,6 +2514,7 @@ watch(selectedDay, (newDay) => {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   transform: scale(0.9);
   animation: modalAppear 0.3s ease forwards;
+  font-family: 'LeeSeoyun';
 }
 
 @keyframes modalAppear {
@@ -2469,12 +2530,14 @@ watch(selectedDay, (newDay) => {
   padding: 1.5rem;
   background-color: #f8f9fa;
   border-bottom: 1px solid #eee;
+  font-family: 'LeeSeoyun';
 }
 
-.save-modal-header h3 {
+.save-modal-header h2 {
   font-size: 1.2rem;
   font-weight: 600;
   color: #333;
+  font-family: 'LeeSeoyun';
 }
 
 .save-modal-body {
@@ -2487,11 +2550,13 @@ watch(selectedDay, (newDay) => {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .success-icon, .error-icon {
   font-size: 3rem;
   margin-bottom: 0.5rem;
+  font-family: 'LeeSeoyun';
 }
 
 .success-message p, .error-message p {
@@ -2499,6 +2564,7 @@ watch(selectedDay, (newDay) => {
   color: #333;
   line-height: 1.5;
   margin-bottom: 1rem;
+  font-family: 'LeeSeoyun';
 }
 
 .ok-button {
@@ -2514,6 +2580,7 @@ watch(selectedDay, (newDay) => {
   position: relative;
   overflow: hidden;
   z-index: 1;
+  font-family: 'LeeSeoyun';
 }
 
 .ok-button::before {
@@ -2527,6 +2594,7 @@ watch(selectedDay, (newDay) => {
   transition: width 0.5s ease;
   z-index: -1;
   border-radius: 8px;
+  font-family: 'LeeSeoyun';
 }
 
 .ok-button:hover {
@@ -2576,6 +2644,7 @@ watch(selectedDay, (newDay) => {
   .save-plan-button {
     padding: 0.7rem 1.2rem;
     font-size: 0.9rem;
+    font-family: 'LeeSeoyun';
   }
 }
 </style>
