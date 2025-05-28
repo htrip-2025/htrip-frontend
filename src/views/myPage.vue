@@ -1196,7 +1196,7 @@ const deleteSelected = async (type) => {
        case 'plans':
          return api.delete(`/api/plan/${id}`);
        case 'reviews':
-         return api.delete(`/api/reviews/${id}`);
+         return api.delete(`/api/review/${id}`);
        case 'posts':
          return api.delete(`/api/board/${id}`);
        case 'comments':
